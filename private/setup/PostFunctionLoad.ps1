@@ -7,15 +7,21 @@ if($Env:SPMTools_TestMode -ne 1) {
     $script:Config = $null
     $FirstRun = $false
 
-    $DefaultConfig = Read-ModuleConfiguration -ConfigFilePath "$PSScriptRoot\private\module\config.default.json"
+    $DefaultConfig = Get-Content -Path "$PSScriptRoot\config.default.json" | ConvertFrom-Json | ConvertTo-HashTable
 
     $Cache = @{}
         
-
+    if(!(Test-Path -Path $Script:ConfigLocation.Replace('\config.json',''))) {
+        Try {
+            New-Item -ItemType Directory -Path $Script:ConfigLocation.Replace('\config.json','')
+        }
+        Catch {
+            Throw $_
+        }
+    }
     if (!(Test-Path -Path $Script:ConfigLocation)) {
         #Config file is missing, Write a new one.
         Try {
-            New-Item -ItemType Directory -Path $Script:ConfigLocation.Replace('\config.json','')
             $Script:Config = $DefaultConfig
             Write-ModuleConfiguration
             $FirstRun = $true

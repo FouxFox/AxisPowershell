@@ -2,7 +2,10 @@ Function Read-ModuleConfiguration {
     [cmdletBinding()] 
     Param(
         [Parameter(Mandatory=$false)]
-        [string]$ConfigFilePath=$Script:ConfigLocation
+        [string]$ConfigFilePath=$Script:ConfigLocation,
+
+        [Parameter(Mandatory=$false)]
+        [Switch]$NoBackup
     )
     
     $Obj = Get-Content -Path $ConfigFilePath | ConvertFrom-Json
@@ -11,8 +14,10 @@ Function Read-ModuleConfiguration {
 
     if($ParsedConfig) {
         $script:Config = $ParsedConfig
-        Write-ModuleConfiguration -ConfigFilePath $Script:BackupConfigLocation
-        Write-Verbose "Writing copy to $Script:BackupConfigLocation"
+        if(!$NoBackup) {
+            Write-ModuleConfiguration -ConfigFilePath $Script:BackupConfigLocation
+            Write-Verbose "Writing copy to $Script:BackupConfigLocation"
+        }
     }
 
     <#

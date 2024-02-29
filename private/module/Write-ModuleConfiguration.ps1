@@ -26,6 +26,11 @@ Function Write-ModuleConfiguration {
     }
 
     if(!$OverwriteMessage -or $Answer) {
-        $script:Config | ConvertTo-Json -Depth 5 | Out-File -FilePath $ConfigFilePath -Force -Confirm:$false
+        #Sanatize the Credential
+        $ConfigToWrite = $script:Config
+        if($ConfigToWrite.ContainsKey('Credential')) {
+            $ConfigToWrite.Credential = ''
+        }
+        $ConfigToWrite | ConvertTo-Json -Depth 5 | Out-File -FilePath $ConfigFilePath -Force -Confirm:$false
     }
 }

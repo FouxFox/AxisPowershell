@@ -4,8 +4,7 @@
     GUID = '072c1e6d-39ea-4620-88b4-52d3a1156541'
     Author = 'Matt Small'
     Copyright = '(c) Matt Small. All rights reserved.'
-    Description = @'
-'@
+    Description = "A module for managing Axis devices."
     PowerShellVersion = '3.0'
     #FormatsToProcess = ''
     FunctionsToExport = @(
@@ -35,14 +34,9 @@
     FileList = @(
         'PSModule.psm1'
     )
-    RequiredModules = @(
-        @{
-            ModuleName='CredentialManager'
-            ModuleVersion='2.0'
-        }
-    )
+    RequiredModules = @()
     HelpInfoURI = 'https://github.com/AbelFox/SPMTools/blob/master/README.md'
-    ModuleVersion = '1.1.1'
+    ModuleVersion = '0.1.0'
     PrivateData = @{
         PSData = @{
             Tags = @(
