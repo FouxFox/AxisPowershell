@@ -5,5 +5,5 @@ function Set-AxisCredential {
         [PSCredential]$Credential
     )
 
-    $AxisAPI.Credential = $Credential
+    $Config.Credential = $Credential
 }

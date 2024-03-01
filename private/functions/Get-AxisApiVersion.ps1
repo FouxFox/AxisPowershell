@@ -1,4 +1,4 @@
-function Get-AxisAPIVersion {
+function Get-ConfigVersion {
     [cmdletbinding()]
     Param(
         [Parameter(Mandatory=$true)]
@@ -9,21 +9,21 @@ function Get-AxisAPIVersion {
     )
 
     #Populate Cache if needed
-    if(!$AxisAPI.Cache.ContainsKey($Device)) {
-        $AxisAPI.Cache.Add($Device,@{})
+    if(!$Cache.ContainsKey($Device)) {
+        $Cache.Add($Device,@{})
     }
 
-    if(!$AxisAPI.Cache.$Device.ContainsKey("APIs")) {
-        $AxisAPI.Cache.$Device.Add("APIs",@{})
+    if(!$Cache.$Device.ContainsKey("APIs")) {
+        $Cache.$Device.Add("APIs",@{})
         (Get-AxisAvailableAPIs -Device $Device) | ForEach-Object {
-            $AxisAPI.Cache.$Device.APIs.Add($_.id,$_)
+            $Cache.$Device.APIs.Add($_.id,$_)
         }
     }
 
-    if(!$AxisAPI.Cache.$Device.APIs.ContainsKey($API)) {
+    if(!$Cache.$Device.APIs.ContainsKey($API)) {
         Throw "Command not supported on this device"
     }
 
 
-    return $AxisAPI.Cache.$Device.APIs.$API.version
+    return $Cache.$Device.APIs.$API.version
 }

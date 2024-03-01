@@ -8,10 +8,23 @@ function Set-CertificateValidation {
         [Switch]$Disable
     )
 
-    if ($Enabled) {
+    if ($Enable) {
         [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
     }
-    if ($Disabled) {
-        [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$false}
+    if ($Disable) {
+        # This does not work
+        #[System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$false}
+        add-type @"
+            using System.Net;
+            using System.Security.Cryptography.X509Certificates;
+            public class TrustAllCertsPolicy : ICertificatePolicy {
+                public bool CheckValidationResult(
+                    ServicePoint srvPoint, X509Certificate certificate,
+                    WebRequest request, int certificateProblem) {
+                    return true;
+                }
+            }
+"@
+        [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
     }
 }

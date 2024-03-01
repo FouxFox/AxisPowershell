@@ -9,7 +9,7 @@ function New-AxisRecordingProfile {
     if($SDCard) {
         $URIString += "diskid=SD_DISK&"
     }
-    $URIString += "options=$($AxisAPI.RecordingParams.Replace('=','%3D'))"
+    $URIString += "options=$($Config.RecordingParams.Replace('=','%3D'))"
 
     $Param = @{
         Device = $Device

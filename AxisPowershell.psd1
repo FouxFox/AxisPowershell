@@ -36,7 +36,7 @@
     )
     RequiredModules = @()
     HelpInfoURI = 'https://github.com/AbelFox/SPMTools/blob/master/README.md'
-    ModuleVersion = '0.1.0'
+    ModuleVersion = '0.1.1'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -45,7 +45,9 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'    
-    ## 0.1
+## 0.1.1 
+    * Fixed issues with port from inital script
+## 0.1.0
     * First Release
     * May be buggy, but shouldn't break anything as all cmdlets only connect to things.
 '@
