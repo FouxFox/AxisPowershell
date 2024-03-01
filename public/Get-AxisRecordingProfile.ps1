@@ -1,3 +1,23 @@
+<#
+.SYNOPSIS
+Retrieves the recording profiles for an Axis device.
+
+.DESCRIPTION
+The Get-AxisRecordingProfile function retrieves the recording profiles for a specified Axis device.
+Each recording profile represents a recording destination and parameters for the recording.
+These profiles are independent of the Stream profiles and are used for recording video to the SD Card.
+
+.PARAMETER Device
+Specifies the IP address or hostname of the Axis device.
+
+.EXAMPLE
+Get-AxisRecordingProfile -Device "192.168.1.100"
+
+id Disk    videocodec
+-- ----    ----------
+10 SD_DISK h265
+
+#>
 function Get-AxisRecordingProfile {
     [cmdletbinding()]
     Param(

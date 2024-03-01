@@ -1,20 +1,26 @@
 <#
 .SYNOPSIS
-Enables DNS update for an Axis device.
+Enables the Dynamic DNS update functionality for an Axis device.
 
 .DESCRIPTION
-The Enable-AxisDNSUpdate function enables DNS update for an Axis device by updating the device's configuration and forcing a DNS update.
+The Enable-AxisDNSUpdate function configures the Axis device to periodically send DNS updates to the DNS server. 
+This allows the device to be accessed by a hostname instead of an IP address.
+
+The function also forces a DNS update to ensure the hostname is immediately available though on older models this may not be supported.
 
 .PARAMETER Device
-The name or IP address of the Axis device.
+The hostname or IP address of the Axis device.
 
 .PARAMETER Hostname
-The hostname to be updated in the DNS.
+The hostname to be updated in the DNS. 
+If no hostname is provided, the serail number of the device is used in the following format:
+axis-<SerialNumber>.sec.aa
 
 .EXAMPLE
-Enable-AxisDNSUpdate -Device "192.168.1.100" -Hostname "axis-camera"
+Enable-AxisDNSUpdate -Device "192.168.1.100" -Hostname "axis-camera.sec.aa"
 
-This example enables DNS update for the Axis device with the IP address "192.168.1.100" and updates the hostname to "axis-camera".
+Setting Configuration...OK!
+Forcing DNS Update...OK!
 
 #>
 function Enable-AxisDNSUpdate {
@@ -23,14 +29,21 @@ function Enable-AxisDNSUpdate {
         [Parameter(Mandatory=$true)]
         [String]$Device,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [String]$Hostname
     )
+
+    if(!$Hostname) {
+        $NewHostName = "axis-$((Get-AxisDeviceInfo -Device $Device).SerialNumber).sec.aa"
+    }
+    else {
+        $NewHostName = $Hostname
+    }
 
     #Update Configuration
     $Param = @{
         Device = $Device
-        Path = "/axis-cgi/param.cgi?action=update&Network.DNSUpdate.DNSName=$Hostname&Network.DNSUpdate.Enabled=yes"
+        Path = "/axis-cgi/param.cgi?action=update&Network.DNSUpdate.DNSName=$NewHostname&Network.DNSUpdate.Enabled=yes"
     }
 
     Write-Host "$($Device): Setting Configuration..." -NoNewline
@@ -54,7 +67,7 @@ function Enable-AxisDNSUpdate {
         $null = Invoke-AxisWebApi @Param 
         Write-Host -ForegroundColor Green "OK!"
     } Catch {
-        Write-Host -ForegroundColor Red "Failed!"
-        Throw
+        #This functionality is not supported on older devices
+        Write-Host -ForegroundColor Yellow "Failed Successfully!"
     }
 }

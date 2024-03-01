@@ -1,3 +1,29 @@
+<#
+.SYNOPSIS
+Retrieves the recording support information for an Axis device.
+
+.DESCRIPTION
+The Get-AxisRecordingSupport function retrieves the supported recording features for an Axis device.
+
+.PARAMETER Device
+Specifies the hostname or IP address of the Axis device.
+
+.EXAMPLE
+Get-AxisRecordingSupport -Device "192.168.1.100"
+
+AutoRepair                       : True
+ContinuousRecording              : True
+DiskEncryption                   : True
+DiskHealth                       : True
+ExportRecording                  : True
+FailOverRecording                : True
+LocalStorage                     : True
+RequiredFileSystem               : True
+SDCard                           : True
+StorageLimit                     : True
+NbrOfContinuousRecordingProfiles : 1
+#>
+
 function Get-AxisRecordingSupport {
     [cmdletbinding()]
     Param(

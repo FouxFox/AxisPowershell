@@ -12,7 +12,6 @@ Specifies the name or IP address of the Axis device.
 
 .EXAMPLE
 Disable-AxisUnusedViews -Device "192.168.0.100"
-Disables unused camera views on the Axis device with the IP address "192.168.0.100".
 
 .NOTES
 This function only supports models defined in the $Config.DisableCameraViews hashtable.

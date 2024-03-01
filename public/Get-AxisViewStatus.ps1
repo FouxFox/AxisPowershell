@@ -1,3 +1,24 @@
+<#
+.SYNOPSIS
+Retrieves the status of Axis camera views.
+
+.DESCRIPTION
+The Get-AxisViewStatus function retrieves the status of Axis camera views. 
+Each View represents a lens or multiplexed output on the camera.
+Some views should be disabled to save bandwidth and storage space.
+
+.PARAMETER Device
+Specifies the IP address or hostname of the Axis camera.
+
+.EXAMPLE
+Get-AxisViewStatus -Device "192.168.1.100"
+
+Id Name        Enabled
+-- ----        -------
+I0 View Area 1 yes
+I1 View Area 2 no
+
+#>
 function Get-AxisViewStatus {
     [cmdletbinding()]
     Param(
@@ -40,5 +61,5 @@ function Get-AxisViewStatus {
     }
 
     #Echo back 
-    $Parsed.Values
+    return $Parsed.Values | Sort-Object Id
 }

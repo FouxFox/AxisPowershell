@@ -1,4 +1,4 @@
-function Get-ConfigVersion {
+function Get-AxisApiVersion {
     [cmdletbinding()]
     Param(
         [Parameter(Mandatory=$true)]
