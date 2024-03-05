@@ -7,7 +7,7 @@ The New-AxisRecordingProfile function creates a new recording profile for an Axi
 Each recording profile represents a LOCAL recording destination and parameters for the recording.
 
 Recording Parameters are pulled from the stored client configuration.
-For more information on the recording parameters, see Get-AxisPSConfig
+For more information on the recording parameters, see Get-AxisPSRecordingProfile
 
 .PARAMETER Device
 The IP address or hostname of the Axis device.

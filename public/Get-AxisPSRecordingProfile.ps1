@@ -14,15 +14,6 @@ function Get-AxisPSRecordingProfile {
     [cmdletbinding()]
     Param()
     
-    <#
-    videocodec         : h265
-    fps                : 30
-    compression        : 30
-    videozstrength     : 20
-    videozgopmode      : dynamic
-    videozmaxgoplength : 1023
-    videozprofile      : storage
-    #>
     $translationList = @{
         'videocodec' = 'Video Codec'
         'fps' = 'FPS'

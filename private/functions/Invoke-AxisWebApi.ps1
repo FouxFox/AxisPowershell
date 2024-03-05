@@ -101,11 +101,14 @@ function Invoke-AxisWebApi {
         $Param.Add('InFile',$InFile)
     }
 
+    Write-Verbose "$($Param.Method) $($Param.Uri)"
+
     #Unsafe header Parsing as older devices can commit porotocol violations
     #Disable Certificate Validation as the user may try to connect to devices with invalid addresses
     Set-UseUnsafeHeaderParsing -Disable
     Set-CertificateValidation -Disable
 
+    $ConnectionError = $false
     $Connected = $false
     Try {
         $response = Invoke-RestMethod @Param
@@ -123,6 +126,7 @@ function Invoke-AxisWebApi {
         }
         Catch {
             Write-Verbose "Failed to connect to $Device using HTTP"
+            $ConnectionError = $_
         }
     }
 
@@ -131,7 +135,7 @@ function Invoke-AxisWebApi {
     #Set-CertificateValidation -Enable
 
     if(!$Connected) {
-        ThrowError "Failed to connect to $Device using HTTP or HTTPS"
+        Throw $ConnectionError
     }
 
     return $response

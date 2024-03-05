@@ -24,6 +24,7 @@
         'Initialize-AxisDevice'
         'New-AxisRecordingProfile'
         'Provision-AxisDevice'
+        'Remove-AxisRecordingProfile'
         'Set-AxisCredential'
         'Set-AxisIPAddress'
         'Set-AxisServices'

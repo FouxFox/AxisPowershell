@@ -1,5 +1,7 @@
 #Content here runs after all functions are loaded
-if($Env:SPMTools_TestMode -ne 1) {
+$Cache = @{}
+
+if($Env:ModuleTools_TestMode -ne 1) {
     $ModuleVersion = $Script:ModuleData.ModuleVersion
     $SchemaVersion = Get-ModuleSchemaVersion -Version $ModuleVersion -ErrorAction Stop
     $Script:ConfigLocation = "$($env:APPDATA)\.powershell\AxisPowershell\config.json"
@@ -8,8 +10,6 @@ if($Env:SPMTools_TestMode -ne 1) {
     $FirstRun = $false
 
     $DefaultConfig = Get-Content -Path "$PSScriptRoot\config.default.json" | ConvertFrom-Json | ConvertTo-HashTable
-
-    $Cache = @{}
         
     if(!(Test-Path -Path $Script:ConfigLocation.Replace('\config.json',''))) {
         Try {

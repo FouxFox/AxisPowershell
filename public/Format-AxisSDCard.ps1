@@ -1,4 +1,26 @@
-#Needs more testing
+<#
+.SYNOPSIS
+Formats an Axis SD card.
+
+.DESCRIPTION
+The Format-AxisSDCard function is used to format an Axis SD card.
+ALL DATA WILL BE ERASED FROM THE SD CARD.
+
+.PARAMETER Device
+The hostname or IP address of the Axis device.
+
+.PARAMETER Wait
+Indicates whether to wait for the formatting process to complete before returning. 
+If this switch is not specified, the function will return immediately after starting the formatting process.
+
+.EXAMPLE
+Format-AxisSDCard -Device "C:\SDCard" -Wait
+Formats the SD card and displays progress.
+
+.EXAMPLE
+Format-AxisSDCard -Device "C:\SDCard"
+Returns immediately after starting the formatting process.
+#>
 function Format-AxisSDCard {
     [cmdletbinding()]
     Param(
@@ -9,12 +31,22 @@ function Format-AxisSDCard {
         [Switch]$Wait
     )
 
+    Write-Host "Unmounting Disk..."
+    $Param = @{
+        Device = $Device
+        Path = "/axis-cgi/disks/mount.cgi?diskid=SD_DISK&action=unmount"
+    }
+    $result = Invoke-AxisWebApi @Param
+
+    if($result.root.job.result -ne 'OK') {
+        Throw "Could not format: $($result.root.job.result)"
+    }
+
+    Write-Host "Starting Fromat..."
     $Param = @{
         Device = $Device
         Path = "/axis-cgi/disks/format.cgi?diskid=SD_DISK&filesystem=ext4"
     }
-
-    #Start Format
     $result = Invoke-AxisWebApi @Param
 
     if($result.root.job.result -ne 'OK') {
@@ -31,13 +63,16 @@ function Format-AxisSDCard {
         Device = $Device
         Path = "/axis-cgi/disks/job.cgi?jobid=$($JobID)&diskid=SD_DISK"
     }
-    $Job = Invoke-AxisWebApi @Param
+    $Job = @{ progress = 0 }
     while($Job.progress -ne 100) {
+        $Job = (Invoke-AxisWebApi @Param).root.job
         $ProgParam = @{
-            Activity = "Formatting SD Card..."
+            Activity = "Formatting SD Card...$($job.progress)%"
             Status = "Press Ctrl-C to return to prompt" 
-            PercentComplete = $Job.progress/100
+            PercentComplete = $Job.progress
         }
-        Write-Progress $ProgParam
+        Write-Progress @ProgParam
+        Write-Verbose $job.progress
+        Start-Sleep -Seconds 1
     }
 }

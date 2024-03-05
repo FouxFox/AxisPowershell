@@ -58,7 +58,7 @@ function Enable-AxisDNSUpdate {
     #Force DNS Update
     $Param = @{
         Device = $Device
-        Path = "/axis-cgi/dnsupdate.cgi?add=$Hostname&hdgen=yes"
+        Path = "/axis-cgi/dnsupdate.cgi?add=$NewHostname&hdgen=yes"
         Method = "Get"
     }
     
