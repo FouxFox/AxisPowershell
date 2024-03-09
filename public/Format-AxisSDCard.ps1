@@ -31,7 +31,14 @@ function Format-AxisSDCard {
         [Switch]$Wait
     )
 
-    Write-Host "Unmounting Disk..."
+    $ProgParam = @{
+        Activity = "Formatting SD Card...0%"
+        Status = "Unmounting SD Card..." 
+        PercentComplete = 0
+    }
+    Write-Progress @ProgParam
+
+    #Write-Host -NoNewLine "Unmounting Disk..."
     $Param = @{
         Device = $Device
         Path = "/axis-cgi/disks/mount.cgi?diskid=SD_DISK&action=unmount"
@@ -42,7 +49,10 @@ function Format-AxisSDCard {
         Throw "Could not format: $($result.root.job.result)"
     }
 
-    Write-Host "Starting Fromat..."
+    Start-Sleep -Seconds 5
+    Write-Host -ForegroundColor Green "Done!"
+
+    #rite-Host -NoNewLine "Starting Format..."
     $Param = @{
         Device = $Device
         Path = "/axis-cgi/disks/format.cgi?diskid=SD_DISK&filesystem=ext4"
@@ -54,6 +64,7 @@ function Format-AxisSDCard {
     }
 
     if(!$Wait) {
+        #Write-Host -ForegroundColor Yellow "Started!"
         return
     }
 
@@ -75,4 +86,6 @@ function Format-AxisSDCard {
         Write-Verbose $job.progress
         Start-Sleep -Seconds 1
     }
+
+    #Write-Host -ForegroundColor Green "Done!"
 }

@@ -21,7 +21,10 @@ function New-AxisRecordingProfile {
     [cmdletbinding()]
     Param(
         [Parameter(Mandatory=$true)]
-        [String]$Device
+        [String]$Device,
+
+        [Parameter(Mandatory=$false)]
+        [Switch]$SDCard
     )
 
     $URIString = '?'
@@ -34,5 +37,9 @@ function New-AxisRecordingProfile {
         Device = $Device
         Path = "/axis-cgi/record/continuous/addconfiguration.cgi$URIString"
     }
-    (Invoke-AxisWebApi @Param).root.configure.result
+    $result = (Invoke-AxisWebApi @Param).root.configure.result
+
+    if($result -ne 'OK') {
+        Throw "Unable to add Continuious Recording Profile"
+    }
 }

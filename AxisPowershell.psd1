@@ -29,6 +29,10 @@
         'Set-AxisIPAddress'
         'Set-AxisServices'
         'Set-AxisStorageOptions'
+        'Update-AxisDevice'
+        'Reset-AxisDevice'
+        'Set-AxisPSFactoryConfig'
+        'New-AxisProvisioningJob'
     )
     VariablesToExport = "*"
     AliasesToExport = "*"
@@ -36,8 +40,8 @@
         'PSModule.psm1'
     )
     RequiredModules = @()
-    HelpInfoURI = 'https://github.com/AbelFox/SPMTools/blob/master/README.md'
-    ModuleVersion = '0.1.1'
+    HelpInfoURI = ''
+    ModuleVersion = '0.3.0'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -45,7 +49,9 @@
                 'Windows'
             )
             IsPrerelease = $true
-            ReleaseNotes = @'    
+            ReleaseNotes = @'
+## 0.2.0
+    * Further Bug fixes and readyment for inistal release
 ## 0.1.1 
     * Fixed issues with port from inital script
 ## 0.1.0

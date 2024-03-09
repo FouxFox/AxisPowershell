@@ -50,7 +50,10 @@ function Set-AxisServices {
         [Switch]$UPnP=$false,
 
         [Parameter(Mandatory=$false)]
-        [Switch]$WSDiscovery=$false
+        [Switch]$WSDiscovery=$false,
+
+        [Parameter(Mandatory=$false)]
+        [Switch]$HttpsBasic=$true
     )
 
     $URIString = ''
@@ -58,11 +61,17 @@ function Set-AxisServices {
     $URIString += "&Network.SSH.Enabled=$(if($SSH) {'yes'} else {'no'})"
     $URIString += "&Network.UPnP.Enabled=$(if($UPnP) {'yes'} else {'no'})"
     $URIString += "&WebService.DiscoveryMode.Discoverable=$(if($WSDiscovery) {'yes'} else {'no'})"
+    #Network.HTTP.AuthenticationPolicy=digest
+    #
 
 
     $Param = @{
             Device = $Device
             Path = "/axis-cgi/param.cgi?action=update$($URIString)"
         }
-    Invoke-AxisWebApi @Param
+    $result = Invoke-AxisWebApi @Param
+
+    if($result -ne 'OK') {
+        Throw "Unable to apply Security Settings"
+    }
 }

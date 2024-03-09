@@ -9,8 +9,15 @@ function Update-ModuleConfiguration {
     if(!$Script:Config.ContainsKey('SchemaVersion')) {
         $Script:Config.Add('SchemaVersion','1')
     }
+    if($Script:Config.SchemaVersion -eq 0) {
+        $Script:Config.SchemaVersion = 1
+    }
     if($Script:Config.SchemaVersion -eq 1) {
-        # $Script:Config.SchemaVersion = 2
+        $Script:Config.SchemaVersion = 2
+        $Config.Add('FirmwareFolder', $false)
+    }
+    if($Script:Config.SchemaVersion -eq 2) {
+        # $Script:Config.SchemaVersion = 3
         # reserved for future updates
     }
 

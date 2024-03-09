@@ -81,6 +81,7 @@ function Invoke-AxisWebApi {
         UseBasicParsing = $true
         Uri = "$baseUrl$Path"
         Headers = $RequestHeaders
+        Verbose = $false
     }
 
     if($Config.Credential -eq '' -and !$NoAuth) {

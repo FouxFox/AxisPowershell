@@ -9,5 +9,6 @@
     },
     "RecordingParams":  "videocodec=h265\u0026fps=30\u0026compression=30\u0026videozstrength=20\u0026videozgopmode=dynamic\u0026videozmaxgoplength=1023\u0026videozprofile=storage",
     "CurrentDevice":  false,
+    "FirmwareFolder": false,
     "Credential": ""
 }
