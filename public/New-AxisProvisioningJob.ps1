@@ -28,6 +28,9 @@ function New-AxisProvisioningJob {
     if(!$Config.Credential) {
         Set-AxisCredential
     }
+    if(!$Config.FirmwareFolder) {
+        Set-AxisPSFactoryConfig
+    }
 
     $TargetDevices = @()
     $ModuleString = "AxisPowershell"
@@ -66,7 +69,7 @@ function New-AxisProvisioningJob {
         Import-Module $RuntimeData.ModulePath
         Set-AxisCredential -Credential $RuntimeData.Credential
         "$($RuntimeData.Device.MacAddress)): Starting Provisioning"
-        Provision-AxisDevice -Device $RuntimeData.Device.IPAddress -FactoryPrep
+        Provision-AxisDevice -Device $RuntimeData.Device.IP -FactoryPrep
         "$($RuntimeData.Device.MacAddress)): Complete"
     }
     
@@ -74,7 +77,7 @@ function New-AxisProvisioningJob {
     $jobs = foreach ($Device in $TargetDevices) {
         $RuntimeData = @{
             Device = $Device
-            ModulePath = $TestModuleString
+            ModulePath = $ModuleString
             Credential = $Config.Credential
         }
 
@@ -94,19 +97,23 @@ function New-AxisProvisioningJob {
     while ($jobs.Handle.IsCompleted -notcontains $true) {
         Clear-Host
         ForEach ($item in $Jobs) {
+            $ProgressIndex = $item.Pipe.Streams.Progress.count
             if($item.Pipe.HadErrors) {
-                Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.Streams.Error[0].Exception.Message)"
+                $ErrorIndex = $item.Pipe.Streams.Error.count
+                Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.Streams.Error[$ErrorIndex].Exception.Message)"
                 return
             }
-            Write-Host "$($item.RuntimeData.Device.MacAddress): $($item.Pipe.Streams.Progress[0].StatusDescription)"
+            Write-Host "$($item.RuntimeData.Device.MacAddress): $($item.Pipe.Streams.Progress[$ProgressIndex].StatusDescription)"
         }
         Start-Sleep -Seconds 5
     }
 
+    Clear-Host
     foreach ($item in $jobs) {
         # EndInvoke method retrieves the results of the asynchronous call
-        if($item.pipe.hasErrors) {
-            Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.Streams.Error[0].Exception.Message)"
+        if($item.pipe.HadErrors) {
+            $ErrorIndex = $item.Pipe.Streams.Error.count
+            Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.Streams.Error[$ErrorIndex].Exception.Message)"
             return
         }
         Write-Host "$($item.RuntimeData.Device.MacAddress): $($item.Pipe.EndInvoke($item.Handle))"

@@ -41,7 +41,7 @@
     )
     RequiredModules = @()
     HelpInfoURI = ''
-    ModuleVersion = '0.3.0'
+    ModuleVersion = '0.4.0'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -50,6 +50,19 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.4.0
+    * Fixed issue connecting to cameras via HTTP
+    * Fixed issue with Format-AxisSDCard showing progress when -Wait is not specified
+    * Fixed issue with New-AxisProvisioningJob where it would not return error information.
+    * Fixed issue with New-AxisProvisioningJob where it would not clear screen on final print.
+    * Fixed issue with New-AxisProvisioningJob where IP was not provided to provisioning process.
+    * Fixed issue with New-AxisProvisioningJob where it did not check for FirmwareFolder before run
+    * Fixed issue with New-AxisProvisioningJob where incremental progress was not reported.
+## 0.3.1
+    * Fixed issue with New-AxisProvisioningJob not functioning properly.
+## 0.3.0
+    * Added New-AxisProvisioningJob
+    * Bug fixes
 ## 0.2.0
     * Further Bug fixes and readyment for inistal release
 ## 0.1.1 

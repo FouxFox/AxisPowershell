@@ -124,6 +124,7 @@ function Invoke-AxisWebApi {
             #If HTTPS call fails, try HTTP
             $Param.Uri = "http://$Device$($Path)"
             $response = Invoke-RestMethod @Param
+            $Connected = $true
         }
         Catch {
             Write-Verbose "Failed to connect to $Device using HTTP"

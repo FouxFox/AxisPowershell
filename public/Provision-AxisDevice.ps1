@@ -73,14 +73,10 @@ function Provision-AxisDevice {
         [Parameter(Mandatory=$false)]
         [Switch]$EdgeRecording
     )
-    
-        if($FactoryPrep) {
-            if(!$Config.FirmwareFolder) {
-                Set-AxisPSFactoryConfig
-            }
-            if(!$Config.Credential) {
-                Set-Credential
-            }
+        $CallingCommand = (Get-PSCallStack)[1].Command
+
+        if(!$Config.Credential) {
+            Set-Credential
         }
 
         Write-Verbose "New Password"
@@ -117,6 +113,9 @@ function Provision-AxisDevice {
             Write-Progress @ProgParam
         }
         if($FactoryPrep -or $FirmwareFolder) {
+            if(!$Config.FirmwareFolder) {
+                Set-AxisPSFactoryConfig
+            }
             Update-AxisDevice -Device $Device
         }
 

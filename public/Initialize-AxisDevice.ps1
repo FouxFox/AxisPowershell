@@ -35,6 +35,6 @@ function Initialize-AxisDevice {
         $null = Invoke-AxisWebApi @Param
     }
     Catch {
-        Throw "Unable to set Root Password"
+        Throw $_
     }
 }

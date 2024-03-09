@@ -30,13 +30,14 @@ function Format-AxisSDCard {
         [Parameter(Mandatory=$false)]
         [Switch]$Wait
     )
-
-    $ProgParam = @{
-        Activity = "Formatting SD Card...0%"
-        Status = "Unmounting SD Card..." 
-        PercentComplete = 0
+    if($Wait) {
+        $ProgParam = @{
+            Activity = "Formatting SD Card...0%"
+            Status = "Unmounting SD Card..." 
+            PercentComplete = 0
+        }
+        Write-Progress @ProgParam
     }
-    Write-Progress @ProgParam
 
     #Write-Host -NoNewLine "Unmounting Disk..."
     $Param = @{
@@ -50,7 +51,7 @@ function Format-AxisSDCard {
     }
 
     Start-Sleep -Seconds 5
-    Write-Host -ForegroundColor Green "Done!"
+    #Write-Host -ForegroundColor Green "Done!"
 
     #rite-Host -NoNewLine "Starting Format..."
     $Param = @{
@@ -64,7 +65,7 @@ function Format-AxisSDCard {
     }
 
     if(!$Wait) {
-        #Write-Host -ForegroundColor Yellow "Started!"
+        Write-Host -ForegroundColor Yellow "$($Device): Format Started!"
         return
     }
 
