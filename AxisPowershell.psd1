@@ -41,7 +41,7 @@
     )
     RequiredModules = @()
     HelpInfoURI = ''
-    ModuleVersion = '0.4.0'
+    ModuleVersion = '0.4.1'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -51,8 +51,8 @@
             IsPrerelease = $true
             ReleaseNotes = @'
 ## 0.4.1
-    * Fixed issue with Format-AxisSDCard where it ignored the second SD card on P3737s
-    * Fixed issue with Get-AxisSDCardStatus where it ignored the second SD card on P3737s
+    * Fixed issue with Format-AxisSDCard where it ignored the second SD card on P3737 and P3719
+    * Fixed issue with Get-AxisSDCardStatus where it ignored the second SD card on P3737 and P3719
     * Fixed issue with Get-AxisDeviceInfo where it would not work against older cameras
     * Fixed issue with Enable-AxisDNSUpdate where it would not autopopulate the DNS name on older cameras
 

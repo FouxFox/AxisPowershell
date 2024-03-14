@@ -33,7 +33,11 @@ function Format-AxisSDCard {
 
     $disks = @("SD_DISK")
     $Model = (Get-AxisDeviceInfo -Device $Device).ProdNbr
-    if($Model -eq "P3737") {
+    $DualSDModels = @(
+        "P3737-PLE"
+        "P3719-PLE"
+    )
+    if($DualSDModels.Contains($Model)) {
         $disks = @("SD_DISK","SD_DISK2")
     }
 
@@ -73,8 +77,8 @@ function Format-AxisSDCard {
         }
 
         if(!$Wait) {
-            Write-Host -ForegroundColor Yellow "$($Device): Format Started!"
-            return
+            Write-Host -ForegroundColor Yellow "$($Device)/$($diskid): Format Started!"
+            continue
         }
 
         #Monitor
