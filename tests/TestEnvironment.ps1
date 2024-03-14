@@ -33,7 +33,8 @@ Function InitTestEnvironment {
                 "P4707-PLVE" = @("Image.I2.Enabled")
             }
             RecordingParams = "videocodec=h265&fps=30&compression=30&videozstrength=20&videozgopmode=dynamic&videozmaxgoplength=1023&videozprofile=storage"
-            SchemaVersion = 1
+            FirmwareFolder = "C:\"
+			SchemaVersion = 1
         }
 	}
 	Set-Variable @Param
@@ -46,6 +47,7 @@ Function InitTestEnvironment {
 			#Setup Variables
 			$Script:Config = Copy-Object $TestConfig
 			$Script:Config.Credential = $TestCredential
+			$Script:Cache = @{"192.168.0.100"=@{Type="https"}}
 		}
 	}
 	Set-Variable @Param
@@ -70,7 +72,7 @@ Function InitTestEnvironment {
 		$formatter.Deserialize($memStream)
 	}
 
-	function reload { 
+	function Global:reload { 
 		Remove-Module AxisPowershell -Force -Confirm:$false -ErrorAction SilentlyContinue
 		Import-Module C:\Users\msmall\Source\powershell\modules\AxisPowershell 
 	}

@@ -40,7 +40,7 @@ function Get-AxisDeviceInfo {
         Path = "/axis-cgi/basicdeviceinfo.cgi"
         Method = "Post"
         Body = @{
-            "apiVersion" = Get-AxisAPIVersion -Device $Device -API 'basic-device-info'
+            "apiVersion" = '1.0'
             "method" = "getAllProperties"
         }
     }

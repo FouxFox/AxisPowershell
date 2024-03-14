@@ -30,63 +30,72 @@ function Format-AxisSDCard {
         [Parameter(Mandatory=$false)]
         [Switch]$Wait
     )
-    if($Wait) {
-        $ProgParam = @{
-            Activity = "Formatting SD Card...0%"
-            Status = "Unmounting SD Card..." 
-            PercentComplete = 0
+
+    $disks = @("SD_DISK")
+    $Model = (Get-AxisDeviceInfo -Device $Device).ProdNbr
+    if($Model -eq "P3737") {
+        $disks = @("SD_DISK","SD_DISK2")
+    }
+
+    ForEach ($diskid in $disks) {
+        if($Wait) {
+            $ProgParam = @{
+                Activity = "Formatting SD Card 1 of $($disks.Count)..."
+                Status = "Unmounting SD Card..." 
+                PercentComplete = 0
+            }
+            Write-Progress @ProgParam
         }
-        Write-Progress @ProgParam
-    }
 
-    #Write-Host -NoNewLine "Unmounting Disk..."
-    $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/disks/mount.cgi?diskid=SD_DISK&action=unmount"
-    }
-    $result = Invoke-AxisWebApi @Param
-
-    if($result.root.job.result -ne 'OK') {
-        Throw "Could not format: $($result.root.job.result)"
-    }
-
-    Start-Sleep -Seconds 5
-    #Write-Host -ForegroundColor Green "Done!"
-
-    #rite-Host -NoNewLine "Starting Format..."
-    $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/disks/format.cgi?diskid=SD_DISK&filesystem=ext4"
-    }
-    $result = Invoke-AxisWebApi @Param
-
-    if($result.root.job.result -ne 'OK') {
-        Throw "Could not format: $($result.root.job.result)"
-    }
-
-    if(!$Wait) {
-        Write-Host -ForegroundColor Yellow "$($Device): Format Started!"
-        return
-    }
-
-    #Monitor
-    $JobID = $result.root.job.jobid
-    $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/disks/job.cgi?jobid=$($JobID)&diskid=SD_DISK"
-    }
-    $Job = @{ progress = 0 }
-    while($Job.progress -ne 100) {
-        $Job = (Invoke-AxisWebApi @Param).root.job
-        $ProgParam = @{
-            Activity = "Formatting SD Card...$($job.progress)%"
-            Status = "Press Ctrl-C to return to prompt" 
-            PercentComplete = $Job.progress
+        #Write-Host -NoNewLine "Unmounting Disk..."
+        $Param = @{
+            Device = $Device
+            Path = "/axis-cgi/disks/mount.cgi?diskid=$($diskid)&action=unmount"
         }
-        Write-Progress @ProgParam
-        Write-Verbose $job.progress
-        Start-Sleep -Seconds 1
-    }
+        $result = Invoke-AxisWebApi @Param
 
-    #Write-Host -ForegroundColor Green "Done!"
+        if($result.root.job.result -ne 'OK') {
+            Throw "Could not format: $($result.root.job.result)"
+        }
+
+        Start-Sleep -Seconds 5
+        #Write-Host -ForegroundColor Green "Done!"
+
+        #rite-Host -NoNewLine "Starting Format..."
+        $Param = @{
+            Device = $Device
+            Path = "/axis-cgi/disks/format.cgi?diskid=$($diskid)&filesystem=ext4"
+        }
+        $result = Invoke-AxisWebApi @Param
+
+        if($result.root.job.result -ne 'OK') {
+            Throw "Could not format: $($result.root.job.result)"
+        }
+
+        if(!$Wait) {
+            Write-Host -ForegroundColor Yellow "$($Device): Format Started!"
+            return
+        }
+
+        #Monitor
+        $JobID = $result.root.job.jobid
+        $Param = @{
+            Device = $Device
+            Path = "/axis-cgi/disks/job.cgi?jobid=$($JobID)&diskid=$($diskid)"
+        }
+        $Job = @{ progress = 0 }
+        while($Job.progress -ne 100) {
+            $Job = (Invoke-AxisWebApi @Param).root.job
+            $ProgParam = @{
+                Activity = "Formatting SD Card 1 of $($disks.Count)..."
+                Status = "Press Ctrl-C to return to prompt" 
+                PercentComplete = $Job.progress
+            }
+            Write-Progress @ProgParam
+            Write-Verbose $job.progress
+            Start-Sleep -Seconds 1
+        }
+
+        #Write-Host -ForegroundColor Green "Done!"
+    }
 }

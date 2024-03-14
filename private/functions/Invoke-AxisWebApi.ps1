@@ -53,11 +53,11 @@ function Invoke-AxisWebApi {
         [Parameter(Mandatory=$false)]
         $Body,
 
-        [Parameter(Mandatory=$false)]
-        [HashTable]$Headers,
+#       [Parameter(Mandatory=$false)]
+#       [HashTable]$Headers,
 
-        [Parameter(Mandatory=$false)]
-        [String]$InFile,
+#       [Parameter(Mandatory=$false)]
+#       [String]$InFile,
 
         [Parameter(Mandatory=$false)]
         [Switch]$NoAuth=$false
@@ -66,11 +66,11 @@ function Invoke-AxisWebApi {
 
     #Build Headers
     $RequestHeaders = $Config.Headers.Clone()
-    if($Headers) {
-        ForEach ($h in $Headers.Keys) {
-            $RequestHeaders.Add($h,$Headers[$h])
-        }
-    }
+#   if($Headers) {
+#       ForEach ($h in $Headers.Keys) {
+#           $RequestHeaders.Add($h,$Headers[$h])
+#       }
+#   }
 
     #Init allows us to set HTTP for cameras not configured for HTTPS
     Initialize-AxisCache -Device $Device
@@ -98,9 +98,9 @@ function Invoke-AxisWebApi {
         $Param.Add('Body',(ConvertTo-JSON -Depth 10 $Body))
     }
 
-    if($InFile) {
-        $Param.Add('InFile',$InFile)
-    }
+#   if($InFile) {
+#       $Param.Add('InFile',$InFile)
+#   }
 
     Write-Verbose "$($Param.Method) $($Param.Uri)"
 

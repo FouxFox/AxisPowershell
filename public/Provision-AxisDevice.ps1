@@ -52,8 +52,8 @@ function Provision-AxisDevice {
         [Parameter(Mandatory=$true)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false)]
-        [Switch]$FactoryPrep,
+        [Parameter(Mandatory=$false,DontShow=$true)]
+        [Switch]$FactoryPrepTest,
 
         [Parameter(Mandatory=$false)]
         [String]$NewPassword,
@@ -74,6 +74,10 @@ function Provision-AxisDevice {
         [Switch]$EdgeRecording
     )
         $CallingCommand = (Get-PSCallStack)[1].Command
+        $FactoryPrep = . {
+            $CallingCommand -eq "New-AxisProvisioningJob" -or
+            $FactoryPrepTest
+        }
 
         if(!$Config.Credential) {
             Set-Credential
@@ -88,7 +92,7 @@ function Provision-AxisDevice {
             }
             Write-Progress @ProgParam
         }
-        if($FactoryPrep -or $NewPassword) {
+        if($NewPassword -or $FactoryPrep) {
             if(!$NewPassword) {
                 # Extract plaintext password from PSCredential
                 $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Config.Credential.Password)
@@ -112,7 +116,7 @@ function Provision-AxisDevice {
             }
             Write-Progress @ProgParam
         }
-        if($FactoryPrep -or $FirmwareFolder) {
+        if($FirmwareFolder -or $FactoryPrep) {
             if(!$Config.FirmwareFolder) {
                 Set-AxisPSFactoryConfig
             }
@@ -133,7 +137,7 @@ function Provision-AxisDevice {
             }
             Write-Progress @ProgParam
         }
-        if($FactoryPrep -or $DNS) {
+        if($DNS -or $FactoryPrep) {
             Enable-AxisDNSUpdate -Device $Device
         }
 
@@ -146,7 +150,7 @@ function Provision-AxisDevice {
             }
             Write-Progress @ProgParam
         }
-        if($FactoryPrep -or $SecuritySettings) {
+        if($SecuritySettings -or $FactoryPrep) {
             Set-AxisServices -Device $Device
         }
 
@@ -159,7 +163,7 @@ function Provision-AxisDevice {
             }
             Write-Progress @ProgParam
         }
-        if($FactoryPrep -or $SDCard) {
+        if($SDCard -or $FactoryPrep) {
             Format-AxisSDCard -Device $Device -Wait
         }
 
@@ -172,7 +176,7 @@ function Provision-AxisDevice {
             }
             Write-Progress @ProgParam
         }
-        if($FactoryPrep -or $EdgeRecording) {
+        if($EdgeRecording -or $FactoryPrep) {
             New-AxisRecordingProfile -Device $Device -SDCard
         }
 

@@ -40,10 +40,21 @@ function Get-AxisSDCardStatus {
         Path = "/axis-cgi/disks/list.cgi?diskid=all"
     }
 
-    $diskObj = (Invoke-AxisWebApi @Param).root.disks.disk | Where-Object { $_.diskid -eq 'SD_DISK' }
+    $disks = (Invoke-AxisWebApi @Param).root.disks.disk | Where-Object { $_.diskid.Contains('SD_DISK') }
 
-    $output = [ordered]@{}
+    ForEach ($diskObj in $disks) {
+        [PSCustomObject]@{
+            DiskNumber = $diskObj.diskid.Replace("SD_DISK","")
+            Status = $diskObj.status
+            MaxAge = $diskObj.cleanupmaxage
+            TotalSizeGB = [math]::Round($diskObj.totalsize / 1MB, 2)
+            FreeSizeGB = [math]::Round($diskObj.freesize / 1MB, 2)
+        }
+    }
+    <#
+    #$output = [ordered]@{}
     foreach ($attribute in $diskObj.attributes) {
+        
         $Name = $attribute.name
         $value = $attribute.value
         
@@ -56,5 +67,6 @@ function Get-AxisSDCardStatus {
         $output.Add($Name, $value)
     }
     
-    return [pscustomobject]$output
+    #return [pscustomobject]$output
+    #>
 }
