@@ -71,8 +71,15 @@ if($Env:ModuleTools_TestMode -ne 1) {
         Update-ModuleConfiguration
     }
 
+    Try {
+        $Script:Config.Credential = Get-StoredCredential -Target "AxisPowershell"
+    }
+    Catch {
+        Write-Verbose "No stored credentials found."
+    }
     #Turn off certificate checking
-    Set-CertificateValidation -Disable
+    #Moved this to Invoke-AxisWebApi
+    #Set-CertificateValidation -Disable
 }
 
 # Cleanup

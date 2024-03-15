@@ -27,7 +27,7 @@ Function Write-ModuleConfiguration {
 
     if(!$OverwriteMessage -or $Answer) {
         #Sanatize the Credential
-        $ConfigToWrite = $script:Config
+        $ConfigToWrite = Copy-Config
         if($ConfigToWrite.ContainsKey('Credential')) {
             $ConfigToWrite.Credential = ''
         }

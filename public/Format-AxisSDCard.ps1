@@ -31,17 +31,12 @@ function Format-AxisSDCard {
         [Switch]$Wait
     )
 
-    $disks = @("SD_DISK")
-    $Model = (Get-AxisDeviceInfo -Device $Device).ProdNbr
-    $DualSDModels = @(
-        "P3737-PLE"
-        "P3719-PLE"
-    )
-    if($DualSDModels.Contains($Model)) {
-        $disks = @("SD_DISK","SD_DISK2")
+    $disks = Get-AxisSDCardStatus -Device $Device
+    if($disks.Status -contains "disconnected") {
+        Throw "SD Card(s) not installed"
     }
 
-    ForEach ($diskid in $disks) {
+    ForEach ($disk in $disks) {
         if($Wait) {
             $ProgParam = @{
                 Activity = "Formatting SD Card 1 of $($disks.Count)..."
@@ -54,7 +49,7 @@ function Format-AxisSDCard {
         #Write-Host -NoNewLine "Unmounting Disk..."
         $Param = @{
             Device = $Device
-            Path = "/axis-cgi/disks/mount.cgi?diskid=$($diskid)&action=unmount"
+            Path = "/axis-cgi/disks/mount.cgi?diskid=$($disk.id)&action=unmount"
         }
         $result = Invoke-AxisWebApi @Param
 
@@ -68,7 +63,7 @@ function Format-AxisSDCard {
         #rite-Host -NoNewLine "Starting Format..."
         $Param = @{
             Device = $Device
-            Path = "/axis-cgi/disks/format.cgi?diskid=$($diskid)&filesystem=ext4"
+            Path = "/axis-cgi/disks/format.cgi?diskid=$($disk.id)&filesystem=ext4"
         }
         $result = Invoke-AxisWebApi @Param
 
@@ -77,7 +72,7 @@ function Format-AxisSDCard {
         }
 
         if(!$Wait) {
-            Write-Host -ForegroundColor Yellow "$($Device)/$($diskid): Format Started!"
+            Write-Host -ForegroundColor Yellow "$($Device)/$($disk.id): Format Started!"
             continue
         }
 
@@ -85,7 +80,7 @@ function Format-AxisSDCard {
         $JobID = $result.root.job.jobid
         $Param = @{
             Device = $Device
-            Path = "/axis-cgi/disks/job.cgi?jobid=$($JobID)&diskid=$($diskid)"
+            Path = "/axis-cgi/disks/job.cgi?jobid=$($JobID)&diskid=$($disk.id)"
         }
         $Job = @{ progress = 0 }
         while($Job.progress -ne 100) {

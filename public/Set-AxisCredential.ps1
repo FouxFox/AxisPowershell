@@ -18,8 +18,20 @@ function Set-AxisCredential {
     [cmdletbinding()]
     Param(
         [Parameter(Mandatory=$true)]
-        [PSCredential]$Credential
+        [PSCredential]$Credential,
+
+        [Parameter(Mandatory=$false)]
+        [Switch]$StoreCredential
     )
 
     $Config.Credential = $Credential
+
+        if($StoreCredential) {
+        $Param = @{
+            Target = "AxisPowershell" 
+            Persist = 'Enterprise' 
+            Credentials = $Credential
+        }
+        $null = New-StoredCredential @Param
+    }
 }

@@ -177,7 +177,7 @@ function Provision-AxisDevice {
             Write-Progress @ProgParam
         }
         if($EdgeRecording -or $FactoryPrep) {
-            New-AxisRecordingProfile -Device $Device -SDCard
+            New-AxisRecordingProfile -Device $Device
         }
 
         if($FactoryPrep) {

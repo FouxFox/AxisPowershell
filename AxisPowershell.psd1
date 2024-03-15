@@ -39,9 +39,13 @@
     FileList = @(
         'PSModule.psm1'
     )
-    RequiredModules = @()
+    RequiredModules = @(
+        @{ModuleName='CredentialManager'; ModuleVersion='2.0'}
+        @{ModuleName='IPV4Toolbox'; ModuleVersion='0.6.0'}
+        @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
+    )
     HelpInfoURI = ''
-    ModuleVersion = '0.4.1'
+    ModuleVersion = '0.4.6'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -50,12 +54,28 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.4.6
+    * Fixed issue with error reporting in New-AxisProvisioningJob
+## 0.4.5
+    * Fixed issue with Provision-AxisDevice where it called New-AxisRecordingProfile with the wrong parameter
+    * Fixed issue with Format-AxisSDCard where it would not check if there was an SD card to format
+## 0.4.4
+    * Fixed issue with New-AxisProvisioningJob where it would not display progress or errors
+    * Fixed issue with Set-AxisPSFactoryConfig where it would cause credential prompt on next command
+## 0.4.3
+    * Credential storage hotfix
+## 0.4.2
+    * Fixed issue with Get-AxisSDCardStatus where it would not display a disk number for SD Card 1
+    * Added Lens count to Get-AxisRecordingSupport
+    * Added multi-lens support to New-AxisRecordingProfile
+    * Fixed issues with dubnet calculation in New-AxisProvisioningJob
+    * Added optional credential storage to Set-AxisCredential
+    * Fixed issue with New-AxisProvisioningJob where it would stall if no devices were found
 ## 0.4.1
     * Fixed issue with Format-AxisSDCard where it ignored the second SD card on P3737 and P3719
     * Fixed issue with Get-AxisSDCardStatus where it ignored the second SD card on P3737 and P3719
     * Fixed issue with Get-AxisDeviceInfo where it would not work against older cameras
     * Fixed issue with Enable-AxisDNSUpdate where it would not autopopulate the DNS name on older cameras
-
 ## 0.4.0
     * Fixed issue connecting to cameras via HTTP
     * Fixed issue with Format-AxisSDCard showing progress when -Wait is not specified

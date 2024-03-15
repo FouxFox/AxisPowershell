@@ -34,7 +34,6 @@ function New-AxisProvisioningJob {
 
     $TargetDevices = @()
     $ModuleString = "AxisPowershell"
-    $TestModuleString = "C:\Users\msmall\Source\powershell\modules\AxisPowershell"
     $AxisOUIs = @(
         "e8-27-25"
         "00-40-8c"
@@ -44,11 +43,7 @@ function New-AxisProvisioningJob {
 
     if(!$IP) {
         $ipInfo = Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceIndex -ne 1 }
-        $MachineSubnet = $ipInfo.IPAddress -replace "\.\d+$",""
-        $hostBits = 32 - $ipInfo.PrefixLength
-        $lastOctetStart = [math]::Pow(2, $hostBits - 1)
-        $lastOctetEnd = $lastOctetStart * 2 - 2
-        $IPRange = $lastOctetStart..$lastOctetEnd | ForEach-Object { "$($MachineSubnet).$_" }
+        $IPRange = Out-SubnetRange -Subnet $ipInfo.IPAddress -Prefix $ipInfo.PrefixLength
         $TargetDevices = Find-LANHosts -IP $IPRange | Where-Object { $_.MACAddress -match "($($AxisOUIs -join '|'))" }
     }
     else {
@@ -60,6 +55,9 @@ function New-AxisProvisioningJob {
         }
     }
     
+    if($TargetDevices.Count -eq 0) {
+        Throw "No Axis Devices Found"
+    }
 
     $runspacePool = [runspacefactory]::CreateRunspacePool(1, 255)
     $runspacePool.Open()
@@ -97,10 +95,10 @@ function New-AxisProvisioningJob {
     while ($jobs.Handle.IsCompleted -notcontains $true) {
         Clear-Host
         ForEach ($item in $Jobs) {
-            $ProgressIndex = $item.Pipe.Streams.Progress.count
+            $ProgressIndex = $item.Pipe.Streams.Progress.count - 1
             if($item.Pipe.HadErrors) {
-                $ErrorIndex = $item.Pipe.Streams.Error.count
-                Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.Streams.Error[$ErrorIndex].Exception.Message)"
+                $ErrorIndex = $item.Pipe.Streams.Error.count - 1
+                Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.InvocationStateInfo.Reason.Message)"
                 return
             }
             Write-Host "$($item.RuntimeData.Device.MacAddress): $($item.Pipe.Streams.Progress[$ProgressIndex].StatusDescription)"
@@ -112,8 +110,8 @@ function New-AxisProvisioningJob {
     foreach ($item in $jobs) {
         # EndInvoke method retrieves the results of the asynchronous call
         if($item.pipe.HadErrors) {
-            $ErrorIndex = $item.Pipe.Streams.Error.count
-            Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.Streams.Error[$ErrorIndex].Exception.Message)"
+            $ErrorIndex = $item.Pipe.Streams.Error.count - 1
+            Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.InvocationStateInfo.Reason.Message)"
             return
         }
         Write-Host "$($item.RuntimeData.Device.MacAddress): $($item.Pipe.EndInvoke($item.Handle))"
