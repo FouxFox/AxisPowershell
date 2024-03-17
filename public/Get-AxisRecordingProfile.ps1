@@ -25,21 +25,71 @@ function Get-AxisRecordingProfile {
         [String]$Device
     )
 
-    $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/record/continuous/listconfiguration.cgi"
-    }
-    $result = (Invoke-AxisWebApi @Param).root.continuousrecordingconfigurations.continuousrecordingconfiguration
+    $LensCount = (Get-AxisViewStatus -RemoveCombinedViews -Device $Device).count
+    $SingleLens = $LensCount -eq 1
+    $cProfiles = Get-AxisContinuousRecordingProfiles -Device $Device
+    $Actions = Get-AxisAction -Device $Device | ? { $_.TemplateToken -eq "com.axis.action.unlimited.recording.storage" }
 
-    ForEach ($streamProfile in $result) {
-        $ProfileParameters = [ordered]@{
-            id =   $streamProfile.profile
-            Disk = $streamProfile.diskid
+    #Decode Actions
+    $aProfiles = @()
+    ForEach ($ap in $Actions) {
+        $Lens = 1 #No "camera=" in stream options defaults to 1
+        if(!$SingleLens -and $ap.StreamOptions.contains('camera')) {
+            $Lens = $ap.StreamOptions.subString($ap.StreamOptions.indexOf('camera=')+7,1)
         }
-        ForEach ($item in $streamProfile.options.Split('&')) {
-            $ProfileParameters.Add($item.Split('=')[0],$item.Split('=')[1])
+
+        $aProfiles += [PSCustomObject]@{
+            ID      = $ap.ID
+            camera  = $Lens
+            Disk    = $ap.StorageLocation
         }
-        
-        [pscustomobject]$ProfileParameters
     }
+
+    $output = @()
+
+    ForEach ($Lens in 1..$LensCount) {
+        $HasCProfile = $cProfiles.camera -contains $Lens
+        $HasAProfile = $aProfiles.camera -contains $Lens
+
+        if($HasCProfile -and $HasAProfile) {
+            $output += [PSCustomObject]@{
+                Lens    = $Lens
+                Status  = 'Error'
+                Type    = 'N/A'
+                Disk    = 'N/A'
+                Error   = 'Continuious Profiles and Action rules found for this lens'
+            }
+        }
+        elseif($HasCProfile) {
+            $cProfile = $cProfiles | ? { $_.camera -eq $Lens }
+            $output += [PSCustomObject]@{
+                Lens    = $Lens
+                Status  = 'OK'
+                Type    = 'Continuous'
+                Disk    = $cProfile.Disk
+                Error   = 'N/A'
+            }
+        }
+        elseif($HasAProfile) {
+            $aProfile = $aProfiles | ? { $_.camera -eq $Lens }
+            $output += [PSCustomObject]@{
+                Lens    = $Lens
+                Status  = 'Warning'
+                Type    = 'Action'
+                Disk    = $aProfile.Disk
+                Error   = 'It is recomended to use Continuous Profiles'
+            }
+        }
+        else {
+            $output += [PSCustomObject]@{
+                Lens    = $Lens
+                Status  = 'Error'
+                Type    = 'Error'
+                Disk    = 'N/A'
+                Error   = 'No Profile Exists'
+            }
+        }
+    }
+
+    return $output
 }

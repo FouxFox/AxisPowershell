@@ -39,7 +39,7 @@ function Get-AxisRecordingSupport {
 
     $Parsed = [ordered]@{}
     ForEach ($line in $result.split("`n")) {
-        $Parsed.Add($line.split("=")[0].replace("root.Properties.LocalStorage.",'').replace("root.ImageSource.NbrOfSources.",''),$line.split("=")[1])
+        $Parsed.Add($line.split("=")[0].replace("root.",'').replace("Properties.LocalStorage.",'').replace("ImageSource.",''),$line.split("=")[1])
     }
 
     [pscustomobject]@{
@@ -54,6 +54,6 @@ function Get-AxisRecordingSupport {
         SDCard =                            $Parsed.SDCard              -eq 'yes'
         StorageLimit =                      $Parsed.StorageLimit        -eq 'yes'
         NbrOfContinuousRecordingProfiles =  $Parsed.NbrOfContinuousRecordingProfiles
-        NumberofLenses =                    $Parsed.NumberofLenses 
+        NumberofLenses =                    $Parsed.NbrOfSources 
     }
 }

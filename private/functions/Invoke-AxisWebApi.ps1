@@ -53,11 +53,11 @@ function Invoke-AxisWebApi {
         [Parameter(Mandatory=$false)]
         $Body,
 
-#       [Parameter(Mandatory=$false)]
-#       [HashTable]$Headers,
+        [Parameter(Mandatory=$false)]
+        [Switch]$WebRequest,
 
-#       [Parameter(Mandatory=$false)]
-#       [String]$InFile,
+        [Parameter(Mandatory=$false)]
+        [String]$OutFile,
 
         [Parameter(Mandatory=$false)]
         [Switch]$NoAuth=$false
@@ -84,7 +84,7 @@ function Invoke-AxisWebApi {
         Verbose = $false
     }
 
-    if($Config.Credential -eq '' -and !$NoAuth) {
+    if(($Config.Credential -eq '' -or $Config.Credential -eq $null) -and !$NoAuth) {
         Write-Warning "No Credential found, please set credentials for this session. In the future, you can use Set-AxisCredential to set credentials."
         Set-AxisCredential
     }
@@ -98,9 +98,9 @@ function Invoke-AxisWebApi {
         $Param.Add('Body',(ConvertTo-JSON -Depth 10 $Body))
     }
 
-#   if($InFile) {
-#       $Param.Add('InFile',$InFile)
-#   }
+    if($OutFile) {
+        $Param.Add('OutFile',$OutFile)
+    }
 
     Write-Verbose "$($Param.Method) $($Param.Uri)"
 
@@ -112,7 +112,12 @@ function Invoke-AxisWebApi {
     $ConnectionError = $false
     $Connected = $false
     Try {
-        $response = Invoke-RestMethod @Param
+        if($WebRequest) {
+            $response = Invoke-WebRequest @Param
+        }
+        else {
+            $response = Invoke-RestMethod @Param
+        }
         $Connected = $true
     }
     Catch {
@@ -123,7 +128,12 @@ function Invoke-AxisWebApi {
         Try {
             #If HTTPS call fails, try HTTP
             $Param.Uri = "http://$Device$($Path)"
-            $response = Invoke-RestMethod @Param
+            if($WebRequest) {
+                $response = Invoke-WebRequest @Param
+            }
+            else {
+                $response = Invoke-RestMethod @Param
+            }
             $Connected = $true
         }
         Catch {

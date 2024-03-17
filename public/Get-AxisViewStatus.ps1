@@ -23,7 +23,10 @@ function Get-AxisViewStatus {
     [cmdletbinding()]
     Param(
         [Parameter(Mandatory=$true)]
-        [String]$Device
+        [String]$Device,
+
+        [Parameter(Mandatory=$true)]
+        [Switch]$RemoveCombinedViews
     )
 
     $Param = @{
@@ -60,6 +63,10 @@ function Get-AxisViewStatus {
         $Parsed.$Id.$Key = $value
     }
 
-    #Echo back 
+    #Echo back
+    if($RemoveCombinedViews) {
+        return $Parsed.Values | ? { $_.Name -notlike "*View" } | Sort-Object Id
+    }
+
     return $Parsed.Values | Sort-Object Id
 }

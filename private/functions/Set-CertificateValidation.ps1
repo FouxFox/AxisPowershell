@@ -8,10 +8,12 @@ function Set-CertificateValidation {
         [Switch]$Disable
     )
 
-    if ($Enable) {
+    $IsEnabled = [System.Net.ServicePointManager]::CertificatePolicy.GetType().Name -ne 'TrustAllCertsPolicy'
+
+    if ($Enable -and !$IsEnabled) {
         [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
     }
-    if ($Disable) {
+    if ($Disable -and $IsEnabled) {
         # This does not work
         #[System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$false}
         add-type @"

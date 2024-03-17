@@ -23,7 +23,7 @@
         'Get-AxisViewStatus'
         'Initialize-AxisDevice'
         'New-AxisRecordingProfile'
-        'Provision-AxisDevice'
+        'Get-AxisSnapshot'
         'Remove-AxisRecordingProfile'
         'Set-AxisCredential'
         'Set-AxisIPAddress'
@@ -33,6 +33,9 @@
         'Reset-AxisDevice'
         'Set-AxisPSFactoryConfig'
         'New-AxisProvisioningJob'
+        'Get-AxisAction'
+        'Remove-AxisAction'
+        'Get-AxisContinuousRecordingProfiles'
     )
     VariablesToExport = "*"
     AliasesToExport = "*"
@@ -54,6 +57,13 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.5.0
+    * Removed Provision-AxisDevice to get rid of Verb warnings
+    * Added Get-AxisSnapshot
+    * Added logic to suppress errors when another command has already set TrustAllCerts
+    * Modified behavior for Get-AxisDeviceInfo to use param.cgi to increase compatibility with older models.
+    * Added functions to manipulate Event-to-Action configurations from the camera
+    * Get-AxisRecordingProfiles now returns action-based recording profiles
 ## 0.4.6
     * Fixed issue with error reporting in New-AxisProvisioningJob
 ## 0.4.5

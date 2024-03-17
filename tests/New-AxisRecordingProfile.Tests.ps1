@@ -28,14 +28,47 @@ Describe "New-AxisRecordingProfile" {
         }
     }
 
-    Context -Skip "Variations on All Lenses" {
+    Context -Tag "Test" "Variations on All Lenses" {
         It "<Desc>" -ForEach @(
             @{
                 Desc = "1 Lens, 1 SD Card"
                 LensScript = {return @{NumberofLenses = 1}}
                 SDScript = { return @{Status = 'OK'} }
                 InvokeScript = { return @{root=@{configure=@{result = 'OK'}}} }
-                URIString = { $Path.Split('?')[1].Split('opt')[0] -eq "camera=1&diskid=SD_DISK" }
+                URIString = { $Path.contains("camera=1&diskid=SD_DISK") }
+                TestCases = @(
+                    "Mocks"
+                    "Invoke"
+                )
+            }
+            @{
+                Desc = "2 Lenses, 1 SD Card"
+                LensScript = {return @{NumberofLenses = 2}}
+                SDScript = { return @{Status = 'OK'} }
+                InvokeScript = { return @{root=@{configure=@{result = 'OK'}}} }
+                URIString = { $Path.contains("camera=1&diskid=SD_DISK") }
+                TestCases = @(
+                    "Mocks"
+                    "Invoke"
+                )
+            }
+            @{
+                Desc = "4 Lenses, 1 SD Card"
+                LensScript = {return @{NumberofLenses = 1}}
+                SDScript = { return @{Status = 'OK'} }
+                InvokeScript = { return @{root=@{configure=@{result = 'OK'}}} }
+                URIString = { $Path.contains("camera=1&diskid=SD_DISK") }
+                TestCases = @(
+                    "Mocks"
+                    "Invoke"
+                )
+            }
+            @{
+                Desc = "4 Lenses, 2 SD Cards"
+                LensScript = {return @{NumberofLenses = 1}}
+                SDScript = { return @{Status = 'OK'} }
+                InvokeScript = { return @{root=@{configure=@{result = 'OK'}}} }
+                URIString = { $Path.contains("camera=1&diskid=SD_DISK") }
                 TestCases = @(
                     "Mocks"
                     "Invoke"
