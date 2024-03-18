@@ -24,10 +24,10 @@ function Get-AxisRecordingProfile {
         [Parameter(Mandatory=$true)]
         [String]$Device
     )
-
+    
     $LensCount = (Get-AxisViewStatus -RemoveCombinedViews -Device $Device).count
     $SingleLens = $LensCount -eq 1
-    $cProfiles = Get-AxisContinuousRecordingProfiles -Device $Device
+    $cProfiles = Get-AxisContinuousRecordingProfile -Device $Device
     $Actions = Get-AxisAction -Device $Device | ? { $_.TemplateToken -eq "com.axis.action.unlimited.recording.storage" }
 
     #Decode Actions
@@ -83,8 +83,8 @@ function Get-AxisRecordingProfile {
         else {
             $output += [PSCustomObject]@{
                 Lens    = $Lens
-                Status  = 'Error'
-                Type    = 'Error'
+                Status  = 'Warning'
+                Type    = 'N/A'
                 Disk    = 'N/A'
                 Error   = 'No Profile Exists'
             }

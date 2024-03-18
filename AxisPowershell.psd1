@@ -35,7 +35,8 @@
         'New-AxisProvisioningJob'
         'Get-AxisAction'
         'Remove-AxisAction'
-        'Get-AxisContinuousRecordingProfiles'
+        'Get-AxisContinuousRecordingProfile'
+        'Optimize-AxisRecordingProfiles'
     )
     VariablesToExport = "*"
     AliasesToExport = "*"
@@ -48,7 +49,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.4.6'
+    ModuleVersion = '0.5.0'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -64,6 +65,7 @@
     * Modified behavior for Get-AxisDeviceInfo to use param.cgi to increase compatibility with older models.
     * Added functions to manipulate Event-to-Action configurations from the camera
     * Get-AxisRecordingProfiles now returns action-based recording profiles
+    * Added Optimize-AxisRecordingProfiles
 ## 0.4.6
     * Fixed issue with error reporting in New-AxisProvisioningJob
 ## 0.4.5

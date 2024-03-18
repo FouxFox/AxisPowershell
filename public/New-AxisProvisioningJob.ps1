@@ -25,9 +25,8 @@ function New-AxisProvisioningJob {
         [String[]]$IP
     )
 
-    if(!$Config.Credential) {
-        Set-AxisCredential
-    }
+    Check-Credential
+    
     if(!$Config.FirmwareFolder) {
         Set-AxisPSFactoryConfig
     }

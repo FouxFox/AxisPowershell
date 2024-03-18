@@ -42,7 +42,6 @@ function New-AxisRecordingProfile {
     $URIString = '?'
 
     ForEach ($CurrentLens in $LensList) {
-        $URIString += "camera=$CurrentLens&"
         if(
             $CurrentLens -eq 1 -or
             $CurrentLens % $disks.Count -eq 0
@@ -53,7 +52,8 @@ function New-AxisRecordingProfile {
             $URIString += "diskid=SD_DISK2&"
         }
 
-        $URIString += "options=$($Config.RecordingParams.Replace('=','%3D'))"
+        $URIString += "options=camera%3D$CurrentLens&"
+        $URIString += "$($Config.RecordingParams.Replace('=','%3D'))"
 
         $Param = @{
             Device = $Device

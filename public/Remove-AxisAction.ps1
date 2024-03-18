@@ -7,6 +7,8 @@ function Remove-AxisAction {
         $ActionRule
     )
 
+    Check-Credential
+
     $soap_action = New-WebServiceProxy -Uri "http://www.axis.com/vapix/ws/action1/ActionService.wsdl" -Credential $Config.Credential
     $soap_action.URL = "https://$($Device)/vapix/services"
     $soap_action.RemoveActionRule($ActionRule.Id)

@@ -84,12 +84,8 @@ function Invoke-AxisWebApi {
         Verbose = $false
     }
 
-    if(($Config.Credential -eq '' -or $Config.Credential -eq $null) -and !$NoAuth) {
-        Write-Warning "No Credential found, please set credentials for this session. In the future, you can use Set-AxisCredential to set credentials."
-        Set-AxisCredential
-    }
-
     if(!$NoAuth) {
+        Check-Credential
         $Param.Add('Credential',$Config.Credential)
     }
 

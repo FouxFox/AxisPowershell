@@ -18,7 +18,7 @@ id Disk    videocodec
 10 SD_DISK h265
 
 #>
-function Get-AxisContinuousRecordingProfiles {
+function Get-AxisContinuousRecordingProfile {
     [cmdletbinding()]
     Param(
         [Parameter(Mandatory=$true)]
@@ -38,6 +38,10 @@ function Get-AxisContinuousRecordingProfiles {
         }
         ForEach ($item in $streamProfile.options.Split('&')) {
             $ProfileParameters.Add($item.Split('=')[0],$item.Split('=')[1])
+        }
+
+        if(!$ProfileParameters.Contains('camera')) {
+            $ProfileParameters.Add('camera',1)
         }
         
         [pscustomobject]$ProfileParameters

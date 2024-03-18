@@ -5,6 +5,8 @@ function Get-AxisAction {
         [String]$Device
     )
 
+    Check-Credential
+
     $soap_action = New-WebServiceProxy -Uri "http://www.axis.com/vapix/ws/action1/ActionService.wsdl" -Credential $Config.Credential
     $soap_action.URL = "https://$($Device)/vapix/services"
     $ActionConfigs = @{}
@@ -27,6 +29,7 @@ function Get-AxisAction {
             TemplateToken = $templateToken
             StreamOptions = $streamOptions
             StorageLocation = $storageId
+            PrimaryAction = $action.PrimaryAction
         }
     }
 }
