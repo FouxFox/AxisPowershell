@@ -49,7 +49,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.5.0'
+    ModuleVersion = '0.5.1'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -58,6 +58,8 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.5.1
+    * Documentation adjustments
 ## 0.5.0
     * Removed Provision-AxisDevice to get rid of Verb warnings
     * Added Get-AxisSnapshot

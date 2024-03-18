@@ -1,3 +1,44 @@
+<#
+.SYNOPSIS
+    Retrieves snapshots from an Axis camera and saves them as image files.
+
+.DESCRIPTION
+    The Get-AxisSnapshot function retrieves snapshots from an Axis camera and saves them as image files. 
+    It supports multiple lenses, allowing you to capture snapshots from different angles. 
+    You can specify the device, lens, output path, file name, and optional text to be displayed on the image.
+
+.PARAMETER Device
+    Specifies the hostname or IP address of the Axis camera.
+
+.PARAMETER Lens
+    Specifies the lens or lenses from which to capture snapshots. 
+    By default, it captures snapshots from all lenses. 
+    You can specify one or more lenses separated by commas.
+
+.PARAMETER Path
+    Specifies the output path where the image files will be saved.
+    By default, it saves the images in the current directory.
+
+.PARAMETER FileName
+    Specifies the file name for the image files.
+    Each image file will be in the following format: <filename>_<LensNumber>.jpg
+    By default, it uses "snapshot_1.jpg".
+    It is not nessasary to include the file extension.
+
+.PARAMETER Text
+    Specifies custom text to be displayed on the image. If not specified, custom text will not be included.
+
+.PARAMETER NoInfo
+    Indicates whether to exclude device information from the image. 
+    By default, device information (lens number, product name, and serial number) will be displayed.
+
+.EXAMPLE
+    Get-AxisSnapshot -Device "192.168.1.100" -Lens 1,2,3 -Path "C:\Snapshots" -FileName "my_snapshot.jpg" -Text "Security Camera"
+
+    This example captures snapshots from lenses 1, 2, and 3 of the Axis camera with the IP address "192.168.1.100". 
+    The snapshots are saved in the "C:\Snapshots" directory with the file name "my_snapshot_<lens>.jpg". 
+    The text "Security Camera" is displayed on each image.
+#>
 function Get-AxisSnapshot {
     [cmdletbinding()]
     Param(

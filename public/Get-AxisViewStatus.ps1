@@ -10,8 +10,15 @@ Some views should be disabled to save bandwidth and storage space.
 .PARAMETER Device
 Specifies the IP address or hostname of the Axis camera.
 
+.PARAMETER RemoveCombinedViews
+If this switch is enabled, the function will remove views that are typically disabled.
+These views are combined views that are not typically used for recording.
+
 .EXAMPLE
 Get-AxisViewStatus -Device "192.168.1.100"
+
+.EXAMPLE
+Get-AxisViewStatus -Device "192.168.1.100" -RemoveCombinedViews
 
 Id Name        Enabled
 -- ----        -------

@@ -1,3 +1,19 @@
+<#
+.SYNOPSIS
+Optimizes Axis recording profiles by removing action profiles and creating continuous profiles.
+
+.DESCRIPTION
+The Optimize-AxisRecordingProfiles function is used to optimize Axis recording profiles for a specified device.
+It creates continuous recording profiles for lenses that have action profiles or no profile.
+
+.PARAMETER Device
+Specifies the device for which the recording profiles should be optimized.
+
+.EXAMPLE
+Optimize-AxisRecordingProfiles -Device "AXIS-1234"
+Removes action profiles and creates continuous profiles for the specified device.
+
+#>
 function Optimize-AxisRecordingProfiles {
     [CmdletBinding()]
     param (

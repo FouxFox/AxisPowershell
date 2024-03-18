@@ -1,21 +1,22 @@
 <#
 .SYNOPSIS
-Retrieves the recording profiles for an Axis device.
+Retrieves the continuous recording profiles for an Axis device.
 
 .DESCRIPTION
-The Get-AxisContinuousRecordingProfiles function retrieves the recording profiles for a specified Axis device.
-Each recording profile represents a recording destination and parameters for the recording.
-These profiles are independent of the Stream profiles and are used for recording video to the SD Card.
+The Get-AxisContinuousRecordingProfile function retrieves the continuous recording profiles for a specified Axis device. 
 
 .PARAMETER Device
-Specifies the IP address or hostname of the Axis device.
+The IP address or hostname of the Axis device.
 
 .EXAMPLE
-Get-AxisContinuousRecordingProfiles -Device "192.168.1.100"
+Get-AxisContinuousRecordingProfile -Device "192.168.1.100"
 
-id Disk    videocodec
--- ----    ----------
-10 SD_DISK h265
+id Disk     camera
+-- ----     ------
+24 SD_DISK2 3
+23 SD_DISK  2
+25 SD_DISK  4
+22 SD_DISK  1
 
 #>
 function Get-AxisContinuousRecordingProfile {
@@ -44,6 +45,6 @@ function Get-AxisContinuousRecordingProfile {
             $ProfileParameters.Add('camera',1)
         }
         
-        [pscustomobject]$ProfileParameters
+        [pscustomobject]$ProfileParameters | Sort-Object camera
     }
 }

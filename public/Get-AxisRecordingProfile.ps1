@@ -4,19 +4,21 @@ Retrieves the recording profiles for an Axis device.
 
 .DESCRIPTION
 The Get-AxisRecordingProfile function retrieves the recording profiles for a specified Axis device.
-Each recording profile represents a recording destination and parameters for the recording.
-These profiles are independent of the Stream profiles and are used for recording video to the SD Card.
+It checks for both continuous recording profiles and action rules associated with each lens of the device. 
+It returns an object containing information about the status, type, disk location, and any errors for each lens.
 
 .PARAMETER Device
-Specifies the IP address or hostname of the Axis device.
+The name or IP address of the Axis device.
 
 .EXAMPLE
 Get-AxisRecordingProfile -Device "192.168.1.100"
 
-id Disk    videocodec
--- ----    ----------
-10 SD_DISK h265
-
+Lens Status Type       Disk     Error
+---- ------ ----       ----     -----
+   1 OK     Continuous SD_DISK  N/A
+   2 OK     Continuous SD_DISK  N/A  
+   3 OK     Continuous SD_DISK2 N/A
+   4 OK     Continuous SD_DISK  N/A
 #>
 function Get-AxisRecordingProfile {
     [cmdletbinding()]

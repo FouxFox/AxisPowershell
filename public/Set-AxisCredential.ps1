@@ -10,6 +10,9 @@ Username is typically 'root'
 .PARAMETER Credential
 Specifies the PSCredential object that contains the username and password.
 
+.PARAMETER StoreCredential
+Stores the Cerdential in the Windows Password vault such that it can persist between sessions.
+
 .EXAMPLE
 Set-AxisCredential
 #>
