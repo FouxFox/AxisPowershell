@@ -14,10 +14,15 @@ function Update-ModuleConfiguration {
     }
     if($Script:Config.SchemaVersion -eq 1) {
         $Script:Config.SchemaVersion = 2
-        $Config.Add('FirmwareFolder', $false)
+        $Script:Config.Add('FirmwareFolder', $false)
     }
     if($Script:Config.SchemaVersion -eq 2) {
-        # $Script:Config.SchemaVersion = 3
+        $Script:Config.SchemaVersion = 3
+        $Script:Config.Add('LogPath', "$env:ProgramData\AxisPowershell\Log\")
+        $Script:Config.Add('LogEnabled', $false)
+    }
+    if($Script:Config.SchemaVersion -eq 3) {
+        # $Script:Config.SchemaVersion = 4
         # reserved for future updates
     }
 

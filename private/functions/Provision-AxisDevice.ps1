@@ -52,141 +52,184 @@ function Provision-AxisDevice {
         [Parameter(Mandatory=$true)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false,DontShow=$true)]
-        [Switch]$FactoryPrepTest,
-
         [Parameter(Mandatory=$false)]
-        [String]$NewPassword,
-
-        [Parameter(Mandatory=$false)]
-        [Switch]$DHCP,
-
-        [Parameter(Mandatory=$false)]
-        [Switch]$DNS,
-
-        [Parameter(Mandatory=$false)]
-        [Switch]$SecuritySettings,
-
-        [Parameter(Mandatory=$false)]
-        [Switch]$SDCard,
-
-        [Parameter(Mandatory=$false)]
-        [Switch]$EdgeRecording
+        [String]$MacAddress
     )
-        $CallingCommand = (Get-PSCallStack)[1].Command
-        $FactoryPrep = . {
-            $CallingCommand -eq "New-AxisProvisioningJob" -or
-            $FactoryPrepTest
-        }
 
-        if(!$Config.Credential) {
-            Set-Credential
-        }
+    ###########
+    ## Begin ##
+    ###########
+    Write-Log -ID $MacAddress -Message "Starting Job"
 
-        Write-Verbose "New Password"
-        if($FactoryPrep) {
-            $ProgParam = @{
-                Activity = "Perfroming Factory Preparation on $Device..."
-                Status = "Stage 1/6: Setting Password" 
-                PercentComplete = 0
-            }
-            Write-Progress @ProgParam
-        }
-        if($NewPassword -or $FactoryPrep) {
-            if(!$NewPassword) {
-                # Extract plaintext password from PSCredential
-                $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Config.Credential.Password)
-                $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
-                [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
+    ###########################
+    ## Stage 1: Set Password ##
+    ###########################
+    Write-Verbose "New Password"
+    $ProgParam = @{
+        Activity = "Perfroming Factory Preparation on $Device..."
+        Status = "Stage 1/7: Setting Password" 
+        PercentComplete = 0
+    }
+    Write-Progress @ProgParam
+    Write-Log -ID $MacAddress -Message "Checking Device State"
 
-                #Send to device
-                Initialize-AxisDevice -Device $Device -NewPassword $PlainPassword
-            }
-            else {
-                Initialize-AxisDevice -Device $Device -NewPassword $NewPassword
-            }
-        }
+    #Check Device state
+    $PasswordAlreadySet = $false
+    Try {
+        $null = Get-AxisDeviceInfo -Device $Device
+        $PasswordAlreadySet = $true
+        Write-Log -ID $MacAddress -Message "Device has already had password set"
+    } Catch {
+        Write-Log -ID $MacAddress -Message "Device in Factory default state"
+    }
 
-        Write-Verbose "Update Firmware"
-        if($FactoryPrep) {
-            $ProgParam = @{
-                Activity = "Perfroming Factory Preparation on $Device..."
-                Status = "Stage 2/6: Updating Firmware" 
-                PercentComplete = 16
-            }
-            Write-Progress @ProgParam
-        }
-        if($FirmwareFolder -or $FactoryPrep) {
-            if(!$Config.FirmwareFolder) {
-                Set-AxisPSFactoryConfig
-            }
-            Update-AxisDevice -Device $Device
-        }
+    #Set password if not already set
+    if(!$PasswordAlreadySet) {
+        # Extract plaintext password from PSCredential
+        $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Config.Credential.Password)
+        $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
 
-        $NetStatus = Get-AxisNetworkInfo -Device $Device
-        if($DHCP -and !$NetStatus.DHCP) {
-            Set-AxisIPAddress -Device $Device -DHCP
+        #Send to device
+        Try {
+            Initialize-AxisDevice -Device $Device -NewPassword $PlainPassword
+            Write-Log -ID $MacAddress -Message "Successfully set password"
+        } Catch {
+            Write-Log -ID $MacAddress -Message "Failed to set password"
+            Write-Log -ID $MacAddress -Message $_.Exception.Message
+            Throw $_
         }
+    }
 
-        Write-Verbose "Set Network Settings"
-        if($FactoryPrep) {
-            $ProgParam = @{
-                Activity = "Perfroming Factory Preparation on $Device..."
-                Status = "Stage 3/6: Set Network Configuration" 
-                PercentComplete = 33
-            }
-            Write-Progress @ProgParam
-        }
-        if($DNS -or $FactoryPrep) {
-            Enable-AxisDNSUpdate -Device $Device
-        }
+    ##############################
+    ## Stage 2: Update Firmware ##
+    ##############################
+    Write-Verbose "Update Firmware"
+    $ProgParam = @{
+        Activity = "Perfroming Factory Preparation on $Device..."
+        Status = "Stage 2/7: Updating Firmware" 
+        PercentComplete = 16
+    }
+    Write-Progress @ProgParam
+    Write-Log -ID $MacAddress -Message "Updating Firmware"
+    Try {
+        Update-AxisDevice -Device $Device
+        Write-Log -ID $MacAddress -Message "Successfully Updated Device"
+    } Catch {
+        Write-Log -ID $MacAddress -Message "Failed to Update Device"
+        Write-Log -ID $MacAddress -Message $_.Exception.Message
+        Throw $_
+    }
 
-        Write-Verbose "Applying Security Best Practices"
-        if($FactoryPrep) {
-            $ProgParam = @{
-                Activity = "Perfroming Factory Preparation on $Device..."
-                Status = "Stage 4/6: Applying Security Best Practices" 
-                PercentComplete = 50
-            }
-            Write-Progress @ProgParam
-        }
-        if($SecuritySettings -or $FactoryPrep) {
-            Set-AxisServices -Device $Device
-        }
+    #################################
+    ## Stage 3: Set Network Config ##
+    #################################
+    Write-Verbose "Set Network Settings"
+    $ProgParam = @{
+        Activity = "Perfroming Factory Preparation on $Device..."
+        Status = "Stage 3/7: Set Network Configuration" 
+        PercentComplete = 33
+    }
+    Write-Progress @ProgParam
+    Write-Log -ID $MacAddress -Message "Setting DNS Hostname"
+    Try {
+        Enable-AxisDNSUpdate -Device $Device
+        Write-Log -ID $MacAddress -Message "Successfully set DNS Hostname"
+    } Catch {
+        Write-Log -ID $MacAddress -Message "Failed to set DNS Hostname"
+        Write-Log -ID $MacAddress -Message $_.Exception.Message
+        Throw $_
+    }
 
-        Write-Verbose "Formatting SD Card"
-        if($FactoryPrep) {
-            $ProgParam = @{
-                Activity = "Perfroming Factory Preparation on $Device..."
-                Status = "Stage 5/6: Formatting SD Card" 
-                PercentComplete = 67
-            }
-            Write-Progress @ProgParam
-        }
-        if($SDCard -or $FactoryPrep) {
-            Format-AxisSDCard -Device $Device -Wait
-        }
+    ##################################
+    ## Stage 4: Set Security Config ##
+    ##################################
+    Write-Verbose "Applying Security Best Practices"
+    $ProgParam = @{
+        Activity = "Perfroming Factory Preparation on $Device..."
+        Status = "Stage 4/7: Applying Security Best Practices" 
+        PercentComplete = 50
+    }
+    Write-Progress @ProgParam
+    Write-Log -ID $MacAddress -Message "Setting Security Settings"
+    Try {
+        Set-AxisServices -Device $Device
+        Write-Log -ID $MacAddress -Message "Successfully set security settings"
+    } Catch {
+        Write-Log -ID $MacAddress -Message "Failed to set security settings"
+        Write-Log -ID $MacAddress -Message $_.Exception.Message
+        Throw $_
+    }
 
-        Write-Verbose "Creating Edge Recording Profile"
-        if($FactoryPrep) {
-            $ProgParam = @{
-                Activity = "Perfroming Factory Preparation on $Device..."
-                Status = "Stage 6/6: Creating Edge Recording Profile" 
-                PercentComplete = 84
-            }
-            Write-Progress @ProgParam
-        }
-        if($EdgeRecording -or $FactoryPrep) {
-            New-AxisRecordingProfile -Device $Device
-        }
+    #############################
+    ## Stage 5: Format SD Card ##
+    #############################
+    Write-Verbose "Formatting SD Card"
+    $ProgParam = @{
+        Activity = "Perfroming Factory Preparation on $Device..."
+        Status = "Stage 5/7: Formatting SD Card" 
+        PercentComplete = 67
+    }
+    Write-Progress @ProgParam
+    Write-Log -ID $MacAddress -Message "Formatting SD Card"
+    Try {
+        Format-AxisSDCard -Device $Device -Wait
+        Write-Log -ID $MacAddress -Message "Successfully formatted SD Card"
+    } Catch {
+        Write-Log -ID $MacAddress -Message "Failed to format SD Card"
+        Write-Log -ID $MacAddress -Message $_.Exception.Message
+        Throw $_
+    }
 
-        if($FactoryPrep) {
-            $ProgParam = @{
-                Activity = "Perfroming Factory Preparation on $Device..."
-                Status = "Done" 
-                PercentComplete = 100
-            }
-            Write-Progress @ProgParam
-        }
+    #################################
+    ## Stage 6: Set Edge Recording ##
+    #################################
+    Write-Verbose "Creating Edge Recording Profile"
+    $ProgParam = @{
+        Activity = "Perfroming Factory Preparation on $Device..."
+        Status = "Stage 6/7: Creating Edge Recording Profile" 
+        PercentComplete = 84
+    }
+    Write-Progress @ProgParam
+    Write-Log -ID $MacAddress -Message "Creating Edge Recording Profile"
+    Try {
+        New-AxisRecordingProfile -Device $Device
+        Write-Log -ID $MacAddress -Message "Successfully created Edge Recording Profile"
+    } Catch {
+        Write-Log -ID $MacAddress -Message "Failed to create Edge Recording Profile"
+        Write-Log -ID $MacAddress -Message $_.Exception.Message
+        Throw $_
+    }
+
+    ###############################
+    ## Stage 7: Getting Snapshot ##
+    ###############################
+    Write-Verbose "Getting snapshot from camera"
+    $ProgParam = @{
+        Activity = "Perfroming Factory Preparation on $Device..."
+        Status = "Stage 7/7: Getting Snapshot from camera" 
+        PercentComplete = 84
+    }
+    Write-Progress @ProgParam
+    Write-Log -ID $MacAddress -Message "Getting Snapshot from camera"
+    Try {
+        Get-AxisSnapshot -Device $Device -Path "C:\Users\$env:USERNAME\Downloads" -FileName $MacAddress
+        Write-Log -ID $MacAddress -Message "Successfully created snapshot from camera"
+    } Catch {
+        Write-Log -ID $MacAddress -Message "Failed to create snapshot from camera"
+        Write-Log -ID $MacAddress -Message $_.Exception.Message
+        Throw $_
+    }
+
+    ##############
+    ## Complete ##
+    ##############
+    $ProgParam = @{
+        Activity = "Perfroming Factory Preparation on $Device..."
+        Status = "Done" 
+        PercentComplete = 100
+    }
+    Write-Progress @ProgParam
+    Write-Log -ID $MacAddress -Message "Provisioning Complete"
         
 }

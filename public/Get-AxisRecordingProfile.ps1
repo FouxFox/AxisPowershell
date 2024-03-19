@@ -19,6 +19,7 @@ Lens Status Type       Disk     Error
    2 OK     Continuous SD_DISK  N/A  
    3 OK     Continuous SD_DISK2 N/A
    4 OK     Continuous SD_DISK  N/A
+
 #>
 function Get-AxisRecordingProfile {
     [cmdletbinding()]
@@ -27,7 +28,7 @@ function Get-AxisRecordingProfile {
         [String]$Device
     )
     
-    $LensCount = (Get-AxisViewStatus -RemoveCombinedViews -Device $Device).count
+    $LensCount = (Get-AxisViewStatus -RemoveCombinedViews -Device $Device | Measure-Object).count
     $SingleLens = $LensCount -eq 1
     $cProfiles = Get-AxisContinuousRecordingProfile -Device $Device
     $Actions = Get-AxisAction -Device $Device | ? { $_.TemplateToken -eq "com.axis.action.unlimited.recording.storage" }

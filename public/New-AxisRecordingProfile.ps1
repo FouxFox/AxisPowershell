@@ -30,8 +30,9 @@ function New-AxisRecordingProfile {
     )
 
     $disks = Get-AxisSDCardStatus -Device $Device
+    $profiles = Get-AxisRecordingProfile -Device $Device | ? { $_.Status -eq 'OK'}
 
-    if($disks.Status -ne 'OK') {
+    if($disks.Status -ne 'OK' -and $disks.Status -ne 'connected') {
         Throw "SD Card is not in a valid state"
     }
 
@@ -44,6 +45,13 @@ function New-AxisRecordingProfile {
     $URIString = '?'
 
     ForEach ($CurrentLens in $LensList) {
+        #Check if there is an operational profile
+        if($profiles.Lens -contains $CurrentLens) {
+            Write-Warning "Lens $($CurrentLens): A recording profile already exists"
+            continue
+        }
+
+        #Set proper SD Card
         if(
             $CurrentLens -eq 1 -or
             $CurrentLens % $disks.Count -eq 0
@@ -54,6 +62,7 @@ function New-AxisRecordingProfile {
             $URIString += "diskid=SD_DISK2&"
         }
 
+        #Add lens and recording parameters
         $URIString += "options=camera%3D$CurrentLens&"
         $URIString += "$($Config.RecordingParams.Replace('=','%3D'))"
 

@@ -13,7 +13,7 @@
         'Format-AxisSDCard'
         'Get-AxisDeviceInfo'
         'Get-AxisNetworkInfo'
-        'Get-AxisPSRecordingProfile'
+        'Get-AxisPSConfig'
         'Get-AxisRecordingProfile'
         'Get-AxisRecordingSupport'
         'Get-AxisSDCardStatus'
@@ -31,12 +31,13 @@
         'Set-AxisStorageOptions'
         'Update-AxisDevice'
         'Reset-AxisDevice'
-        'Set-AxisPSFactoryConfig'
+        'Set-AxisPSConfig'
         'New-AxisProvisioningJob'
         'Get-AxisAction'
         'Remove-AxisAction'
         'Get-AxisContinuousRecordingProfile'
         'Optimize-AxisRecordingProfiles'
+        'Invoke-AxisProvisioningTask'
     )
     VariablesToExport = "*"
     AliasesToExport = "*"
@@ -49,7 +50,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.5.1'
+    ModuleVersion = '0.6.0'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -58,6 +59,14 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.6.0
+    * Refactored Provision-AxisDevice
+    * Added logging to file
+    * Added Snapshot stage to Provision-AxisDevice
+    * Fixed issue with Get-AxisRecordingProfile where it would not display the correct number of lenses
+    * New-AxisRecordingProfile now completes successfully when a profile already exists
+    * Changed the way of interacting with the config
+    * Added logging to Provision-AxisDevice
 ## 0.5.1
     * Documentation adjustments
 ## 0.5.0

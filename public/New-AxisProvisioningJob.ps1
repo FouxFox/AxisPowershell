@@ -28,11 +28,15 @@ function New-AxisProvisioningJob {
     Check-Credential
     
     if(!$Config.FirmwareFolder) {
-        Set-AxisPSFactoryConfig
+        Throw "Firmware Folder not set. Please use Set-AxisPSConfig to set the firmware folder."
     }
 
     $TargetDevices = @()
     $ModuleString = "AxisPowershell"
+    if($env:TestModulePath) {
+        $ModuleString = $env:TestModulePath
+    }
+
     $AxisOUIs = @(
         "e8-27-25"
         "00-40-8c"
@@ -48,7 +52,7 @@ function New-AxisProvisioningJob {
     else {
         ForEach ($item in $IP) {
             $TargetDevices += [pscustomobject]@{
-                IPAddress = $item
+                IP = $item
                 MacAddress = $item
             }
         }
@@ -66,7 +70,7 @@ function New-AxisProvisioningJob {
         Import-Module $RuntimeData.ModulePath
         Set-AxisCredential -Credential $RuntimeData.Credential
         "$($RuntimeData.Device.MacAddress)): Starting Provisioning"
-        Provision-AxisDevice -Device $RuntimeData.Device.IP -FactoryPrep
+        Invoke-AxisProvisioningTask -Device $RuntimeData.Device.IP -MacAddress $RuntimeData.Device.MacAddress
         "$($RuntimeData.Device.MacAddress)): Complete"
     }
     
@@ -96,7 +100,6 @@ function New-AxisProvisioningJob {
         ForEach ($item in $Jobs) {
             $ProgressIndex = $item.Pipe.Streams.Progress.count - 1
             if($item.Pipe.HadErrors) {
-                $ErrorIndex = $item.Pipe.Streams.Error.count - 1
                 Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.InvocationStateInfo.Reason.Message)"
                 return
             }
@@ -109,7 +112,6 @@ function New-AxisProvisioningJob {
     foreach ($item in $jobs) {
         # EndInvoke method retrieves the results of the asynchronous call
         if($item.pipe.HadErrors) {
-            $ErrorIndex = $item.Pipe.Streams.Error.count - 1
             Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.InvocationStateInfo.Reason.Message)"
             return
         }

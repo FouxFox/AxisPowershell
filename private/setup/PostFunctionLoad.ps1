@@ -10,15 +10,19 @@ if($Env:ModuleTools_TestMode -ne 1) {
     $FirstRun = $false
 
     $DefaultConfig = Get-Content -Path "$PSScriptRoot\config.default.json" | ConvertFrom-Json | ConvertTo-HashTable
-        
-    if(!(Test-Path -Path $Script:ConfigLocation.Replace('\config.json',''))) {
+    
+    #Config Directory check
+    $ConfigPath = $Script:ConfigLocation.Replace('\config.json','')
+    if(!(Test-Path -Path $ConfigPath)) {
         Try {
-            New-Item -ItemType Directory -Path $Script:ConfigLocation.Replace('\config.json','')
+            New-Item -ItemType Directory -Path $ConfigPath
         }
         Catch {
             Throw $_
         }
     }
+
+    #Config File check
     if (!(Test-Path -Path $Script:ConfigLocation)) {
         #Config file is missing, Write a new one.
         Try {
@@ -71,12 +75,27 @@ if($Env:ModuleTools_TestMode -ne 1) {
         Update-ModuleConfiguration
     }
 
+    #Load stored credentials
     Try {
         $Script:Config.Credential = Get-StoredCredential -Target "AxisPowershell"
     }
     Catch {
         Write-Verbose "No stored credentials found."
     }
+
+    #Log Directory check
+    if($Script:Config.LogEnabled) {
+        $LogPath = $Script:Config.LogPath
+        if(!(Test-Path -Path $LogPath)) {
+            Try {
+                New-Item -ItemType Directory -Path $LogPath
+            }
+            Catch {
+                Throw $_
+            }
+        }
+    }
+
     #Turn off certificate checking
     #Moved this to Invoke-AxisWebApi
     #Set-CertificateValidation -Disable

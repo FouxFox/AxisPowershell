@@ -32,7 +32,7 @@ function Get-AxisViewStatus {
         [Parameter(Mandatory=$true)]
         [String]$Device,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [Switch]$RemoveCombinedViews
     )
 
@@ -72,7 +72,7 @@ function Get-AxisViewStatus {
 
     #Echo back
     if($RemoveCombinedViews) {
-        return $Parsed.Values | ? { $_.Name -notlike "*View" } | Sort-Object Id
+        return $Parsed.Values | ? { $_.Name -notlike "*View" } | ? { $_.Enabled -eq "yes" }
     }
 
     return $Parsed.Values | Sort-Object Id
