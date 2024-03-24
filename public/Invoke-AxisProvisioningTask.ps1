@@ -4,7 +4,7 @@ function Invoke-AxisProvisioningTask {
         [Parameter(Mandatory=$true)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$true)]
         [String]$MacAddress
     )
 

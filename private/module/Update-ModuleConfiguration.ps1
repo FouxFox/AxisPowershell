@@ -1,5 +1,5 @@
 #Upgrades the configuration file with new schema changes
-## CURRENT SCHEMA VERSION: 1
+## CURRENT SCHEMA VERSION: 4
 #Don't forget to update Schema Version in Get-ModuleSchemaVersion and the Reference Object
 
 function Update-ModuleConfiguration {
@@ -22,6 +22,10 @@ function Update-ModuleConfiguration {
         $Script:Config.Add('LogEnabled', $false)
     }
     if($Script:Config.SchemaVersion -eq 3) {
+        $Script:Config.SchemaVersion = 4
+        $sCRIPT.Config.Add('DNSSuffix', $false)
+    }
+    if($Script:Config.SchemaVersion -eq 4) {
         # $Script:Config.SchemaVersion = 4
         # reserved for future updates
     }

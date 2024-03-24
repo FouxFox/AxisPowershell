@@ -2,7 +2,7 @@ Describe "New-AxisRecordingProfile" {
     Context "SD Card not formatted" {
         BeforeAll {
             # Required Mock Functions
-            Mock @m Get-AxisRecordingSupport { return @{NumberofLenses = 1} }
+            Mock @m Get-AxisRecordingProfile {}
             Mock @m Invoke-AxisWebApi {}
         }
 
@@ -28,6 +28,7 @@ Describe "New-AxisRecordingProfile" {
         }
     }
 
+    #Need to rehas this to actually test for the other lenses and SD cards
     Context -Tag "Test" "Variations on All Lenses" {
         It "<Desc>" -ForEach @(
             @{
@@ -35,7 +36,7 @@ Describe "New-AxisRecordingProfile" {
                 LensScript = {return @{NumberofLenses = 1}}
                 SDScript = { return @{Status = 'OK'} }
                 InvokeScript = { return @{root=@{configure=@{result = 'OK'}}} }
-                URIString = { $Path.contains("camera=1&diskid=SD_DISK") }
+                URIString = { $Path.contains("diskid=SD_DISK") -and $Path.contains("camera%3D1") }
                 TestCases = @(
                     "Mocks"
                     "Invoke"
@@ -46,7 +47,7 @@ Describe "New-AxisRecordingProfile" {
                 LensScript = {return @{NumberofLenses = 2}}
                 SDScript = { return @{Status = 'OK'} }
                 InvokeScript = { return @{root=@{configure=@{result = 'OK'}}} }
-                URIString = { $Path.contains("camera=1&diskid=SD_DISK") }
+                URIString = { $Path.contains("diskid=SD_DISK") -and $Path.contains("camera%3D1") }
                 TestCases = @(
                     "Mocks"
                     "Invoke"
@@ -57,7 +58,7 @@ Describe "New-AxisRecordingProfile" {
                 LensScript = {return @{NumberofLenses = 1}}
                 SDScript = { return @{Status = 'OK'} }
                 InvokeScript = { return @{root=@{configure=@{result = 'OK'}}} }
-                URIString = { $Path.contains("camera=1&diskid=SD_DISK") }
+                URIString = { $Path.contains("diskid=SD_DISK") -and $Path.contains("camera%3D1") }
                 TestCases = @(
                     "Mocks"
                     "Invoke"
@@ -68,7 +69,7 @@ Describe "New-AxisRecordingProfile" {
                 LensScript = {return @{NumberofLenses = 1}}
                 SDScript = { return @{Status = 'OK'} }
                 InvokeScript = { return @{root=@{configure=@{result = 'OK'}}} }
-                URIString = { $Path.contains("camera=1&diskid=SD_DISK") }
+                URIString = { $Path.contains("diskid=SD_DISK") -and $Path.contains("camera%3D1") }
                 TestCases = @(
                     "Mocks"
                     "Invoke"
@@ -78,6 +79,7 @@ Describe "New-AxisRecordingProfile" {
             Mock @m Invoke-AxisWebApi $InvokeScript
             Mock @m Get-AxisSDCardStatus $SDScript
             Mock @m Get-AxisRecordingSupport $LensScript
+            Mock @m Get-AxisRecordingProfile {}
             if($TestCases.contains("Throw")) {
                 { New-AxisRecordingProfile -Device "192.168.0.100" } | Should -Throw
             }

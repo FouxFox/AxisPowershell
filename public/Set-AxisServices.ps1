@@ -53,25 +53,29 @@ function Set-AxisServices {
         [Switch]$WSDiscovery=$false,
 
         [Parameter(Mandatory=$false)]
-        [Switch]$HttpsBasic=$true
+        [Switch]$O3C=$false
     )
+    
+    Begin {
 
-    $URIString = ''
-    $URIString += "&Network.Bonjour.Enabled=$(if($Bonjour) {'yes'} else {'no'})"
-    $URIString += "&Network.SSH.Enabled=$(if($SSH) {'yes'} else {'no'})"
-    $URIString += "&Network.UPnP.Enabled=$(if($UPnP) {'yes'} else {'no'})"
-    $URIString += "&WebService.DiscoveryMode.Discoverable=$(if($WSDiscovery) {'yes'} else {'no'})"
-    #Network.HTTP.AuthenticationPolicy=digest
-    #
+        $URIString = ''
+        $URIString += "&Network.Bonjour.Enabled=$(if($Bonjour) {'yes'} else {'no'})"
+        $URIString += "&Network.SSH.Enabled=$(if($SSH) {'yes'} else {'no'})"
+        $URIString += "&Network.UPnP.Enabled=$(if($UPnP) {'yes'} else {'no'})"
+        $URIString += "&WebService.DiscoveryMode.Discoverable=$(if($WSDiscovery) {'yes'} else {'no'})"
+        $URIString += "&RemoveService.Enabled=$(if($O3C) {'oneclick'} else {'no'})"
+        #Network.HTTP.AuthenticationPolicy=digest
+        #
 
 
-    $Param = @{
-            Device = $Device
-            Path = "/axis-cgi/param.cgi?action=update$($URIString)"
+        $Param = @{
+                Device = $Device
+                Path = "/axis-cgi/param.cgi?action=update$($URIString)"
+            }
+        $result = Invoke-AxisWebApi @Param
+
+        if($result -ne 'OK') {
+            Throw "Unable to apply Security Settings"
         }
-    $result = Invoke-AxisWebApi @Param
-
-    if($result -ne 'OK') {
-        Throw "Unable to apply Security Settings"
     }
 }

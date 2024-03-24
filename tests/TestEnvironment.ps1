@@ -35,6 +35,7 @@ Function InitTestEnvironment {
             RecordingParams = "videocodec=h265&fps=30&compression=30&videozstrength=20&videozgopmode=dynamic&videozmaxgoplength=1023&videozprofile=storage"
             FirmwareFolder = "C:\"
 			SchemaVersion = 1
+			DNSSuffix = "example.com"
         }
 	}
 	Set-Variable @Param
@@ -74,13 +75,14 @@ Function InitTestEnvironment {
 
 	function Global:reload { 
 		Remove-Module AxisPowershell -Force -Confirm:$false -ErrorAction SilentlyContinue
-		Import-Module C:\Users\msmall\Source\powershell\modules\AxisPowershell 
+		Import-Module "$PSScriptRoot\..\..\AxisPowershell" 
 	}
 
     # Test Mode must be set before testing
     $Env:ModuleTools_TestMode = 1
 
     #Import Module
+	Remove-Module AxisPowershell -Force -Confirm:$false -ErrorAction SilentlyContinue
     $Script:ModulePath = "$PSScriptRoot\..\..\AxisPowershell"
     Import-Module -DisableNameChecking $Script:ModulePath
 }

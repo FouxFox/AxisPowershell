@@ -85,6 +85,9 @@ if($Env:ModuleTools_TestMode -ne 1) {
 
     #Log Directory check
     if($Script:Config.LogEnabled) {
+        if($Script:Config.LogPath -eq $false) {
+            $Script:Config.LogPath = "$env:ProgramData\AxisPowershell\Log\"
+        }
         $LogPath = $Script:Config.LogPath
         if(!(Test-Path -Path $LogPath)) {
             Try {

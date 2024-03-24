@@ -34,7 +34,7 @@ function Enable-AxisDNSUpdate {
     )
 
     if(!$Hostname) {
-        $NewHostName = "axis-$((Get-AxisDeviceInfo -Device $Device).SerialNumber).sec.aa"
+        $NewHostName = "axis-$((Get-AxisDeviceInfo -Device $Device).SerialNumber).$($Config.DNSSuffix)"
     }
     else {
         $NewHostName = $Hostname

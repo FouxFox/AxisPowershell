@@ -73,7 +73,7 @@ Describe "AxisPowerShell.Public.Enable-AxisDNSUpdate" {
             $cmd = 'Invoke-AxisWebApi'
             $Filter = {
                 $Device -eq $TestDevice_IP -and
-                $Path -eq "/axis-cgi/param.cgi?action=update&Network.DNSUpdate.DNSName=axis-123456.sec.aa&Network.DNSUpdate.Enabled=yes"
+                $Path -eq "/axis-cgi/param.cgi?action=update&Network.DNSUpdate.DNSName=axis-123456.example.com&Network.DNSUpdate.Enabled=yes"
             }
             Should @m -Invoke $cmd -Exactly -Times 1 -ParameterFilter $Filter
         }
@@ -82,7 +82,7 @@ Describe "AxisPowerShell.Public.Enable-AxisDNSUpdate" {
             $cmd = 'Invoke-AxisWebApi'
             $Filter = {
                 $Device -eq $TestDevice_IP -and
-                $Path -eq "/axis-cgi/dnsupdate.cgi?add=axis-123456.sec.aa&hdgen=yes" -and
+                $Path -eq "/axis-cgi/dnsupdate.cgi?add=axis-123456.example.com&hdgen=yes" -and
                 $Method -eq "Get"
             }
             Should @m -Invoke $cmd -Exactly -Times 1 -ParameterFilter $Filter

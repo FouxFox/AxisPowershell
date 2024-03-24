@@ -38,6 +38,10 @@
         'Get-AxisContinuousRecordingProfile'
         'Optimize-AxisRecordingProfiles'
         'Invoke-AxisProvisioningTask'
+        'Update-AxisParameter'
+        'Add-AxisParameter'
+        'Remove-AxisParameter'
+        'Get-AxisParameter'
     )
     VariablesToExport = "*"
     AliasesToExport = "*"
@@ -59,6 +63,11 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.7.0
+    * Added AxisParameter cmdlets
+    * Refactored several cmdlets to use AxisParameter cmdlets
+    * Changed behavior of Set-AxisServices to disable O3C by default
+    * Combined PSConfig cmdlets into unified Set-AxisPSConfig / Get-AxisPSConfig
 ## 0.6.0
     * Refactored Provision-AxisDevice
     * Added logging to file

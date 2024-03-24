@@ -15,18 +15,20 @@ This example sets the firmware folder path to "C:\Firmware".
 
 #>
 function Set-AxisPSConfig {
-    [cmdletbinding()]
+    [cmdletbinding(DefaultParameterSetName='LoggingOn')]
     Param(
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ParameterSetName='LoggingOn')]
+        [Parameter(Mandatory=$false, ParameterSetName='LoggingOff')]
         [String]$FirmwareFolder,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ParameterSetName='LoggingOn')]
+        [Parameter(Mandatory=$false, ParameterSetName='LoggingOff')]
         [String]$LogPath,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ParameterSetName='LoggingOn')]
         [Switch]$EnableLogging,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ParameterSetName='LoggingOff')]
         [Switch]$DisableLogging
     )
     

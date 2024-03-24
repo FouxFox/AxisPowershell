@@ -1,67 +1,4 @@
 Describe "Provision-AxisDevice" {
-    Context "Single Parameter Tests" {
-        BeforeEach {
-            # Mock necessary functions
-            Mock @m Initialize-AxisDevice {}
-            Mock @m Get-AxisNetworkInfo {}
-            Mock @m Set-AxisPSFactoryConfig {}
-            Mock @m Update-AxisDevice {}
-            Mock @m Set-AxisIPAddress {}
-            Mock @m Enable-AxisDNSUpdate {}
-            Mock @m Set-AxisServices {}
-            Mock @m Format-AxisSDCard {}
-            Mock @m New-AxisRecordingProfile {}
-            Mock Write-Progress {}
-        }
-
-        It "<cmd>" -ForEach @(
-            @{
-                arg = "NewPassword"
-                cmd = "Initialize-AxisDevice"
-                value = "12345"
-                Filter = {$NewPassword -eq "12345"}
-            }
-            @{
-                arg = "DHCP"
-                cmd = "Set-AxisIPAddress"
-                value = $true
-                Filter = { $DHCP -eq $true}
-            }
-            @{
-                arg = "DNS"
-                cmd = "Enable-AxisDNSUpdate"
-                value = $true
-                Filter = { $true }
-            }
-            @{
-                arg = "SecuritySettings"
-                cmd = "Set-AxisServices"
-                value = $true
-                Filter = { $true }
-            }
-            @{
-                arg = "SDCard"
-                cmd = "Format-AxisSDCard"
-                value = $true
-                Filter = { $Wait -eq $true }
-            }
-            @{
-                arg = "EdgeRecording"
-                cmd = "New-AxisRecordingProfile"
-                value = $true
-                Filter = { $SDCard -eq $true }
-            }) {
-            
-            $Param = @{
-                $arg = $value
-            }
-            Provision-AxisDevice @Param -Device "192.168.1.100"
-            Should @m -Invoke $cmd -Exactly -Times 1 -ParameterFilter $Filter
-        }
-    }
-
-
-
     Context "Called from New-AxisProvisioningJob: Commands" {
         BeforeAll {
             # Mock necessary functions
@@ -116,7 +53,7 @@ Describe "Provision-AxisDevice" {
             # Mock necessary functions
             Mock @m Initialize-AxisDevice {}
             Mock @m Get-AxisNetworkInfo {}
-            Mock @m Set-AxisPSFactoryConfig {}
+            Mock @m Set-AxisPSConfig {}
             Mock @m Update-AxisDevice {}
             Mock @m Set-AxisIPAddress {}
             Mock @m Enable-AxisDNSUpdate {}
@@ -124,9 +61,8 @@ Describe "Provision-AxisDevice" {
             Mock @m Format-AxisSDCard {}
             Mock @m New-AxisRecordingProfile {}
             Mock @m Write-Progress {}
-            Mock New-AxisProvisioningJob { Provision-AxisDevice -Device "192.168.1.100" -FactoryPrepTest }
 
-            New-AxisProvisioningJob
+            Invoke-AxisProvisioningTask -Device "192.168.1.100" -MacAddress "00:00:00:00:00:00"
         }
 
         It "<Desc>" -ForEach @(

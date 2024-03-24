@@ -20,6 +20,7 @@ function Remove-AxisAction {
     param (
         [Parameter(Mandatory=$true)]
         [String]$Device,
+        
         [Parameter(Mandatory=$true)]
         $ActionRule
     )

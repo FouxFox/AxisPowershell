@@ -2,7 +2,7 @@
     "Headers":  {
         "Content-Type":  "application/json"
     },
-    "SchemaVersion":  0,
+    "SchemaVersion":  4,
     "DisableCameraViews":  {
         "P3719-PLE":  ["Image.I4.Enabled"],
         "P4707-PLVE":  ["Image.I2.Enabled"]
@@ -10,5 +10,8 @@
     "RecordingParams":  "videocodec=h265\u0026fps=30\u0026compression=30\u0026videozstrength=20\u0026videozgopmode=dynamic\u0026videozmaxgoplength=1023\u0026videozprofile=storage",
     "CurrentDevice":  false,
     "FirmwareFolder": false,
-    "Credential": ""
+    "Credential": "",
+    "LogEnabled": false,
+    "LogPath": false,
+    "DNSSuffix":  false
 }
