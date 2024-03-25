@@ -32,14 +32,10 @@ function Disable-AxisUnusedViews {
     }
 
     $ViewsToDisable = $Config.DisableCameraViews[$Model]
-    $URIString = ""
+    $ParameterSet = @{}
     ForEach($view in $ViewsToDisable) {
-        $URIString += "$($view)=no"
+        $ParameterSet.Add($view,"no")
     }
 
-    $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/param.cgi?action=update&group=$($URIString)"
-    }
-    Invoke-AxisWebApi @Param
+    Update-AxisParameter -Device $Device -ParameterSet $ParameterSet
 }

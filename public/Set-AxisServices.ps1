@@ -55,27 +55,35 @@ function Set-AxisServices {
         [Parameter(Mandatory=$false)]
         [Switch]$O3C=$false
     )
-    
-    Begin {
 
-        $URIString = ''
-        $URIString += "&Network.Bonjour.Enabled=$(if($Bonjour) {'yes'} else {'no'})"
-        $URIString += "&Network.SSH.Enabled=$(if($SSH) {'yes'} else {'no'})"
-        $URIString += "&Network.UPnP.Enabled=$(if($UPnP) {'yes'} else {'no'})"
-        $URIString += "&WebService.DiscoveryMode.Discoverable=$(if($WSDiscovery) {'yes'} else {'no'})"
-        $URIString += "&RemoveService.Enabled=$(if($O3C) {'oneclick'} else {'no'})"
-        #Network.HTTP.AuthenticationPolicy=digest
-        #
+    $ParamSet = @{
+        "Network.Bonjour.Enabled" = 'no'
+        "Network.SSH.Enabled" = 'no'
+        "Network.UPnP.Enabled" = 'no'
+        "WebService.DiscoveryMode.Discoverable" = 'no'
+        "RemoveService.Enabled" = 'no'
+    }
 
+    if($Bonjour) {
+        $ParamSet["Network.Bonjour.Enabled"] = 'yes'
+    }
+    if($SSH) {
+        $ParamSet["Network.SSH.Enabled"] = 'yes'
+    }
+    if($UPnP) {
+        $ParamSet["Network.UPnP.Enabled"] = 'yes'
+    }
+    if($WSDiscovery) {
+        $ParamSet["WebService.DiscoveryMode.Discoverable"] = 'yes'
+    }
+    if($O3C) {
+        $ParamSet["RemoveService.Enabled"] = 'oneclick'
+    }
 
-        $Param = @{
-                Device = $Device
-                Path = "/axis-cgi/param.cgi?action=update$($URIString)"
-            }
-        $result = Invoke-AxisWebApi @Param
-
-        if($result -ne 'OK') {
-            Throw "Unable to apply Security Settings"
-        }
+    Try {
+        Set-AxisParameter -Device $Device -Parameter $ParamSet
+    }
+    Catch {
+        Throw "Unable to apply Security Settings"
     }
 }

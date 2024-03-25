@@ -2,9 +2,9 @@ Describe "AxisPowerShell.Public.Enable-AxisDNSUpdate" {
     Context "User Output Messages" {
         BeforeAll {
             # Required Mock Functions
-            Mock -ModuleName AxisPowerShell Get-AxisDeviceInfo { return @{SerialNumber='123456'} }
-            Mock -ModuleName AxisPowerShell Invoke-AxisWebApi { return 'Ok!' }
-            Mock -ModuleName AxisPowerShell Write-Host {}
+            Mock @m Get-AxisDeviceInfo { return @{SerialNumber='123456'} }
+            Mock @m Invoke-AxisWebApi { return 'OK' }
+            Mock @m Write-Host {}
         }
 
         It "Prints correctly when successful" {
@@ -37,7 +37,7 @@ Describe "AxisPowerShell.Public.Enable-AxisDNSUpdate" {
         BeforeAll {
             # Required Mock Functions
             Mock -ModuleName AxisPowerShell Get-AxisDeviceInfo { return @{SerialNumber='123456'} }
-            Mock -ModuleName AxisPowerShell Invoke-AxisWebApi { return 'Ok!' }
+            Mock -ModuleName AxisPowerShell Invoke-AxisWebApi { return 'OK' }
         }
 
         It 'Sets the configuration with the provided hostname' {
@@ -65,7 +65,7 @@ Describe "AxisPowerShell.Public.Enable-AxisDNSUpdate" {
         BeforeAll {
             # Required Mock Functions
             Mock -ModuleName AxisPowerShell Get-AxisDeviceInfo { return @{SerialNumber='123456'} }
-            Mock -ModuleName AxisPowerShell Invoke-AxisWebApi { return 'Ok!' }
+            Mock -ModuleName AxisPowerShell Invoke-AxisWebApi { return 'OK' }
         }
 
         # Tests

@@ -34,31 +34,26 @@ function Get-AxisNetworkInfo {
     )
 
     #Standard Post method did not work even on current cameras. This was somehow better
-    $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/param.cgi?action=list&group=Network,WebService.DiscoveryMode.Discoverable"
-    }
-
-    $result = (Invoke-AxisWebApi @Param).replace("root.",'')
-    #Invoke-AxisWebApi Device 10.49.0.2 -Path "/axis-cgi/network_settings.cgi" -Method post -Body @{apiVersion = "1.27"; method = "getNetworkInfo"}
-
-    $Parsed = [ordered]@{}
-    ForEach ($line in $result.split("`n")) {
-        $Parsed.Add($line.split("=")[0].replace("Network.",''),$line.split("=")[1])
-    }
+    $Groups = @(
+        'Network'
+        'WebService.DiscoveryMode.Discoverable'
+        'RemoteService.Enabled'
+    )
+    $result = Get-AxisParameter -Device $Device -Group $Groups
 
     [pscustomobject]@{
-        DHCP =             $Parsed.BootProto                               -eq 'dhcp'
-        IPAddress =        $Parsed.'eth0.IPAddress'
-        SubnetMask =       $Parsed.'eth0.SubnetMask'
-        Gateway =          $Parsed.'Routing.DefaultRouter'
-        DNS =              $Parsed.'Resolver.NameServerList'
-        HostName =         $Parsed.HostName
-        DNSUpdateEnabled = $Parsed.'DNSUpdate.Enabled'                     -eq 'yes'
-        DNSHostName =      $Parsed.'DNSUpdate.DNSName'
-        Bonjour =          $Parsed.'Bonjour.Enabled'                       -eq 'yes'
-        SSH =              $Parsed.'SSH.Enabled'                           -eq 'yes'
-        UPnP =             $Parsed.'UpnP.Enabled'                          -eq 'yes'
-        WSDiscovery =      $Parsed.'WebService.DiscoveryMode.Discoverable' -eq 'yes'
+        DHCP =             $result.'Network.BootProto'                     -eq 'dhcp'
+        IPAddress =        $result.'Network.eth0.IPAddress'
+        SubnetMask =       $result.'Network.eth0.SubnetMask'
+        Gateway =          $result.'Network.Routing.DefaultRouter'
+        DNS =              $result.'Network.Resolver.NameServerList'
+        HostName =         $result.'Network.HostName'
+        DNSUpdateEnabled = $result.'Network.DNSUpdate.Enabled'             -eq 'yes'
+        DNSHostName =      $result.'Network.DNSUpdate.DNSName'
+        Bonjour =          $result.'Network.Bonjour.Enabled'               -eq 'yes'
+        SSH =              $result.'Network.SSH.Enabled'                   -eq 'yes'
+        UPnP =             $result.'Network.UpnP.Enabled'                  -eq 'yes'
+        WSDiscovery =      $result.'WebService.DiscoveryMode.Discoverable' -eq 'yes'
+        O3C =              $result.'RemoteService.Enabled'                 -eq 'oneclick'
     }
 }

@@ -32,9 +32,5 @@ function Set-AxisStorageOptions {
         [int]$MaxAge=0
     )
 
-    $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/param.cgi?action=update&Storage.S0.CleanupMaxAge=$MaxAge"
-    }
-    Invoke-AxisWebApi @Param
+    Set-AxisParameter -Device $Device -Parameter "Storage.S0.CleanupMaxAge" -Value $MaxAge
 }

@@ -52,29 +52,25 @@ function Get-AxisDeviceInfo {
 
     return (Invoke-AxisWebApi @Param).data.propertyList
 #>
-
-    $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/param.cgi?action=list&group=Properties.Firmware,Properties.System,Brand,ImageSource"
-    }
-    $result = Invoke-AxisWebApi @Param
-
-    $Parsed = [ordered]@{}
-    ForEach ($line in $result.split("`n")) {
-        $Parsed.Add($line.split("=")[0].replace("root.",''),$line.split("=")[1])
-    }
-
+    $Group = @( 
+        'Properties.Firmware'
+        'Properties.System'
+        'Brand'
+        'ImageSource'
+    )
+    $result = Get-AxisParameter -Device $Device -Group $Group
+    
     [pscustomobject]@{
-        Architecture    = $Parsed.'Properties.System.Architecture'
-        ProdNbr         = $Parsed.'Brand.ProdNbr'
-        HardwareID      = $Parsed.'Properties.System.HardwareID'
-        ProdFullName    = $Parsed.'Brand.ProdFullName'
-        Version         = $Parsed.'Properties.Firmware.Version'
-        ProdType        = $Parsed.'Brand.ProdType'
-        Soc             = $Parsed.'Properties.System.Soc'
-        SerialNumber    = $Parsed.'Properties.System.SerialNumber'
-        ProdShortName   = $Parsed.'Brand.ProdShortName'
-        FWBuildDate     = $Parsed.'Properties.Firmware.BuildDate'
-        NumberofLenses  = $Parsed.'ImageSource.NbrOfSources'
+        Architecture    = $result.'Properties.System.Architecture'
+        ProdNbr         = $result.'Brand.ProdNbr'
+        HardwareID      = $result.'Properties.System.HardwareID'
+        ProdFullName    = $result.'Brand.ProdFullName'
+        Version         = $result.'Properties.Firmware.Version'
+        ProdType        = $result.'Brand.ProdType'
+        Soc             = $result.'Properties.System.Soc'
+        SerialNumber    = $result.'Properties.System.SerialNumber'
+        ProdShortName   = $result.'Brand.ProdShortName'
+        FWBuildDate     = $result.'Properties.Firmware.BuildDate'
+        NumberofLenses  = $result.'ImageSource.NbrOfSources'
     }
 }

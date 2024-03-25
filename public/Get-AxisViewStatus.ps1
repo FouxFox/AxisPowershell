@@ -24,7 +24,6 @@ Id Name        Enabled
 -- ----        -------
 I0 View Area 1 yes
 I1 View Area 2 no
-
 #>
 function Get-AxisViewStatus {
     [cmdletbinding()]
@@ -36,44 +35,36 @@ function Get-AxisViewStatus {
         [Switch]$RemoveCombinedViews
     )
 
-    $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/param.cgi?action=list&group=Image.*.Name,Image.*.Enabled"
-    }
-    $result = Invoke-AxisWebApi @Param
-    <#
-        Retruns:
-        root.Image.I0.Enabled=yes
-        root.Image.I0.Name=Camera 1
-    #>
+    $groups = @(
+        "Image.*.Name"
+        "Image.*.Enabled"
+    )
+    $result = Get-AxisParameter -Device $Device -Group $groups
 
-    $Parsed = @{}
-    ForEach ($line in $result.split("`n")) {
-        if(!$line.contains('=')) {
-            continue
-        }
+    $Formatted = @{}
+    ForEach ($key in $result.Keys) {
         #Create Components
-        $Id = $line.split(".")[2] #root.Image.I0.Enabled=yes > I0
-        $Key = $line.split(".")[3].split("=")[0] #root.Image.I0.Name=yes > Name
-        $value = $line.split("=")[1] #root.Image.I4.Enabled=no > no
+        $View = $key.split(".")[1] #Image.I0.Enabled=yes > I0
+        $Property = $key.split(".")[2] #Image.I0.Name=yes > Name
+        $value = $result[$key] #Image.I4.Enabled=no > no
         
         #Create object if does not exist
-        if(!$Parsed.ContainsKey($Id)) {
-            $Parsed.Add($Id,[pscustomobject]@{
-                Id = $Id
+        if(!$Formatted.ContainsKey($View)) {
+            $Formatted.Add($View,[pscustomobject]@{
+                Id = $View
                 Name = ''
                 Enabled = ''
             })
         }
 
         #Set value from this line
-        $Parsed.$Id.$Key = $value
+        $Formatted.$View.$Property = $value
     }
 
     #Echo back
     if($RemoveCombinedViews) {
-        return $Parsed.Values | ? { $_.Name -notlike "*View" } | ? { $_.Enabled -eq "yes" }
+        return $Formatted.Values | Where-Object { $_.Name -notlike "*View" } | Where-Object { $_.Enabled -eq "yes" }
     }
 
-    return $Parsed.Values | Sort-Object Id
+    return $Formatted.Values | Sort-Object Id
 }

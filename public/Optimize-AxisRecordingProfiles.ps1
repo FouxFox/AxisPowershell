@@ -21,7 +21,7 @@ function Optimize-AxisRecordingProfiles {
         [String]$Device
     )
     
-    Get-AxisRecordingProfile -Device $Device | ? { $_.Status -ne 'OK' } | % {
+    Get-AxisRecordingProfile -Device $Device | Where-Object { $_.Status -ne 'OK' } | ForEach-Object {
         if($_.Status -eq 'Error') {
             Write-Warning "Lens $($_.Lens) has both Continuous and Action profiles. Please remove one of them."
             return

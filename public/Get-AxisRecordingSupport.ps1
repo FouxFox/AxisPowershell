@@ -31,29 +31,24 @@ function Get-AxisRecordingSupport {
         [String]$Device
     )
 
-    $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/param.cgi?action=list&group=Properties.LocalStorage,ImageSource.NbrOfSources"
-    }
-    $result = Invoke-AxisWebApi @Param
-
-    $Parsed = [ordered]@{}
-    ForEach ($line in $result.split("`n")) {
-        $Parsed.Add($line.split("=")[0].replace("root.",'').replace("Properties.LocalStorage.",'').replace("ImageSource.",''),$line.split("=")[1])
-    }
+    $Groups = @(
+        'Properties.LocalStorage'
+        'ImageSource.NbrOfSources'
+    )
+    $result = Get-AxisParameter -Device $Device -Group $Groups
 
     [pscustomobject]@{
-        AutoRepair =                        $Parsed.AutoRepair          -eq 'yes'
-        ContinuousRecording =               $Parsed.ContinuousRecording -eq 'yes'
-        DiskEncryption =                    $Parsed.DiskEncryption      -eq 'yes'
-        DiskHealth =                        $Parsed.DiskHealth          -eq 'yes'
-        ExportRecording =                   $Parsed.ExportRecording     -eq 'yes'
-        FailOverRecording =                 $Parsed.FailOverRecording   -eq 'yes'
-        LocalStorage =                      $Parsed.LocalStorage        -eq 'yes'
-        RequiredFileSystem =                $Parsed.RequiredFileSystem  -eq 'yes'
-        SDCard =                            $Parsed.SDCard              -eq 'yes'
-        StorageLimit =                      $Parsed.StorageLimit        -eq 'yes'
-        NbrOfContinuousRecordingProfiles =  $Parsed.NbrOfContinuousRecordingProfiles
-        NumberofLenses =                    $Parsed.NbrOfSources 
+        AutoRepair =                        $result.'Properties.LocalStorage.AutoRepair'          -eq 'yes'
+        ContinuousRecording =               $result.'Properties.LocalStorage.ContinuousRecording' -eq 'yes'
+        DiskEncryption =                    $result.'Properties.LocalStorage.DiskEncryption'      -eq 'yes'
+        DiskHealth =                        $result.'Properties.LocalStorage.DiskHealth'          -eq 'yes'
+        ExportRecording =                   $result.'Properties.LocalStorage.ExportRecording'     -eq 'yes'
+        FailOverRecording =                 $result.'Properties.LocalStorage.FailOverRecording'   -eq 'yes'
+        LocalStorage =                      $result.'Properties.LocalStorage.LocalStorage'        -eq 'yes'
+        RequiredFileSystem =                $result.'Properties.LocalStorage.RequiredFileSystem'  -eq 'yes'
+        SDCard =                            $result.'Properties.LocalStorage.SDCard'              -eq 'yes'
+        StorageLimit =                      $result.'Properties.LocalStorage.StorageLimit'        -eq 'yes'
+        NbrOfContinuousRecordingProfiles =  $result.'Properties.LocalStorage.NbrOfContinuousRecordingProfiles'
+        NumberofLenses =                    $result.'ImageSource.NbrOfSources' 
     }
 }

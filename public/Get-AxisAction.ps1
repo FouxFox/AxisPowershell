@@ -1,3 +1,22 @@
+<#
+.SYNOPSIS
+Retrieves the action configurations and rules for an Axis device.
+
+.DESCRIPTION
+The Get-AxisAction function retrieves the action configurations and rules for a specified Axis device. 
+It uses the Axis VAPIX ActionService web service to communicate with the device.
+
+.PARAMETER Device
+The IP address or hostname of the Axis device.
+
+.EXAMPLE
+Get-AxisAction -Device "192.168.1.100"
+Retrieves the action configurations and rules for the Axis device with the IP address "192.168.1.100".
+
+.LINK
+https://www.axis.com/vapix/ws/action1/ActionService.wsdl
+The Axis VAPIX ActionService web service documentation.
+#>
 function Get-AxisAction {
     [CmdletBinding()]
     param (

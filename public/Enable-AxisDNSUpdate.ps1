@@ -42,13 +42,13 @@ function Enable-AxisDNSUpdate {
 
     #Update Configuration
     $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/param.cgi?action=update&Network.DNSUpdate.DNSName=$NewHostname&Network.DNSUpdate.Enabled=yes"
+        'Network.DNSUpdate.DNSName' = $NewHostname
+        'Network.DNSUpdate.Enabled' = 'yes'
     }
 
     Write-Host "$($Device): Setting Configuration..." -NoNewline
     Try {
-        $null = Invoke-AxisWebApi @Param 
+        Update-AxisParameter -Device $Device -ParameterSet $Param
         Write-Host -ForegroundColor Green "OK!"
     } Catch {
         Write-Host -ForegroundColor Red "Failed!"

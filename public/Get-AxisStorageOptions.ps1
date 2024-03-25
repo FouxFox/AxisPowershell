@@ -35,25 +35,16 @@ function Get-AxisStorageOptions {
         [String]$Device
     )
 
-    $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/param.cgi?action=list&group=Storage.S0"
-    }
-    $result = Invoke-AxisWebApi @Param
-
-    $Parsed = [ordered]@{}
-    ForEach ($line in $result.split("`n")) {
-        $Parsed.Add($line.split("=")[0].replace("root.Storage.S0.",''),$line.split("=")[1])
-    }
+    $result = Get-AxisParameter -Device $Device -Group 'Storage.S0'
 
     $out = [pscustomobject]@{
-        Disk =                $Parsed.DiskID
-        Enabled =             $Parsed.Enabled             -eq 'yes'
-        AutoRepair =          $Parsed.AutoRepair          -eq 'yes'
-        CleanupMaxAge =       $Parsed.CleanupMaxAge
-        CleanupPolicyActive = $Parsed.CleanupPolicyActive
-        FileSystem =          $Parsed.FileSystem
-        Locked =              $Parsed.Locked              -eq 'yes'
+        Disk =                $result.'Storage.S0.DiskID'
+        Enabled =             $result.'Storage.S0.Enabled'             -eq 'yes'
+        AutoRepair =          $result.'Storage.S0.AutoRepair'          -eq 'yes'
+        CleanupMaxAge =       $result.'Storage.S0.CleanupMaxAge'
+        CleanupPolicyActive = $result.'Storage.S0.CleanupPolicyActive'
+        FileSystem =          $result.'Storage.S0.FileSystem'
+        Locked =              $result.'Storage.S0.Locked'              -eq 'yes'
     }
 
     return $out

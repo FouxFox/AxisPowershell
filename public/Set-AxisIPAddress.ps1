@@ -30,11 +30,7 @@ function Set-AxisIPAddress {
     )
 
     if($DHCP) {
-        $Param = @{
-            Device = $Device
-            Path = "/axis-cgi/param.cgi?action=update&Network.BootProto=dhcp"
-        }
-        Invoke-AxisWebApi @Param
+        Update-AxisParameter -Device $Device -Parameter "Network.BootProto" -Value "dhcp"
     }
     else {
         ThrowError "Not Implemented"
