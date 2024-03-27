@@ -8,40 +8,42 @@
     PowerShellVersion = '3.0'
     #FormatsToProcess = ''
     FunctionsToExport = @(
+        'Add-AxisParameter'
         'Disable-AxisUnusedViews'
         'Enable-AxisDNSUpdate'
         'Format-AxisSDCard'
+        'Get-AxisAction'
+        'Get-AxisContinuousRecordingProfile'
         'Get-AxisDeviceInfo'
         'Get-AxisNetworkInfo'
+        'Get-AxisParameter'
         'Get-AxisPSConfig'
         'Get-AxisRecordingProfile'
         'Get-AxisRecordingSupport'
         'Get-AxisSDCardStatus'
+        'Get-AxisSnapshot'
         'Get-AxisStorageOptions'
         'Get-AxisStreamProfiles'
         'Get-AxisSupportedResolutions'
         'Get-AxisViewStatus'
         'Initialize-AxisDevice'
+        'Invoke-AxisProvisioningTask'
+        'Invoke-AxisWebAPI'
+        'New-AxisProvisioningJob'
         'New-AxisRecordingProfile'
-        'Get-AxisSnapshot'
+        'Optimize-AxisRecordingProfiles'
+        'Remove-AxisAction'
+        'Remove-AxisParameter'
         'Remove-AxisRecordingProfile'
+        'Reset-AxisDevice'
+        'Restart-AxisDevice'
         'Set-AxisCredential'
         'Set-AxisIPAddress'
+        'Set-AxisPSConfig'
         'Set-AxisServices'
         'Set-AxisStorageOptions'
         'Update-AxisDevice'
-        'Reset-AxisDevice'
-        'Set-AxisPSConfig'
-        'New-AxisProvisioningJob'
-        'Get-AxisAction'
-        'Remove-AxisAction'
-        'Get-AxisContinuousRecordingProfile'
-        'Optimize-AxisRecordingProfiles'
-        'Invoke-AxisProvisioningTask'
         'Update-AxisParameter'
-        'Add-AxisParameter'
-        'Remove-AxisParameter'
-        'Get-AxisParameter'
     )
     VariablesToExport = "*"
     AliasesToExport = "*"
@@ -54,7 +56,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.6.0'
+    ModuleVersion = '0.7.0'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -65,6 +67,7 @@
             ReleaseNotes = @'
 ## 0.7.0
     * Added AxisParameter cmdlets
+    * Added Restart command
     * Refactored several cmdlets to use AxisParameter cmdlets
     * Changed behavior of Set-AxisServices to disable O3C by default
     * Combined PSConfig cmdlets into unified Set-AxisPSConfig / Get-AxisPSConfig

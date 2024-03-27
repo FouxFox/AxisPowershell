@@ -3,24 +3,30 @@ Describe "AxisPowerShell.Public.Disable-AxisUnusedViews" {
         BeforeEach { Disable-AxisUnusedViews -Device $TestDevice_IP }
         BeforeAll {
             #Required Mock Functions
-            Mock -ModuleName AxisPowerShell Get-AxisDeviceInfo { return @{ProdNbr='P3719-PLE'} }
-            Mock -ModuleName AxisPowerShell Invoke-AxisWebApi { return 'Ok!' }
+            Mock @m Get-AxisViewStatus { return @(
+                [pscustomobject]@{Id="I0";Name="View Area 1";Enabled="yes"}
+                [pscustomobject]@{Id="I1";Name="View Area 2";Enabled="no"}
+                [pscustomobject]@{Id="I2";Name="Camera 3";Enabled="yes"}
+                [pscustomobject]@{Id="I3";Name="Camera 4";Enabled="no"}
+                [pscustomobject]@{Id="I4";Name="Quad View";Enabled="yes"}
+            )}
+            Mock @m Update-AxisParameter {}
         }
 
         #Tests
-        It 'Gets the Production Number' {
-            $cmd = 'Get-AxisDeviceInfo'
+        It 'Gets Current View Status' {
+            $cmd = 'Get-AxisViewStatus'
             $Filter = {
                 $Device -eq $TestDevice_IP
             }
             Should @m -Invoke $cmd -Exactly -Times 1 -ParameterFilter $Filter
         }
 
-        It 'Invokes the Axis Web API' {
-            $cmd = 'Invoke-AxisWebApi'
+        It 'Disables only views required' {
+            $cmd = 'Update-AxisParameter'
             $Filter = {
                 $Device -eq $TestDevice_IP -and
-                $Path -eq "/axis-cgi/param.cgi?action=update&group=Image.I4.Enabled=no"
+                $ParameterSet['Image.I4.Enabled'] -eq "no"
             }
             Should @m -Invoke $cmd -Exactly -Times 1 -ParameterFilter $Filter
         }
@@ -30,21 +36,27 @@ Describe "AxisPowerShell.Public.Disable-AxisUnusedViews" {
         BeforeEach { Disable-AxisUnusedViews -Device $TestDevice_IP }
         BeforeAll {
             #Mock Functions
-            Mock -ModuleName AxisPowerShell Get-AxisDeviceInfo { return @{ProdNbr='Axis1234'} }
-            Mock -ModuleName AxisPowerShell Invoke-AxisWebApi { return 'Ok!' }
+            Mock @m Get-AxisViewStatus { return @(
+                [pscustomobject]@{Id="I0";Name="View Area 1";Enabled="yes"}
+                [pscustomobject]@{Id="I1";Name="View Area 2";Enabled="no"}
+                [pscustomobject]@{Id="I2";Name="Camera 3";Enabled="yes"}
+                [pscustomobject]@{Id="I3";Name="Camera 4";Enabled="no"}
+                [pscustomobject]@{Id="I4";Name="Quad View";Enabled="no"}
+            )}
+            Mock @m Update-AxisParameter { return 'Ok!' }
         }
 
         #Tests
-        It 'Gets the Production Number' {
-            $cmd = 'Get-AxisDeviceInfo'
+        It 'Gets Current View Status' {
+            $cmd = 'Get-AxisViewStatus'
             $Filter = {
                 $Device -eq $TestDevice_IP
             }
             Should @m -Invoke $cmd -Exactly -Times 1 -ParameterFilter $Filter
         }
 
-        It 'Does not invoke the Axis Web API' {
-            $cmd = 'Invoke-AxisWebApi'
+        It 'Does not update values' {
+            $cmd = 'Update-AxisParameter'
             Should @m -Not -Invoke $cmd
         }
     }

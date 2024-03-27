@@ -24,17 +24,15 @@ function Disable-AxisUnusedViews {
         [String]$Device
     )
 
-    $Model = (Get-AxisDeviceInfo -Device $Device).ProdNbr
-
-    if(!$Config.DisableCameraViews.ContainsKey($Model)) {
-        Write-Verbose "The model '$Model' does not have unused views to disable."
+    $ViewsToDisable = Get-AxisViewStatus -Device $Device | Where-Object { $_.Name -like "*View" } | Where-Object { $_.Name -notlike "View Area*" } | Where-Object { $_.Enabled -eq "yes" }
+    
+    if($ViewsToDisable.Count -eq 0) {
         return
     }
-
-    $ViewsToDisable = $Config.DisableCameraViews[$Model]
+    
     $ParameterSet = @{}
     ForEach($view in $ViewsToDisable) {
-        $ParameterSet.Add($view,"no")
+        $ParameterSet.Add("Image.$($view.Id).Enabled","no")
     }
 
     Update-AxisParameter -Device $Device -ParameterSet $ParameterSet
