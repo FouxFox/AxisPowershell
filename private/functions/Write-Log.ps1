@@ -5,14 +5,16 @@ function Write-Log {
         [string]$ID,
 
         [Parameter(Mandatory=$true)]
-        [string]$Message
+        [string]$Message,
+
+        [Parameter(Mandatory=$false)]
+        [string]$LogPath = $Config.LogPath
     )
 
     if(!$Config.LogEnabled) {
         return
     }
 
-    $LogPath = $Config.LogPath
     $LogMessage = "$(Get-Date -Format "yyyy-MM-dd HH:mm:ss") - [$ID] $Message"
-    Add-Content -Path $LogPath -Value $LogMessage
+    Add-Content -Path "$((Resolve-Path $LogPath).Path)\$($ID).txt" -Value $LogMessage
 }

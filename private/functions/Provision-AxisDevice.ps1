@@ -173,7 +173,7 @@ function Provision-AxisDevice {
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Formatting SD Card"
     Try {
-        Format-AxisSDCard -Device $Device -Wait
+        Format-AxisSDCard -Device $Device -Wait -NoProgress
         Write-Log -ID $MacAddress -Message "Successfully formatted SD Card"
     } Catch {
         Write-Log -ID $MacAddress -Message "Failed to format SD Card"

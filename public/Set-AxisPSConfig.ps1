@@ -35,7 +35,7 @@ function Set-AxisPSConfig {
     if($FirmwareFolder) {
         $Config.FirmwareFolder = $FirmwareFolder
     }
-    if($LogDir) {
+    if($LogPath) {
         $Config.LogPath = $LogPath
     }
     if($EnableLogging) {

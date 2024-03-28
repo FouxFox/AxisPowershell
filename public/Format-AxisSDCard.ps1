@@ -27,6 +27,9 @@ function Format-AxisSDCard {
         [Parameter(Mandatory=$true)]
         [String]$Device,
 
+        [Parameter(Mandatory=$false, DontShow=$true)]
+        [Switch]$NoProgress,
+
         [Parameter(Mandatory=$false)]
         [Switch]$Wait
     )
@@ -37,7 +40,7 @@ function Format-AxisSDCard {
     }
 
     ForEach ($disk in $disks) {
-        if($Wait) {
+        if($Wait -and !$NoProgress) {
             $ProgParam = @{
                 Activity = "Formatting SD Card 1 of $($disks.Count)..."
                 Status = "Unmounting SD Card..." 
@@ -85,12 +88,14 @@ function Format-AxisSDCard {
         $Job = @{ progress = 0 }
         while($Job.progress -ne 100) {
             $Job = (Invoke-AxisWebApi @Param).root.job
-            $ProgParam = @{
-                Activity = "Formatting SD Card 1 of $($disks.Count)..."
-                Status = "Press Ctrl-C to return to prompt" 
-                PercentComplete = $Job.progress
+            if(!$NoProgress) {
+                $ProgParam = @{
+                    Activity = "Formatting SD Card 1 of $($disks.Count)..."
+                    Status = "Press Ctrl-C to return to prompt" 
+                    PercentComplete = $Job.progress
+                }
+                Write-Progress @ProgParam
             }
-            Write-Progress @ProgParam
             Write-Verbose $job.progress
             Start-Sleep -Seconds 1
         }

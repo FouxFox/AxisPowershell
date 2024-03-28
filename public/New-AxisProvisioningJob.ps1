@@ -115,7 +115,7 @@ function New-AxisProvisioningJob {
             Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.InvocationStateInfo.Reason.Message)"
             return
         }
-        Write-Host "$($item.RuntimeData.Device.MacAddress): $($item.Pipe.EndInvoke($item.Handle))"
+        Write-Host "$($item.RuntimeData.Device.MacAddress): Provisioning Complete"
         $item.Pipe.Dispose()
     }
 

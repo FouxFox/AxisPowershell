@@ -27,7 +27,6 @@
         'Get-AxisSupportedResolutions'
         'Get-AxisViewStatus'
         'Initialize-AxisDevice'
-        'Invoke-AxisProvisioningTask'
         'Invoke-AxisWebAPI'
         'New-AxisProvisioningJob'
         'New-AxisRecordingProfile'
@@ -56,7 +55,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.7.0'
+    ModuleVersion = '0.7.1'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -65,6 +64,12 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.7.1
+    * Hotfix release
+    * Fixed issue with Set-AxisServices
+    * Fixed issue with Progress display during a provisioning job
+    * Fixed issues with logging to file
+    * Fixed issue where Set-AxisPSConfig would not change the logging directory
 ## 0.7.0
     * Added AxisParameter cmdlets
     * Added Restart command

@@ -61,7 +61,7 @@ function Set-AxisServices {
         "Network.SSH.Enabled" = 'no'
         "Network.UPnP.Enabled" = 'no'
         "WebService.DiscoveryMode.Discoverable" = 'no'
-        "RemoveService.Enabled" = 'no'
+        "RemoteService.Enabled" = 'no'
     }
 
     if($Bonjour) {
@@ -77,11 +77,11 @@ function Set-AxisServices {
         $ParamSet["WebService.DiscoveryMode.Discoverable"] = 'yes'
     }
     if($O3C) {
-        $ParamSet["RemoveService.Enabled"] = 'oneclick'
+        $ParamSet["RemoteService.Enabled"] = 'oneclick'
     }
 
     Try {
-        Set-AxisParameter -Device $Device -Parameter $ParamSet
+        Update-AxisParameter -Device $Device -ParameterSet $ParamSet
     }
     Catch {
         Throw "Unable to apply Security Settings"
