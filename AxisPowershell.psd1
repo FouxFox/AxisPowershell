@@ -55,7 +55,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.7.1'
+    ModuleVersion = '0.7.2'
     PrivateData = @{
         PSData = @{
             Tags = @(
