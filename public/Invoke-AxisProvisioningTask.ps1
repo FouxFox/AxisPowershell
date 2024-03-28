@@ -46,7 +46,7 @@ Provision-AxisDevice -Device "AxisDevice01" -FactoryPrep
 Provisions the Axis device with the specified name and performs factory preparation, which updates DNS settings and configures security settings.
 
 #>
-function Provision-AxisDevice {
+function Invoke-AxisProvisioningTask {
     [cmdletbinding()]
     Param(
         [Parameter(Mandatory=$true)]
@@ -213,7 +213,7 @@ function Provision-AxisDevice {
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Getting Snapshot from camera"
     Try {
-        Get-AxisSnapshot -Device $Device -Path "C:\Users\$env:USERNAME\Downloads" -FileName $MacAddress
+        Get-AxisSnapshot -Device $Device -Path $Config.ProvisioningSnapshotPath -FileName $MacAddress
         Write-Log -ID $MacAddress -Message "Successfully created snapshot from camera"
     } Catch {
         Write-Log -ID $MacAddress -Message "Failed to create snapshot from camera"

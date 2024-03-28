@@ -28,6 +28,7 @@
         'Get-AxisViewStatus'
         'Initialize-AxisDevice'
         'Invoke-AxisWebAPI'
+        'Invoke-AxisProvisioningTask'
         'New-AxisProvisioningJob'
         'New-AxisRecordingProfile'
         'Optimize-AxisRecordingProfiles'
@@ -55,7 +56,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.7.2'
+    ModuleVersion = '0.8.2'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -64,6 +65,10 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.8.0
+    * Added support for customizing the directory provisioning snapshots are saved to
+## 0.7.3
+    * Issue with Refactor causing script not to run
 ## 0.7.2
     * Issue with Refactor causing script not to run
 ## 0.7.1

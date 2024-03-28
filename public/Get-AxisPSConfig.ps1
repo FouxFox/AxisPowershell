@@ -19,6 +19,8 @@ function Get-AxisPSConfig {
     
     [pscustomobject]@{
         FirmwareFolder = $Config.FirmwareFolder
+        DNSSuffix = $Config.DNSSuffix
+        ProvisioningSnapshotPath = $Config.ProvisioningSnapshotPath
         LogPath = $Config.LogPath
         LogEnabled = $Config.LogEnabled
     }

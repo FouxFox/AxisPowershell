@@ -26,6 +26,14 @@ function Set-AxisPSConfig {
         [String]$LogPath,
 
         [Parameter(Mandatory=$false, ParameterSetName='LoggingOn')]
+        [Parameter(Mandatory=$false, ParameterSetName='LoggingOff')]
+        [String]$ProvisioningSnapshotPath,
+
+        [Parameter(Mandatory=$false, ParameterSetName='LoggingOn')]
+        [Parameter(Mandatory=$false, ParameterSetName='LoggingOff')]
+        [String]$DNSSuffix,
+
+        [Parameter(Mandatory=$false, ParameterSetName='LoggingOn')]
         [Switch]$EnableLogging,
 
         [Parameter(Mandatory=$false, ParameterSetName='LoggingOff')]
@@ -37,6 +45,12 @@ function Set-AxisPSConfig {
     }
     if($LogPath) {
         $Config.LogPath = $LogPath
+    }
+    if ($ProvisioningSnapshotPath) {
+        $Config.ProvisioningSnapshotPath = $ProvisioningSnapshotPath
+    }
+    if ($DNSSuffix) {
+        $Config.DNSSuffix = $DNSSuffix
     }
     if($EnableLogging) {
         $Config.LogEnabled = $true

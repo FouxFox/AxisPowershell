@@ -23,10 +23,14 @@ function Update-ModuleConfiguration {
     }
     if($Script:Config.SchemaVersion -eq 3) {
         $Script:Config.SchemaVersion = 4
-        $sCRIPT.Config.Add('DNSSuffix', $false)
+        $Script:Config.Add('DNSSuffix', $false)
     }
     if($Script:Config.SchemaVersion -eq 4) {
-        # $Script:Config.SchemaVersion = 4
+        $Script:Config.SchemaVersion = 5
+        $Script:Config.Add('ProvisioningSnapshotPath', "C:\Users\$env:USERNAME\Downloads")
+    }
+    if($Script:Config.SchemaVersion -eq 5) {
+        # $Script:Config.SchemaVersion = 6
         # reserved for future updates
     }
 
