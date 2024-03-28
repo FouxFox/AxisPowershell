@@ -64,6 +64,8 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.7.2
+    * Issue with Refactor causing script not to run
 ## 0.7.1
     * Hotfix release
     * Fixed issue with Set-AxisServices

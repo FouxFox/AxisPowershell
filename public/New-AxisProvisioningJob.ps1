@@ -70,7 +70,7 @@ function New-AxisProvisioningJob {
         Import-Module $RuntimeData.ModulePath
         Set-AxisCredential -Credential $RuntimeData.Credential
         "$($RuntimeData.Device.MacAddress)): Starting Provisioning"
-        Invoke-AxisProvisioningTask -Device $RuntimeData.Device.IP -MacAddress $RuntimeData.Device.MacAddress
+        Provision-AxisDevice -Device $RuntimeData.Device.IP -MacAddress $RuntimeData.Device.MacAddress
         "$($RuntimeData.Device.MacAddress)): Complete"
     }
     
