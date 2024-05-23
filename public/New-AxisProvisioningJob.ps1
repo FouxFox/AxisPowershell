@@ -22,7 +22,10 @@ function New-AxisProvisioningJob {
     [cmdletBinding()]
     Param(
         [Parameter(Mandatory=$false)]
-        [String[]]$IP
+        [String[]]$IP,
+
+        [Parameter(Mandatory=$false)]
+        [Switch]$SingleThreaded
     )
 
     Check-Credential
@@ -62,7 +65,21 @@ function New-AxisProvisioningJob {
         Throw "No Axis Devices Found"
     }
 
-    $runspacePool = [runspacefactory]::CreateRunspacePool(1, 255)
+    ##Single Thread
+    if($SingleThreaded) {
+        foreach ($Device in $TargetDevices) {
+            Try {
+            Invoke-AxisProvisioningTask -Device $Device.IP -MacAddress $Device.MacAddress
+            }
+            Catch {
+                Write-Warning "$($Device.MacAddress): $_"
+            }
+        }
+        return
+    }
+
+    ##MultiThreaded
+    $runspacePool = [runspacefactory]::CreateRunspacePool(1, 50)
     $runspacePool.Open()
 
     $ScriptBlock = {
@@ -99,9 +116,10 @@ function New-AxisProvisioningJob {
             $ProgressIndex = $item.Pipe.Streams.Progress.count - 1
             if($item.Pipe.HadErrors) {
                 Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.InvocationStateInfo.Reason.Message)"
-                return
             }
-            Write-Host "$($item.RuntimeData.Device.MacAddress): $($item.Pipe.Streams.Progress[$ProgressIndex].StatusDescription)"
+            else {
+                Write-Host "$($item.RuntimeData.Device.MacAddress): $($item.Pipe.Streams.Progress[$ProgressIndex].StatusDescription)"
+            }
         }
         Start-Sleep -Seconds 5
     }
@@ -111,9 +129,10 @@ function New-AxisProvisioningJob {
         # EndInvoke method retrieves the results of the asynchronous call
         if($item.pipe.HadErrors) {
             Write-Host "$($item.RuntimeData.Device.MacAddress): ERROR - $($item.Pipe.InvocationStateInfo.Reason.Message)"
-            return
         }
-        Write-Host "$($item.RuntimeData.Device.MacAddress): Provisioning Complete"
+        else {
+            Write-Host "$($item.RuntimeData.Device.MacAddress): Provisioning Complete"
+        }
         $item.Pipe.Dispose()
     }
 

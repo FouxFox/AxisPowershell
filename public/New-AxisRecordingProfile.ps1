@@ -35,6 +35,7 @@ function New-AxisRecordingProfile {
     if($disks.Status -ne 'OK' -and $disks.Status -ne 'connected') {
         Throw "SD Card is not in a valid state"
     }
+    $diskCount = ($disks | Measure-Object).count
 
     $LensList = @($Lens)
 
@@ -54,7 +55,7 @@ function New-AxisRecordingProfile {
         #Set proper SD Card
         if(
             $CurrentLens -eq 1 -or
-            $CurrentLens % $disks.Count -eq 0
+            $CurrentLens % $diskCount -eq 0
         ) {
             $URIString += "diskid=SD_DISK&"
         } 

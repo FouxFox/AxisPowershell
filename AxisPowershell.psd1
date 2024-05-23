@@ -56,7 +56,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.8.2'
+    ModuleVersion = '0.8.5'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -65,6 +65,14 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.8.4
+    * Minor bugfix for singlethreaded behavior
+## 0.8.3
+    * Added Singlthreaded provisioning to try to resolve issues with runspaces
+## 0.8.2
+    * Fixed formatting issue with Update-AxisDevice
+    * Fixed output in Restart-AxisDevice
+    * Fixed issue where New-AxisRecordingProfile incorrectly counted SDCards.
 ## 0.8.0
     * Added support for customizing the directory provisioning snapshots are saved to
 ## 0.7.3

@@ -31,7 +31,7 @@ function Update-AxisDevice {
     $Model = (Get-AxisDeviceInfo -Device $Device).ProdNbr
 
     $FirmwareFile = Get-ChildItem -Path $FirmwareFolder -Filter "$Model*.bin" | Select-Object -First 1
-    Write-Host -NoNewline "Uploading Firmware..."
+    Write-Host -NoNewline "$($Device): Uploading Firmware..."
     $Param = @{
         URL = "https://$($Device)/axis-cgi/firmwaremanagement.cgi"
         File = $FirmwareFile.FullName
@@ -44,7 +44,7 @@ function Update-AxisDevice {
         throw $_
     }
 
-    Write-Host -NoNewline "($Device): Rebooting Device..."
+    Write-Host -NoNewline "$($Device): Rebooting Device..."
     $DeviceUp = $true
     $count = 0
     While($DeviceUp -and $count -lt 20) {
@@ -78,6 +78,7 @@ function Update-AxisDevice {
     }
 
     # Wait for services to start
+    Write-Host ""
     Write-Host -NoNewline "$($Device): Waiting for Services to start..."
     $DeviceUp = $false
     $count = 0

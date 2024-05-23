@@ -23,5 +23,5 @@ function Restart-AxisDevice {
         Device = $Device
         Path = "/axis-cgi/restart.cgi"
     }
-    Invoke-AxisWebAPI @Param
+    $null = Invoke-AxisWebAPI @Param
 }

@@ -51,22 +51,4 @@ function Get-AxisSDCardStatus {
             FreeSizeGB = [math]::Round($diskObj.freesize / 1MB, 2)
         }
     }
-    <#
-    #$output = [ordered]@{}
-    foreach ($attribute in $diskObj.attributes) {
-        
-        $Name = $attribute.name
-        $value = $attribute.value
-        
-        # Convert size attributes to GB
-        if ($attribute.name.contains('size')) {
-            $Name = $Name.replace('size','SizeGB')
-            $value = [math]::Round($value / 1MB, 2)
-        }
-
-        $output.Add($Name, $value)
-    }
-    
-    #return [pscustomobject]$output
-    #>
 }
