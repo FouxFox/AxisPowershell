@@ -9,7 +9,7 @@ Describe "AxisPowerShell.Public.Enable-AxisDNSUpdate" {
 
         It "Prints correctly when successful" {
             #Mock -ModuleName AxisPowerShell Invoke-AxisWebApi { return 'Ok!' }
-            Enable-AxisDNSUpdate -Device $TestDevice_IP -Hostname "axis-camera.sec.aa"
+            Enable-AxisDNSUpdate -Device $TestDevice_IP -Hostname "axis-camera.example.com"
             Should @m -Invoke "Write-Host" -Exactly -Times 2 -ParameterFilter { $Object -eq "OK!" }
             Should @m -Invoke "Write-Host" -Exactly -Times 1 -ParameterFilter { $Object -eq "$($TestDevice_IP): Setting Configuration..." }
             Should @m -Invoke "Write-Host" -Exactly -Times 1 -ParameterFilter { $Object -eq "$($TestDevice_IP): Forcing DNS Update..." }
@@ -18,7 +18,7 @@ Describe "AxisPowerShell.Public.Enable-AxisDNSUpdate" {
         It "Prints correctly when configuration is unsuccessful" {
             $Filter = { $Path -and $Path.StartsWith("/axis-cgi/param.cgi?") }
             Mock -ModuleName AxisPowerShell Invoke-AxisWebApi -ParameterFilter $Filter { Throw 'some error' }
-            {Enable-AxisDNSUpdate -Device $TestDevice_IP -Hostname "axis-camera.sec.aa"} | Should -Throw
+            {Enable-AxisDNSUpdate -Device $TestDevice_IP -Hostname "axis-camera.example.com"} | Should -Throw
             Should @m -Invoke "Write-Host" -Exactly -Times 1 -ParameterFilter { $Object -eq "$($TestDevice_IP): Setting Configuration..." }
             Should @m -Invoke "Write-Host" -Exactly -Times 1 -ParameterFilter { $Object -eq "Failed!" }
         }
@@ -26,14 +26,14 @@ Describe "AxisPowerShell.Public.Enable-AxisDNSUpdate" {
         It "Prints correctly when DNS Update is unsuccessful" {
             $Filter = { $Path -and $Path.StartsWith("/axis-cgi/dnsupdate.cgi?") }
             Mock -ModuleName AxisPowerShell Invoke-AxisWebApi -ParameterFilter $Filter { Throw 'some error' }
-            Enable-AxisDNSUpdate -Device $TestDevice_IP -Hostname "axis-camera.sec.aa"
+            Enable-AxisDNSUpdate -Device $TestDevice_IP -Hostname "axis-camera.example.com"
             Should @m -Invoke "Write-Host" -Exactly -Times 1 -ParameterFilter { $Object -eq "Failed Successfully!" }
             Should @m -Invoke "Write-Host" -Exactly -Times 1 -ParameterFilter { $Object -eq "$($TestDevice_IP): Setting Configuration..." }
             Should @m -Invoke "Write-Host" -Exactly -Times 1 -ParameterFilter { $Object -eq "$($TestDevice_IP): Forcing DNS Update..." }
         }
     }
     Context "When enabling DNS update with a provided hostname" {
-        BeforeEach { Enable-AxisDNSUpdate -Device $TestDevice_IP -Hostname "axis-camera.sec.aa" }
+        BeforeEach { Enable-AxisDNSUpdate -Device $TestDevice_IP -Hostname "axis-camera.example.com" }
         BeforeAll {
             # Required Mock Functions
             Mock -ModuleName AxisPowerShell Get-AxisDeviceInfo { return @{SerialNumber='123456'} }
@@ -44,7 +44,7 @@ Describe "AxisPowerShell.Public.Enable-AxisDNSUpdate" {
             $cmd = 'Invoke-AxisWebApi'
             $Filter = {
                 $Device -eq $TestDevice_IP -and
-                $Path -eq "/axis-cgi/param.cgi?action=update&Network.DNSUpdate.DNSName=axis-camera.sec.aa&Network.DNSUpdate.Enabled=yes"
+                $Path -eq "/axis-cgi/param.cgi?action=update&Network.DNSUpdate.DNSName=axis-camera.example.com&Network.DNSUpdate.Enabled=yes"
             }
             Should @m -Invoke $cmd -Exactly -Times 1 -ParameterFilter $Filter
         }
@@ -53,7 +53,7 @@ Describe "AxisPowerShell.Public.Enable-AxisDNSUpdate" {
             $cmd = 'Invoke-AxisWebApi'
             $Filter = {
                 $Device -eq $TestDevice_IP -and
-                $Path -eq "/axis-cgi/dnsupdate.cgi?add=axis-camera.sec.aa&hdgen=yes" -and
+                $Path -eq "/axis-cgi/dnsupdate.cgi?add=axis-camera.example.com&hdgen=yes" -and
                 $Method -eq "Get"
             }
             Should @m -Invoke $cmd -Exactly -Times 1 -ParameterFilter $Filter

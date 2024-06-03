@@ -19,7 +19,7 @@ Gateway          : 192.168.1.1
 DNS              : 8.8.8.8,8.8.4.4
 HostName         : axis-b8a44f4bfed4
 DNSUpdateEnabled : True
-DNSHostName      : axis-b8a44f4bfed4.sec.aa
+DNSHostName      : axis-b8a44f4bfed4.example.com
 Bonjour          : False
 SSH              : False
 UPnP             : False

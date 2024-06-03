@@ -14,10 +14,10 @@ The hostname or IP address of the Axis device.
 .PARAMETER Hostname
 The hostname to be updated in the DNS. 
 If no hostname is provided, the serail number of the device is used in the following format:
-axis-<SerialNumber>.sec.aa
+axis-<SerialNumber>.<DNS Suffix>
 
 .EXAMPLE
-Enable-AxisDNSUpdate -Device "192.168.1.100" -Hostname "axis-camera.sec.aa"
+Enable-AxisDNSUpdate -Device "192.168.1.100" -Hostname "axis-camera.example.com"
 
 Setting Configuration...OK!
 Forcing DNS Update...OK!
