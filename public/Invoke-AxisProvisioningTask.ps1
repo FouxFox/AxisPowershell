@@ -141,6 +141,16 @@ function Invoke-AxisProvisioningTask {
         Throw $_
     }
 
+    Write-Log -ID $MacAddress -Message "Setting DSCP values"
+    Try {
+        Set-AxisDSCP -Device $Device
+        Write-Log $MacAddress -Message "Successfully set DSCP values"
+    } Catch {
+        Write-Log -ID $MacAddress -Message "Failed to set DSCP values"
+        Write-Log -ID $MacAddress -Message $_.Exception.Message
+        Throw $_
+    }
+
     ##################################
     ## Stage 4: Set Security Config ##
     ##################################
@@ -192,11 +202,21 @@ function Invoke-AxisProvisioningTask {
     }
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Creating Edge Recording Profile"
+
     Try {
-        New-AxisRecordingProfile -Device $Device
-        Write-Log -ID $MacAddress -Message "Successfully created Edge Recording Profile"
+        New-AxisStreamProfile -Device $Device -Name "EdgeRecording"
+        Write-Log -ID $MacAddress -Message "Successfully created Stream Profile"
     } Catch {
-        Write-Log -ID $MacAddress -Message "Failed to create Edge Recording Profile"
+        Write-Log -ID $MacAddress -Message "Failed to create Stream Profile"
+        Write-Log -ID $MacAddress -Message $_.Exception.Message
+        Throw $_
+    }
+
+    Try {
+        New-AxisRecordingProfile -Device $Device -StreamProfile "EdgeRecording"
+        Write-Log -ID $MacAddress -Message "Successfully created Continuious Recording Profile"
+    } Catch {
+        Write-Log -ID $MacAddress -Message "Failed to create Continuious Recording Profile"
         Write-Log -ID $MacAddress -Message $_.Exception.Message
         Throw $_
     }

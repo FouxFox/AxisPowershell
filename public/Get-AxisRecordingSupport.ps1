@@ -22,6 +22,8 @@ RequiredFileSystem               : True
 SDCard                           : True
 StorageLimit                     : True
 NbrOfContinuousRecordingProfiles : 1
+NumberofLenses                   : 2
+H265Support                      : True
 #>
 
 function Get-AxisRecordingSupport {
@@ -34,6 +36,7 @@ function Get-AxisRecordingSupport {
     $Groups = @(
         'Properties.LocalStorage'
         'ImageSource.NbrOfSources'
+        'Properties.Image.Format'
     )
     $result = Get-AxisParameter -Device $Device -Group $Groups
 
@@ -50,5 +53,6 @@ function Get-AxisRecordingSupport {
         StorageLimit =                      $result.'Properties.LocalStorage.StorageLimit'        -eq 'yes'
         NbrOfContinuousRecordingProfiles =  $result.'Properties.LocalStorage.NbrOfContinuousRecordingProfiles'
         NumberofLenses =                    $result.'ImageSource.NbrOfSources' 
+        SupportedCodecs =                   $result.'Properties.Image.Format'
     }
 }

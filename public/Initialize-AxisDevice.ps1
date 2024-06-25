@@ -35,6 +35,7 @@ function Initialize-AxisDevice {
         $null = Invoke-AxisWebApi @Param
     }
     Catch {
+        #TODO: Add better error handling
         Throw $_
     }
 }

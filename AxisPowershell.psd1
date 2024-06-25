@@ -15,6 +15,7 @@
         'Get-AxisAction'
         'Get-AxisContinuousRecordingProfile'
         'Get-AxisDeviceInfo'
+        'Get-AxisDSCP'
         'Get-AxisNetworkInfo'
         'Get-AxisParameter'
         'Get-AxisPSConfig'
@@ -23,7 +24,7 @@
         'Get-AxisSDCardStatus'
         'Get-AxisSnapshot'
         'Get-AxisStorageOptions'
-        'Get-AxisStreamProfiles'
+        'Get-AxisStreamProfile'
         'Get-AxisSupportedResolutions'
         'Get-AxisViewStatus'
         'Initialize-AxisDevice'
@@ -31,17 +32,21 @@
         'Invoke-AxisProvisioningTask'
         'New-AxisProvisioningJob'
         'New-AxisRecordingProfile'
+        'New-AxisStreamProfile'
         'Optimize-AxisRecordingProfiles'
         'Remove-AxisAction'
         'Remove-AxisParameter'
         'Remove-AxisRecordingProfile'
+        'Remove-AxisStreamProfile'
         'Reset-AxisDevice'
         'Restart-AxisDevice'
         'Set-AxisCredential'
+        'Set-AxisDSCP'
         'Set-AxisIPAddress'
         'Set-AxisPSConfig'
         'Set-AxisServices'
         'Set-AxisStorageOptions'
+        'Set-AxisStreamProfile'
         'Update-AxisDevice'
         'Update-AxisParameter'
     )
@@ -56,7 +61,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.8.5'
+    ModuleVersion = '0.10.0'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -65,6 +70,15 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.10.0
+    * Get-AxisRecordingSupport now returns a comma separated list of supported codecs
+    * Added New-, Get-, Set-, Remove- Stream Profile commands
+    * Fixed New-AxisRecordingProfile to properly tie to a stream profile
+    * Invoke-AxisProvisioningTask now creates a stream profile called "EdgeRecording" which is used by New-AxisRecordingProfile
+    * Invoke-AxisProvisioningTask now sets sensible DSCP values
+    * Added Get-AxisDSCP
+## 0.9.0
+    * Added support for setting DSCP values
 ## 0.8.4
     * Minor bugfix for singlethreaded behavior
 ## 0.8.3

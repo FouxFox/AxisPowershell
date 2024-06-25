@@ -13,12 +13,12 @@ The name or IP address of the Axis device.
 .EXAMPLE
 Get-AxisRecordingProfile -Device "192.168.1.100"
 
-Lens Status Type       Disk     Error
----- ------ ----       ----     -----
-   1 OK     Continuous SD_DISK  N/A
-   2 OK     Continuous SD_DISK  N/A  
-   3 OK     Continuous SD_DISK2 N/A
-   4 OK     Continuous SD_DISK  N/A
+Lens Status Type       Id Disk    Error
+---- ------ ----       -- ----    -----
+   1 OK     Continuous 20 SD_DISK  N/A
+   2 OK     Continuous 21 SD_DISK  N/A  
+   3 OK     Continuous 22 SD_DISK2 N/A
+   4 OK     Continuous 23 SD_DISK2 N/A
 
 #>
 function Get-AxisRecordingProfile {
@@ -59,6 +59,7 @@ function Get-AxisRecordingProfile {
                 Lens    = $Lens
                 Status  = 'Error'
                 Type    = 'N/A'
+                Id      = 'N/A'
                 Disk    = 'N/A'
                 Error   = 'Continuious Profiles and Action rules found for this lens'
             }
@@ -69,6 +70,7 @@ function Get-AxisRecordingProfile {
                 Lens    = $Lens
                 Status  = 'OK'
                 Type    = 'Continuous'
+                Id      = $cProfile.ID
                 Disk    = $cProfile.Disk
                 Error   = 'N/A'
             }
@@ -79,6 +81,7 @@ function Get-AxisRecordingProfile {
                 Lens    = $Lens
                 Status  = 'Warning'
                 Type    = 'Action'
+                Id      = $aProfile.ID
                 Disk    = $aProfile.Disk
                 Error   = 'It is recomended to use Continuous Profiles'
             }
@@ -88,6 +91,7 @@ function Get-AxisRecordingProfile {
                 Lens    = $Lens
                 Status  = 'Warning'
                 Type    = 'N/A'
+                Id      = 'N/A'
                 Disk    = 'N/A'
                 Error   = 'No Profile Exists'
             }

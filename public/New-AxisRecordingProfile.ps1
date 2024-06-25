@@ -8,6 +8,9 @@ The New-AxisRecordingProfile function creates a new recording profile for an Axi
 .PARAMETER Device
 Specifies the Axis device for which the recording profile should be created. This parameter is mandatory.
 
+.PARAMETER StreamProfile
+The Stream Profile to use. The profile must exist.
+
 .PARAMETER Lens
 Specifies the numeric lens for which the recording profile should be created. 
 This parameter is optional. 
@@ -25,6 +28,9 @@ function New-AxisRecordingProfile {
         [Parameter(Mandatory=$true)]
         [String]$Device,
 
+        [Parameter(Mandatory=$true)]
+        [String]$StreamProfile,
+
         [Parameter(Mandatory=$false)]
         [String]$Lens
     )
@@ -40,6 +46,7 @@ function New-AxisRecordingProfile {
     $LensList = @($Lens)
 
     if(!$Lens) {
+        # 1..1 will return an array with one entity
         $LensList = 1..(Get-AxisRecordingSupport -Device $Device).NumberofLenses
     }
 
@@ -53,6 +60,7 @@ function New-AxisRecordingProfile {
         }
 
         #Set proper SD Card
+        #It is assumed only 2 SD cards will ever be in an Axis Camera
         if(
             $CurrentLens -eq 1 -or
             $CurrentLens % $diskCount -eq 0
@@ -65,7 +73,7 @@ function New-AxisRecordingProfile {
 
         #Add lens and recording parameters
         $URIString += "options=camera%3D$CurrentLens&"
-        $URIString += "$($Config.RecordingParams.Replace('=','%3D'))"
+        $URIString += "streamprofile%3D$StreamProfile"
 
         $Param = @{
             Device = $Device
