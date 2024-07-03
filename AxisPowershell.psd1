@@ -61,7 +61,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.10.0'
+    ModuleVersion = '0.10.1'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -70,6 +70,8 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.10.1
+    * Fixed issue with Set-AxisDSCP
 ## 0.10.0
     * Get-AxisRecordingSupport now returns a comma separated list of supported codecs
     * Added New-, Get-, Set-, Remove- Stream Profile commands
