@@ -41,6 +41,10 @@ function Get-AxisSDCardStatus {
     }
 
     $disks = (Invoke-AxisWebApi @Param).root.disks.disk | Where-Object { $_.diskid.Contains('SD_DISK') }
+    if(!$disks) {
+        Write-Warning "No SD card found on device $Device"
+        return
+    }
 
     ForEach ($diskObj in $disks) {
         [PSCustomObject]@{

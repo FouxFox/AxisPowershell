@@ -3,7 +3,7 @@
 Updates the parameter(s) of an Axis device.
 
 .DESCRIPTION
-The Update-AxisParameter function is used to update the parameter(s) of an Axis device.
+The Set-AxisParameter function is used to update the parameter(s) of an Axis device.
 It supports updating a single parameter or multiple parameters at once.
 
 .PARAMETER Device
@@ -19,18 +19,19 @@ Specifies the new value for the parameter.
 Specifies a hashtable containing the parameters and their corresponding values to update.
 
 .EXAMPLE
-Update-AxisParameter -Device "192.168.1.100" -Parameter "Brightness" -Value "50"
+Set-AxisParameter -Device "192.168.1.100" -Parameter "Brightness" -Value "50"
 Updates the 'Brightness' parameter of the Axis device with the value '50'.
 
 .EXAMPLE
-Update-AxisParameter -Device "192.168.1.100" -ParameterSet @{
+Set-AxisParameter -Device "192.168.1.100" -ParameterSet @{
     "Brightness" = "50"
     "Contrast" = "75"
 }
 Updates the 'Brightness' and 'Contrast' parameters of the Axis device with the specified values.
 #>
-function Update-AxisParameter {
+function Set-AxisParameter {
     [cmdletbinding(DefaultParameterSetName='Single')]
+    [Alias("Update-AxisParameter")]
     Param(
         [Parameter(Mandatory=$true, ParameterSetName='Single')]
         [Parameter(Mandatory=$true, ParameterSetName='Multiple')]

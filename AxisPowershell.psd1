@@ -11,14 +11,19 @@
         'Add-AxisParameter'
         'Disable-AxisUnusedViews'
         'Enable-AxisDNSUpdate'
+        'Export-AxisRecording'
         'Format-AxisSDCard'
         'Get-AxisAction'
         'Get-AxisContinuousRecordingProfile'
+        'Get-AxisDate'
         'Get-AxisDeviceInfo'
         'Get-AxisDSCP'
         'Get-AxisNetworkInfo'
+        'Get-AxisNTPClient'
         'Get-AxisParameter'
         'Get-AxisPSConfig'
+        #'Get-AxisPSRecordingProfile
+        'Get-AxisRecording'
         'Get-AxisRecordingProfile'
         'Get-AxisRecordingSupport'
         'Get-AxisSDCardStatus'
@@ -41,14 +46,16 @@
         'Reset-AxisDevice'
         'Restart-AxisDevice'
         'Set-AxisCredential'
+        'Set-AxisDNSResolver'
         'Set-AxisDSCP'
-        'Set-AxisIPAddress'
+        'Set-AxisIPv4Address'
+        'Set-AxisNTPClient'
+        'Set-AxisParameter'
         'Set-AxisPSConfig'
         'Set-AxisServices'
         'Set-AxisStorageOptions'
         'Set-AxisStreamProfile'
         'Update-AxisDevice'
-        'Update-AxisParameter'
     )
     VariablesToExport = "*"
     AliasesToExport = "*"
@@ -61,7 +68,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.10.1'
+    ModuleVersion = '0.10.3'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -70,6 +77,15 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.10.2
+    * Added Get-AxisNTPClient
+    * Added Set-AxisNTPClient
+    * Added Get-AxisRecording
+    * Added Set-AxisDNSResolver
+    * Added Export-AxisRecording
+    * Changed Set-AxisIPAddress to Set-AxisIPv4Address (Old command will still work)
+    * Added ability to use static addresses with Set-AxisIPv4Address    
+    * Get-AxisNetworkInfo now returns the UPnP name of the device     
 ## 0.10.1
     * Fixed issue with Set-AxisDSCP
 ## 0.10.0

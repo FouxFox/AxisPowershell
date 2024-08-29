@@ -18,6 +18,7 @@ SubnetMask       : 255.255.255.0
 Gateway          : 192.168.1.1
 DNS              : 8.8.8.8,8.8.4.4
 HostName         : axis-b8a44f4bfed4
+Name             : Hallway-Camera
 DNSUpdateEnabled : True
 DNSHostName      : axis-b8a44f4bfed4.example.com
 Bonjour          : False
@@ -48,6 +49,7 @@ function Get-AxisNetworkInfo {
         Gateway =          $result.'Network.Routing.DefaultRouter'
         DNS =              $result.'Network.Resolver.NameServerList'
         HostName =         $result.'Network.HostName'
+        Name =             $result.'Network.UPnP.FriendlyName'
         DNSUpdateEnabled = $result.'Network.DNSUpdate.Enabled'             -eq 'yes'
         DNSHostName =      $result.'Network.DNSUpdate.DNSName'
         Bonjour =          $result.'Network.Bonjour.Enabled'               -eq 'yes'
