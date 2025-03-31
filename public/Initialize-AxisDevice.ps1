@@ -19,16 +19,34 @@ Initialize-AxisDevice -Device "192.168.1.100" -NewPassword "MyNewPassword"
 function Initialize-AxisDevice {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter()]
         [String]$NewPassword
     )
 
+    $DeviceNeedsSetup = (Get-AxisDeviceStatus -Device $Device).Status -eq "Needs Setup"
+
+    if(!$DeviceNeedsSetup) {
+        Write-Host "Device is not in factory default state. Skipping initialization."
+        return
+    }
+
+    if(-not $NewPassword) {
+        Write-Host "Setting Password to Stored Credential..."
+        # Extract plaintext password from PSCredential
+        $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Config.Credential.Password)
+        $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
+    }
+    else {
+        $PlainPassword = $NewPassword
+    }
+
     $Param = @{
         Device = $Device
-        Path = "/axis-cgi/pwdgrp.cgi?action=add&user=root&pwd=$($NewPassword)&grp=root&sgrp=admin:operator:viewer:ptz"
+        Path = "/axis-cgi/pwdgrp.cgi?action=add&user=root&pwd=$($PlainPassword)&grp=root&sgrp=admin:operator:viewer:ptz"
         NoAuth = $true
     }
     Try {

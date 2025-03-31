@@ -72,7 +72,7 @@ function New-AxisRecordingProfile {
         }
 
         #Add lens and recording parameters
-        $URIString += "options=camera%3D$CurrentLens&"
+        $URIString += "options=camera%3D$CurrentLens%26"
         $URIString += "streamprofile%3D$StreamProfile"
 
         $Param = @{

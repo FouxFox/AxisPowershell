@@ -21,29 +21,69 @@ This example updates the firmware of the Axis device with the IP address "192.16
 function Update-AxisDevice {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false)]
-        [String]$FirmwareFolder=$Config.FirmwareFolder
+        [Parameter()]
+        [String]$FirmwareFolder=$Config.FirmwareFolder,
+
+        [Parameter()]
+        [Switch]$FactoryDefault,
+
+        [Parameter()]
+        [Switch]$Force
     )
 
-    $Model = (Get-AxisDeviceInfo -Device $Device).ProdNbr
+    $DeviceNeedsSetup = (Get-AxisDeviceStatus -Device $Device).Status -eq "Needs Setup"
 
-    $FirmwareFile = Get-ChildItem -Path $FirmwareFolder -Filter "$Model*.bin" | Select-Object -First 1
+    if($DeviceNeedsSetup -and $FactoryDefault) {
+        Initialize-AxisDevice -Device $Device
+    }
+
+    $DeviceInfo = Get-AxisDeviceInfo -Device $Device
+    $FirmwareFile = Get-ChildItem -Path $FirmwareFolder -Filter "$($DeviceInfo.ProdNbr)*.bin" | Select-Object -First 1
+    $FrimwareFileName = $FirmwareFile.BaseName
+
+    #Check Firmware Versions
+    $VersionCheck = Compare-Version -Version $DeviceInfo.Version -TargetVersion $FrimwareFileName.Substring($FrimwareFileName.IndexOf("_")+1).Replace('_','.')
+
+    if(!$Force -and $VersionCheck -eq 0) {
+        Write-Host "Firmware is already up to date."
+        return
+    }
+
+    if($VersionCheck -eq -1) {
+        Write-Host "Firmware on device is newer."
+        return
+    }
+
+    $FirmwareParam = @{
+        method = "upgrade"
+        params = @{}
+    }
+
+    if($FactoryDefault) {
+        $FirmwareParam.params.Add("factoryDefaultMode","soft")
+    }
+
     Write-Host -NoNewline "$($Device): Uploading Firmware..."
     $Param = @{
         URL = "https://$($Device)/axis-cgi/firmwaremanagement.cgi"
         File = $FirmwareFile.FullName
-        Data = "{`"method`":`"upgrade`",`"params`":{}}"
+        Data = $FirmwareParam | ConvertTo-Json -Depth 5
     }
     Try {
-        $null = Invoke-MultiPartWebRequest @Param
+        $RequestOutput = Invoke-MultiPartWebRequest @Param | ConvertFrom-Json
+        if($RequestOutput.error) {
+            Write-Host -ForegroundColor Red "Failed!"
+            Throw $RequestOutput.error.message
+        }
         Write-Host -ForegroundColor Green "Done!"
     } Catch {
         throw $_
     }
 
+    # Wait for device to go down
     Write-Host -NoNewline "$($Device): Rebooting Device..."
     $DeviceUp = $true
     $count = 0
@@ -62,11 +102,11 @@ function Update-AxisDevice {
     # Sepearate function because of timeout
     $DeviceUp = $false
     $count = 0
-    While(!$DeviceUp -and $count -lt 20) {
+    While(!$DeviceUp -and $count -lt 40) {
         Start-Sleep -Seconds 3
         Try {
-            $null = Invoke-RestMethod -Uri "https://$($Device)" -Timeout 1 -ErrorAction Stop
-            $DeviceUp = $true
+            $DeviceStatus = (Get-AxisDeviceStatus -Device $Device -TimeoutSec 1).Status
+            $DeviceUp = ($DeviceStatus -eq "Ready") -or ($DeviceStatus -eq "Needs Setup")
         } Catch {
             $count++
         }
@@ -75,26 +115,5 @@ function Update-AxisDevice {
     if(!$DeviceUp) {
         Write-Host -ForegroundColor Red "Failed!"
         Throw "Device did not come back online in a timely manner."
-    }
-
-    # Wait for services to start
-    Write-Host ""
-    Write-Host -NoNewline "$($Device): Waiting for Services to start..."
-    $DeviceUp = $false
-    $count = 0
-    While(!$DeviceUp -and $count -lt 20) {
-        Start-Sleep -Seconds 3
-        Try {
-            $null = Get-AxisNetworkInfo -Device $Device
-            Write-Host -ForegroundColor Green "Done!"
-            $DeviceUp = $true
-        } Catch {
-            $count++
-        }
-    }
-
-    if(!$DeviceUp) {
-        Write-Host -ForegroundColor Red "Failed!"
-        Throw "Device did not come back online in a timely manner." 
     }
 }

@@ -61,14 +61,39 @@ function Invoke-AxisProvisioningTask {
     ###########
     Write-Log -ID $MacAddress -Message "Starting Job"
 
+    #Get Plaintext password for use in provisioning
+    $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Config.Credential.Password)
+    $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+    [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
+
+    ##############################
+    ## Stage 1: Update Firmware ##
+    ##############################
+    Write-Verbose "Update Firmware"
+    $ProgParam = @{
+        Activity = "Perfroming Factory Preparation on $Device..."
+        Status = "Stage 1/7: Updating Firmware" 
+        PercentComplete = 0
+    }
+    Write-Progress @ProgParam
+    Write-Log -ID $MacAddress -Message "Updating Firmware"
+    Try {
+        Update-AxisDevice -Device $Device -FactoryDefault -Force
+        Write-Log -ID $MacAddress -Message "Successfully Updated Device"
+    } Catch {
+        Write-Log -ID $MacAddress -Message "Failed to Update Device"
+        Write-Log -ID $MacAddress -Message $_.Exception.Message
+        Throw $_
+    }
+
     ###########################
-    ## Stage 1: Set Password ##
+    ## Stage 2: Set Password ##
     ###########################
     Write-Verbose "New Password"
     $ProgParam = @{
         Activity = "Perfroming Factory Preparation on $Device..."
-        Status = "Stage 1/7: Setting Password" 
-        PercentComplete = 0
+        Status = "Stage 2/7: Setting Password" 
+        PercentComplete = 16
     }
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Checking Device State"
@@ -76,8 +101,7 @@ function Invoke-AxisProvisioningTask {
     #Check Device state
     $PasswordAlreadySet = $false
     Try {
-        $null = Get-AxisDeviceInfo -Device $Device
-        $PasswordAlreadySet = $true
+        $PasswordAlreadySet = (Get-AxisDeviceStatus -Device $Device).Status -eq "Ready"
         Write-Log -ID $MacAddress -Message "Device has already had password set"
     } Catch {
         Write-Log -ID $MacAddress -Message "Device in Factory default state"
@@ -85,11 +109,6 @@ function Invoke-AxisProvisioningTask {
 
     #Set password if not already set
     if(!$PasswordAlreadySet) {
-        # Extract plaintext password from PSCredential
-        $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Config.Credential.Password)
-        $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
-        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
-
         #Send to device
         Try {
             Initialize-AxisDevice -Device $Device -NewPassword $PlainPassword
@@ -99,26 +118,6 @@ function Invoke-AxisProvisioningTask {
             Write-Log -ID $MacAddress -Message $_.Exception.Message
             Throw $_
         }
-    }
-
-    ##############################
-    ## Stage 2: Update Firmware ##
-    ##############################
-    Write-Verbose "Update Firmware"
-    $ProgParam = @{
-        Activity = "Perfroming Factory Preparation on $Device..."
-        Status = "Stage 2/7: Updating Firmware" 
-        PercentComplete = 16
-    }
-    Write-Progress @ProgParam
-    Write-Log -ID $MacAddress -Message "Updating Firmware"
-    Try {
-        Update-AxisDevice -Device $Device
-        Write-Log -ID $MacAddress -Message "Successfully Updated Device"
-    } Catch {
-        Write-Log -ID $MacAddress -Message "Failed to Update Device"
-        Write-Log -ID $MacAddress -Message $_.Exception.Message
-        Throw $_
     }
 
     #################################
@@ -183,10 +182,22 @@ function Invoke-AxisProvisioningTask {
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Formatting SD Card"
     Try {
-        Format-AxisSDCard -Device $Device -Wait -NoProgress
+        Format-AxisSDCard -Device $Device -Wait -NoProgress -EncryptionKey $PlainPassword
         Write-Log -ID $MacAddress -Message "Successfully formatted SD Card"
     } Catch {
         Write-Log -ID $MacAddress -Message "Failed to format SD Card"
+        Write-Log -ID $MacAddress -Message $_.Exception.Message
+        Throw $_
+    }
+
+    Start-Sleep -Seconds 10
+
+    Write-Log -ID $MacAddress -Message "setting retention"
+    Try {
+        Set-AxisStorageOptions -Device $Device
+        Write-Log -ID $MacAddress -Message "Successfully set retention"
+    } Catch {
+        Write-Log -ID $MacAddress -Message "Failed to set retention"
         Write-Log -ID $MacAddress -Message $_.Exception.Message
         Throw $_
     }
@@ -204,7 +215,8 @@ function Invoke-AxisProvisioningTask {
     Write-Log -ID $MacAddress -Message "Creating Edge Recording Profile"
 
     Try {
-        New-AxisStreamProfile -Device $Device -Name "EdgeRecording"
+        $StreamParams = "videocodec=h265&videozstrength=20&videozgopmode=dynamic&videozprofile=storage"
+        New-AxisStreamProfile -Device $Device -Name "EdgeRecording" -Parameters $StreamParams
         Write-Log -ID $MacAddress -Message "Successfully created Stream Profile"
     } Catch {
         Write-Log -ID $MacAddress -Message "Failed to create Stream Profile"
@@ -251,5 +263,7 @@ function Invoke-AxisProvisioningTask {
     }
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Provisioning Complete"
-        
+
+    #Dealloc sensitive data
+    Remove-Variable -Name PlainPassword -ErrorAction SilentlyContinue
 }

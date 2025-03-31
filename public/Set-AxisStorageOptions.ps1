@@ -32,5 +32,9 @@ function Set-AxisStorageOptions {
         [int]$MaxAge=0
     )
 
-    Set-AxisParameter -Device $Device -Parameter "Storage.S0.CleanupMaxAge" -Value $MaxAge
+    $ParamSet = @{}
+    Get-AxisSDCardStatus -Device $Device | ForEach-Object {
+        $ParamSet.Add("Storage.$($_.Group).CleanupMaxAge",$MaxAge)
+    }
+    Set-AxisParameter -Device $Device -ParameterSet $ParamSet
 }

@@ -49,7 +49,9 @@ function Get-AxisSDCardStatus {
     ForEach ($diskObj in $disks) {
         [PSCustomObject]@{
             Id = $diskObj.diskid
+            Group = $diskObj.group
             Status = $diskObj.status
+            DiskEncrypted = $diskObj.diskencrypted
             MaxAge = $diskObj.cleanupmaxage
             TotalSizeGB = [math]::Round($diskObj.totalsize / 1MB, 2)
             FreeSizeGB = [math]::Round($diskObj.freesize / 1MB, 2)

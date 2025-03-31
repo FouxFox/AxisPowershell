@@ -17,6 +17,7 @@
         'Get-AxisContinuousRecordingProfile'
         'Get-AxisDate'
         'Get-AxisDeviceInfo'
+        'Get-AxisDeviceStatus'
         'Get-AxisDSCP'
         'Get-AxisNetworkInfo'
         'Get-AxisNTPClient'
@@ -68,7 +69,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.10.3'
+    ModuleVersion = '0.11.2'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -77,6 +78,18 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 0.11.1
+    * Added break between formatting and retention setting as some cameras would not take the retention setting in a timely maner.
+## 0.11.0
+    * Added Get-AxisDeviceStatus using SystemReady API
+    * Added FactoryDefault option to Update-AxisDevice
+    * Initialize-AxisDevice now checks devices status
+    * Initialize-AxisDevice now sets password to the Stored Credential if no password is specified
+    * Provisioning jobs now perform a factory default to account for the breaking changes in AxisOS 12.x
+    * Provisioning jobs now encrypt the disk with the device password by default
+    * Format-AxisSDCard now provides an option to encrypt the SD card
+    * Fixed Set-AxisStorageOptions to set CleanupMaxAge for all SD cards
+    * Fixed issue with New-AxisRecordingProfile where it would ignore the stream profile
 ## 0.10.2
     * Added Get-AxisNTPClient
     * Added Set-AxisNTPClient

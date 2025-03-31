@@ -44,23 +44,26 @@ function Invoke-AxisWebApi {
         [Parameter(Mandatory=$true)]
         [String]$Path,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$Device=$Config.CurrentDevice,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$Method="GET",
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         $Body,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$WebRequest,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$OutFile,
 
-        [Parameter(Mandatory=$false)]
-        [Switch]$NoAuth=$false
+        [Parameter()]
+        [Switch]$NoAuth=$false,
+
+        [Parameter()]
+        [Int]$TimeoutSec
     )
 
 
@@ -96,6 +99,10 @@ function Invoke-AxisWebApi {
 
     if($OutFile) {
         $Param.Add('OutFile',$OutFile)
+    }
+
+    if($TimeoutSec) {
+        $Param.Add('TimeoutSec',$TimeoutSec)
     }
 
     Write-Verbose "$($Param.Method) $($Param.Uri)"

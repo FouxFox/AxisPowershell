@@ -24,14 +24,17 @@ Returns immediately after starting the formatting process.
 function Format-AxisSDCard {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false, DontShow=$true)]
+        [Parameter(DontShow)]
         [Switch]$NoProgress,
 
-        [Parameter(Mandatory=$false)]
-        [Switch]$Wait
+        [Parameter()]
+        [Switch]$Wait,
+
+        [Parameter()]
+        [String]$EncryptionKey
     )
 
     $disks = Get-AxisSDCardStatus -Device $Device
@@ -40,6 +43,9 @@ function Format-AxisSDCard {
     }
 
     ForEach ($disk in $disks) {
+        ########################################
+        # Unmount Disk
+        ########################################
         if($Wait -and !$NoProgress) {
             $ProgParam = @{
                 Activity = "Formatting SD Card 1 of $($disks.Count)..."
@@ -49,7 +55,6 @@ function Format-AxisSDCard {
             Write-Progress @ProgParam
         }
 
-        #Write-Host -NoNewLine "Unmounting Disk..."
         $Param = @{
             Device = $Device
             Path = "/axis-cgi/disks/mount.cgi?diskid=$($disk.id)&action=unmount"
@@ -61,9 +66,26 @@ function Format-AxisSDCard {
         }
 
         Start-Sleep -Seconds 5
-        #Write-Host -ForegroundColor Green "Done!"
 
-        #rite-Host -NoNewLine "Starting Format..."
+        ########################################
+        # Set Encryption Passphrase
+        ########################################
+        if($EncryptionKey) {
+            $Param = @{
+                Device = $Device
+                Path = "/axis-cgi/disks/properties/enablediskencryption.cgi?schemaversion=1&diskid=$($disk.id)&passphrase=$EncryptionKey"
+            }
+            $result = Invoke-AxisWebApi @Param
+
+            if($result.DiskPropertiesResponse.Error) {
+                Throw "Could not format: $($result.DiskPropertiesResponse.Error.ErrorDescription)"
+            }
+        }
+
+        
+        ########################################
+        # Format Disk
+        ########################################
         $Param = @{
             Device = $Device
             Path = "/axis-cgi/disks/format.cgi?diskid=$($disk.id)&filesystem=ext4"
@@ -100,6 +122,19 @@ function Format-AxisSDCard {
             Start-Sleep -Seconds 1
         }
 
-        #Write-Host -ForegroundColor Green "Done!"
+        Start-Sleep -Seconds 2
+
+        ########################################
+        # Mount Disk
+        ########################################
+        $Param = @{
+            Device = $Device
+            Path = "/axis-cgi/disks/mount.cgi?diskid=$($disk.id)&action=mount"
+        }
+        $result = Invoke-AxisWebApi @Param
+
+        if($result.root.job.result -ne 'OK') {
+            Throw "Could not format: $($result.root.job.result)"
+        }
     }
 }
