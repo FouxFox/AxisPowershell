@@ -28,7 +28,7 @@ The function returns a custom object with the following properties:
 function Get-AxisNTPClient {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
 

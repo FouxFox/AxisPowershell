@@ -1,8 +1,20 @@
+<#
+.SYNOPSIS
+Retrieves user account information from an Axis device.
 
+.DESCRIPTION
+Retrieves a list of user accounts and their groups.
+
+.PARAMETER Device
+The hostname or IP address.
+
+.EXAMPLE
+Get-AxisUserAccount -Device "192.168.1.100"
+#>
 function Get-AxisUserAccount {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
 

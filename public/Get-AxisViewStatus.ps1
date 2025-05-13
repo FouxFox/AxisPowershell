@@ -28,10 +28,10 @@ I1 View Area 2 no
 function Get-AxisViewStatus {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$RemoveCombinedViews
     )
 

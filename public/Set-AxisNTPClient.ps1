@@ -43,21 +43,21 @@ Disables the NTP client.
 function Set-AxisNTPClient {
     [cmdletbinding(DefaultParameterSetName='DHCP')]
     Param(
-        [Parameter(Mandatory,ParameterSetName='DHCP')]
-        [Parameter(Mandatory,ParameterSetName='Static')]
-        [Parameter(Mandatory,ParameterSetName='Disabled')]
+        [Parameter(ParameterSetName='DHCP', Mandatory)]
+        [Parameter(ParameterSetName='Static', Mandatory)]
+        [Parameter(ParameterSetName='Disabled', Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory,ParameterSetName='Disabled')]
+        [Parameter(ParameterSetName='Disabled', Mandatory)]
         [Switch]$Disable,
 
-        [Parameter(Mandatory,ParameterSetName='DHCP')]
+        [Parameter(ParameterSetName='DHCP', Mandatory)]
         [Switch]$DHCP,
 
         [Parameter(ParameterSetName='DHCP')]
         [String]$FallbackServers,
 
-        [Parameter(Mandatory,ParameterSetName='Static')]
+        [Parameter(ParameterSetName='Static', Mandatory)]
         [String]$Servers,
 
         [Parameter(ParameterSetName='DHCP')]

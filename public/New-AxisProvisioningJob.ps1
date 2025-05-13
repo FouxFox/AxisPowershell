@@ -21,10 +21,10 @@ Creates a new provisioning job by automatically discovering devices on the local
 function New-AxisProvisioningJob {
     [cmdletBinding()]
     Param(
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String[]]$IP,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$SingleThreaded
     )
 

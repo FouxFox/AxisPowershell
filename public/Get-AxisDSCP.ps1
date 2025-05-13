@@ -23,7 +23,7 @@ Metadata   0
 function Get-AxisDSCP {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
 

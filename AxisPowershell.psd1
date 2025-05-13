@@ -69,7 +69,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '0.11.2'
+    ModuleVersion = '1.0.0'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -78,6 +78,10 @@
             )
             IsPrerelease = $true
             ReleaseNotes = @'
+## 1.0.0
+    * Inital release.
+    * Added documentation for AxisUserAccount cmdlets.
+    * Code formatting and cleanup.
 ## 0.11.1
     * Added break between formatting and retention setting as some cameras would not take the retention setting in a timely maner.
 ## 0.11.0

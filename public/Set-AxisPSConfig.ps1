@@ -17,26 +17,26 @@ This example sets the firmware folder path to "C:\Firmware".
 function Set-AxisPSConfig {
     [cmdletbinding(DefaultParameterSetName='LoggingOn')]
     Param(
-        [Parameter(Mandatory=$false, ParameterSetName='LoggingOn')]
-        [Parameter(Mandatory=$false, ParameterSetName='LoggingOff')]
+        [Parameter(ParameterSetName='LoggingOn')]
+        [Parameter(ParameterSetName='LoggingOff')]
         [String]$FirmwareFolder,
 
-        [Parameter(Mandatory=$false, ParameterSetName='LoggingOn')]
-        [Parameter(Mandatory=$false, ParameterSetName='LoggingOff')]
+        [Parameter(ParameterSetName='LoggingOn')]
+        [Parameter(ParameterSetName='LoggingOff')]
         [String]$LogPath,
 
-        [Parameter(Mandatory=$false, ParameterSetName='LoggingOn')]
-        [Parameter(Mandatory=$false, ParameterSetName='LoggingOff')]
+        [Parameter(ParameterSetName='LoggingOn')]
+        [Parameter(ParameterSetName='LoggingOff')]
         [String]$ProvisioningSnapshotPath,
 
-        [Parameter(Mandatory=$false, ParameterSetName='LoggingOn')]
-        [Parameter(Mandatory=$false, ParameterSetName='LoggingOff')]
+        [Parameter(ParameterSetName='LoggingOn')]
+        [Parameter(ParameterSetName='LoggingOff')]
         [String]$DNSSuffix,
 
-        [Parameter(Mandatory=$false, ParameterSetName='LoggingOn')]
+        [Parameter(ParameterSetName='LoggingOn')]
         [Switch]$EnableLogging,
 
-        [Parameter(Mandatory=$false, ParameterSetName='LoggingOff')]
+        [Parameter(ParameterSetName='LoggingOff')]
         [Switch]$DisableLogging
     )
     

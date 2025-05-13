@@ -18,10 +18,10 @@ Remove-AxisAction -Device "192.168.1.100" -ActionRule $rule
 function Remove-AxisAction {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         $ActionRule
     )
 

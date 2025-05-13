@@ -19,16 +19,16 @@ Recording                     videocodec=h265&videobitratemode=vbr&videozstrengt
 function Get-AxisStreamProfile {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String[]]$Name,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$ExpandParameters,
 
-        [Parameter(Mandatory=$false,DontShow)]
+        [Parameter(DontShow)]
         [Switch]$MaxProfiles
     )
     

@@ -26,10 +26,10 @@ Forcing DNS Update...OK!
 function Enable-AxisDNSUpdate {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$Hostname
     )
 

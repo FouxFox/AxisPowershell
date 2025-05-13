@@ -20,7 +20,7 @@ This function only supports models defined in the $Config.DisableCameraViews has
 function Disable-AxisUnusedViews {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
 

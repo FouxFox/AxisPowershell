@@ -37,22 +37,22 @@ Sets the best practices for the services configuration on the Axis device with t
 function Set-AxisServices {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$Bonjour=$false,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$SSH=$false,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$UPnP=$false,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$WSDiscovery=$false,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$O3C=$false
     )
 

@@ -2,7 +2,7 @@
 function Get-AxisZipStreamSupport {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
 

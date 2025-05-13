@@ -34,7 +34,7 @@ ImageSource.NbrOfSources
 function Get-AxisDeviceInfo {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
 

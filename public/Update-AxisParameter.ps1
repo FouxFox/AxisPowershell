@@ -32,17 +32,17 @@ Updates the 'Brightness' and 'Contrast' parameters of the Axis device with the s
 function Update-AxisParameter {
     [cmdletbinding(DefaultParameterSetName='Single')]
     Param(
-        [Parameter(Mandatory=$true, ParameterSetName='Single')]
-        [Parameter(Mandatory=$true, ParameterSetName='Multiple')]
+        [Parameter(ParameterSetName='Single', Mandatory)]
+        [Parameter(ParameterSetName='Multiple', Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$true, ParameterSetName='Single')]
+        [Parameter(ParameterSetName='Single', Mandatory)]
         [String]$Parameter,
 
-        [Parameter(Mandatory=$true, ParameterSetName='Single')]
+        [Parameter(ParameterSetName='Single', Mandatory)]
         [String]$Value,
 
-        [Parameter(Mandatory=$true, ParameterSetName='Multiple')]
+        [Parameter(ParameterSetName='Multiple', Mandatory)]
         [Hashtable]$ParameterSet
     )
 

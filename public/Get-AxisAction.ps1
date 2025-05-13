@@ -20,7 +20,7 @@ The Axis VAPIX ActionService web service documentation.
 function Get-AxisAction {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
 

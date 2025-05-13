@@ -35,20 +35,20 @@ Configures the Axis device with static IP configuration, specifying the DNS serv
 function Set-AxisDNSResolver {
     [cmdletbinding(DefaultParameterSetName='DHCP')]
     Param(
-        [Parameter(Mandatory,ParameterSetName='DHCP')]
-        [Parameter(Mandatory,ParameterSetName='Static')]
-        [Parameter(Mandatory,ParameterSetName='StaticLegacy')]
+        [Parameter(ParameterSetName='DHCP', Mandatory)]
+        [Parameter(ParameterSetName='Static', Mandatory)]
+        [Parameter(ParameterSetName='StaticLegacy', Mandatory)]
         [String]$Device,
 
         [Parameter(ParameterSetName='DHCP')]
         [Parameter(ParameterSetName='StaticLegacy')]
         [Switch]$LegacyMethod,
 
-        [Parameter(Mandatory,ParameterSetName='DHCP')]
+        [Parameter(ParameterSetName='DHCP', Mandatory)]
         [Switch]$UseDHCP,
 
-        [Parameter(Mandatory,ParameterSetName='Static')]
-        [Parameter(Mandatory,ParameterSetName='StaticLegacy')]
+        [Parameter(ParameterSetName='Static', Mandatory)]
+        [Parameter(ParameterSetName='StaticLegacy', Mandatory)]
         [String[]]$DNSServers,
 
         [Parameter(ParameterSetName='Static')]

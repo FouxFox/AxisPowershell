@@ -30,10 +30,10 @@ Removes recording profile but does not set Properties.LocalStorage.NbrOfContinuo
 function Remove-AxisRecordingProfile {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$ProfileId
     )
 

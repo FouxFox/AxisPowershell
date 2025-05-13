@@ -28,19 +28,19 @@ This example renames the profile to "Profile2", and updates the parameters to "v
 function Set-AxisStreamProfile {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Name,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$NewName,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$Description,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$Parameters
     )
 

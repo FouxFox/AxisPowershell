@@ -19,10 +19,10 @@ Removes the stream profile named "Profile1" from the Axis device with the IP add
 function Remove-AxisStreamProfile {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String[]]$Name
     )
 

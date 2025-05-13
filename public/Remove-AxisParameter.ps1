@@ -20,10 +20,10 @@ This example removes the "Network" and "Video" parameter groups from the Axis de
 function Remove-AxisParameter {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String[]]$Group
     )
 

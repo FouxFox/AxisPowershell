@@ -20,10 +20,10 @@ Set-AxisCredential
 function Set-AxisCredential {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [PSCredential]$Credential,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$StoreCredential
     )
 

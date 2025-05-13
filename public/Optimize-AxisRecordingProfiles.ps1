@@ -17,7 +17,7 @@ Removes action profiles and creates continuous profiles for the specified device
 function Optimize-AxisRecordingProfiles {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$true)]
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
         [String]$Device
     )
     

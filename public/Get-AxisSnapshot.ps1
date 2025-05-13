@@ -42,22 +42,22 @@
 function Get-AxisSnapshot {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String[]]$Lens="all",
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$Path=".",
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$FileName="snapshot.jpg",
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$Text,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$NoInfo
     )
     

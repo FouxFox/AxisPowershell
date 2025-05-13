@@ -25,13 +25,13 @@ New-AxisRecordingProfile -Device "192.168.1.100"
 function New-AxisRecordingProfile {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$StreamProfile,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$Lens
     )
 

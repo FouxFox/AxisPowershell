@@ -18,10 +18,10 @@ Retrieves the parameters for the "System" and "Network" groups from the Axis dev
 function Get-AxisParameter {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String[]]$Group
     )
 

@@ -27,7 +27,7 @@ This function only fetches the supported resolutions for the first lens on multi
 function Get-AxisSupportedResolutions {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
     

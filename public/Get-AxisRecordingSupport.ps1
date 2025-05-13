@@ -29,7 +29,7 @@ H265Support                      : True
 function Get-AxisRecordingSupport {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
 

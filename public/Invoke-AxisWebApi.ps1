@@ -41,7 +41,7 @@ This function requires the Axis PowerShell module to be imported.
 function Invoke-AxisWebApi {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Path,
 
         [Parameter()]

@@ -22,10 +22,10 @@ Currently only supports DHCP
 function Set-AxisIPAddress {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$DHCP
     )
 

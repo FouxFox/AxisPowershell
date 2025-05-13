@@ -31,7 +31,7 @@ diskencrypted      : false
 function Get-AxisSDCardStatus {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
 

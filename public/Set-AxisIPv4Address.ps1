@@ -37,28 +37,28 @@ function Set-AxisIPv4Address {
     [cmdletbinding(DefaultParameterSetName='DHCP')]
     [Alias("Set-AxisIPAddress")]
     Param(
-        [Parameter(Mandatory=$true,ParameterSetName='DHCP')]
-        [Parameter(Mandatory=$true,ParameterSetName='Static')]
+        [Parameter(ParameterSetName='DHCP', Mandatory)]
+        [Parameter(ParameterSetName='Static', Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false,ParameterSetName='DHCP')]
-        [Parameter(Mandatory=$false,ParameterSetName='Static')]
+        [Parameter(ParameterSetName='DHCP')]
+        [Parameter(ParameterSetName='Static')]
         [String]$Interface="eth0",
 
-        [Parameter(Mandatory=$false,ParameterSetName='DHCP')]
-        [Parameter(Mandatory=$false,ParameterSetName='Static')]
+        [Parameter(ParameterSetName='DHCP')]
+        [Parameter(ParameterSetName='Static')]
         [Switch]$LegacyMethod,
 
         [Parameter(ParameterSetName='DHCP')]
         [Switch]$DHCP,
 
-        [Parameter(Mandatory=$true,ParameterSetName='Static')]
+        [Parameter(ParameterSetName='Static', Mandatory)]
         [IPAddress]$IPAddress,
 
-        [Parameter(Mandatory=$true,ParameterSetName='Static')]
+        [Parameter(ParameterSetName='Static', Mandatory)]
         [Int]$PrefixLength,
 
-        [Parameter(Mandatory=$true,ParameterSetName='Static')]
+        [Parameter(ParameterSetName='Static', Mandatory)]
         [IPAddress]$DefaultGateway
 
         

@@ -31,7 +31,7 @@ Locked              : False
 function Get-AxisStorageOptions {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
 

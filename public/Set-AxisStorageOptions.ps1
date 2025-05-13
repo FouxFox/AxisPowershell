@@ -25,10 +25,10 @@ Sets the device to only clean up when storage is full.
 function Set-AxisStorageOptions {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [int]$MaxAge=0
     )
 

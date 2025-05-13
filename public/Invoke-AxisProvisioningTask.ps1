@@ -49,10 +49,10 @@ Provisions the Axis device with the specified name and performs factory preparat
 function Invoke-AxisProvisioningTask {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$MacAddress
     )
 

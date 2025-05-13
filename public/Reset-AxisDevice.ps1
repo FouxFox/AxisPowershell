@@ -26,10 +26,10 @@ Resets the Axis device with the IP address "192.168.0.100" to factory defaults u
 function Reset-AxisDevice {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [Switch]$Hard
     )
 

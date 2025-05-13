@@ -30,7 +30,7 @@ WSDiscovery      : False
 function Get-AxisNetworkInfo {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
 

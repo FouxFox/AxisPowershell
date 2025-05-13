@@ -24,7 +24,7 @@ Lens Status Type       Id Disk    Error
 function Get-AxisRecordingProfile {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device
     )
     

@@ -15,7 +15,7 @@ Restarts the Axis device with the IP address "192.168.1.100".
 function Restart-AxisDevice {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory)]
         [string]$Device
     )
 

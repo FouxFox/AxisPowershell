@@ -27,16 +27,16 @@ This example creates a new stream profile named "Profile1" with the description 
 function New-AxisStreamProfile {
     [cmdletbinding()]
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Device,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         [String]$Name,
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$Description='',
 
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
         [String]$Parameters
     )
     

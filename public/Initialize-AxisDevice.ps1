@@ -23,7 +23,7 @@ function Initialize-AxisDevice {
         [String]$Device,
 
         [Parameter()]
-        [String]$NewPassword
+        [SecureString]$NewPassword
     )
 
     $DeviceNeedsSetup = (Get-AxisDeviceStatus -Device $Device).Status -eq "Needs Setup"
@@ -35,25 +35,11 @@ function Initialize-AxisDevice {
 
     if(-not $NewPassword) {
         Write-Host "Setting Password to Stored Credential..."
-        # Extract plaintext password from PSCredential
-        $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Config.Credential.Password)
-        $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
-        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
+        $TargetPassword = $Config.Credential.Password
     }
     else {
-        $PlainPassword = $NewPassword
+        $TargetPassword = $NewPassword
     }
 
-    $Param = @{
-        Device = $Device
-        Path = "/axis-cgi/pwdgrp.cgi?action=add&user=root&pwd=$($PlainPassword)&grp=root&sgrp=admin:operator:viewer:ptz"
-        NoAuth = $true
-    }
-    Try {
-        $null = Invoke-AxisWebApi @Param
-    }
-    Catch {
-        #TODO: Add better error handling
-        Throw $_
-    }
+    Add-AxisUserAccount -Device $Device -Password $TargetPassword -AsRoot
 }
