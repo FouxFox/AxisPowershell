@@ -9,6 +9,7 @@
     #FormatsToProcess = ''
     FunctionsToExport = @(
         'Add-AxisParameter'
+        'Add-AxisUserAccount'
         'Disable-AxisUnusedViews'
         'Enable-AxisDNSUpdate'
         'Export-AxisRecording'
@@ -32,6 +33,7 @@
         'Get-AxisStorageOptions'
         'Get-AxisStreamProfile'
         'Get-AxisSupportedResolutions'
+        'Get-AxisUserAccount'
         'Get-AxisViewStatus'
         'Initialize-AxisDevice'
         'Invoke-AxisWebAPI'
@@ -56,6 +58,7 @@
         'Set-AxisServices'
         'Set-AxisStorageOptions'
         'Set-AxisStreamProfile'
+        'Set-AxisUserAccount'
         'Update-AxisDevice'
     )
     VariablesToExport = "*"
