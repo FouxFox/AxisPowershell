@@ -79,7 +79,7 @@
                 'ManagedServiceProvider'
                 'Windows'
             )
-            IsPrerelease = $true
+            IsPrerelease = $false
             ReleaseNotes = @'
 ## 1.0.0
     * Inital release.
