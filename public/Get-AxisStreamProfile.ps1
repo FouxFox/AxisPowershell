@@ -56,10 +56,6 @@ function Get-AxisStreamProfile {
 
     $Data = (Invoke-AxisWebApi @Param).data
 
-    if(($Data.streamProfile.Name).contains("EdgeRecording")) {
-        Write-Warning '"EdgeRecording" profile already exists!'
-    }
-
     if($MaxProfiles) {
         return $Data.maxProfiles
     }

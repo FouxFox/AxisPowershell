@@ -24,7 +24,6 @@
         'Get-AxisNTPClient'
         'Get-AxisParameter'
         'Get-AxisPSConfig'
-        #'Get-AxisPSRecordingProfile
         'Get-AxisRecording'
         'Get-AxisRecordingProfile'
         'Get-AxisRecordingSupport'
@@ -32,6 +31,7 @@
         'Get-AxisSnapshot'
         'Get-AxisStorageOptions'
         'Get-AxisStreamProfile'
+        'Get-AxisStreamStatus'
         'Get-AxisSupportedResolutions'
         'Get-AxisUserAccount'
         'Get-AxisViewStatus'
@@ -72,7 +72,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '1.0.0'
+    ModuleVersion = '1.0.1'
     PrivateData = @{
         PSData = @{
             Tags = @(

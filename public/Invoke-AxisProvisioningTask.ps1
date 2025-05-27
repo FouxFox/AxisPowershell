@@ -215,7 +215,7 @@ function Invoke-AxisProvisioningTask {
     Write-Log -ID $MacAddress -Message "Creating Edge Recording Profile"
 
     Try {
-        $StreamParams = "videocodec=h265&videozstrength=20&videozgopmode=dynamic&videozprofile=storage"
+        $StreamParams = $Config.DefaultEdgeRecordingParameters
         New-AxisStreamProfile -Device $Device -Name "EdgeRecording" -Parameters $StreamParams
         Write-Log -ID $MacAddress -Message "Successfully created Stream Profile"
     } Catch {

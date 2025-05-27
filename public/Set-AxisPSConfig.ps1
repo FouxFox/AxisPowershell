@@ -34,6 +34,10 @@ function Set-AxisPSConfig {
         [String]$DNSSuffix,
 
         [Parameter(ParameterSetName='LoggingOn')]
+        [Parameter(ParameterSetName='LoggingOff')]
+        [String]$DefaultEdgeRecordingParameters,
+
+        [Parameter(ParameterSetName='LoggingOn')]
         [Switch]$EnableLogging,
 
         [Parameter(ParameterSetName='LoggingOff')]
@@ -48,6 +52,9 @@ function Set-AxisPSConfig {
     }
     if ($ProvisioningSnapshotPath) {
         $Config.ProvisioningSnapshotPath = $ProvisioningSnapshotPath
+    }
+    if ($DefaultEdgeRecordingParameters) {
+        $Config.RecordingParams = $DefaultEdgeRecordingParameters
     }
     if ($DNSSuffix) {
         $Config.DNSSuffix = $DNSSuffix
