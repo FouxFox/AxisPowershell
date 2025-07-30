@@ -24,4 +24,6 @@ function Set-AxisPSRecordingParams {
         $Config.RecordingParams.Add($Model, $false)
     }
     $Config.RecordingParams.$Model = $Parameters
+
+    Write-ModuleConfiguration
 }

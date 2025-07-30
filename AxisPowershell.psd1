@@ -75,7 +75,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '1.0.1'
+    ModuleVersion = '1.1.0'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -84,6 +84,11 @@
             )
             IsPrerelease = $false
             ReleaseNotes = @'
+## 1.1.0
+    * Added Get-AxisPSRecordingParams
+    * Added Set-AxisPSRecordingParams
+    * Added Remove-AxisPSRecordingParams
+    * Created ability to define specific recording parameters on a per-model basis
 ## 1.0.0
     * Inital release.
     * Added documentation for AxisUserAccount cmdlets.
