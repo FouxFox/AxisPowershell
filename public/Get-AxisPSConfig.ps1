@@ -21,7 +21,6 @@ function Get-AxisPSConfig {
         FirmwareFolder = $Config.FirmwareFolder
         DNSSuffix = $Config.DNSSuffix
         ProvisioningSnapshotPath = $Config.ProvisioningSnapshotPath
-        DefaultEdgeRecordingParameters = $Config.RecordingParams
         LogPath = $Config.LogPath
         LogEnabled = $Config.LogEnabled
     }

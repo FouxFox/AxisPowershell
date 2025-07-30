@@ -18,6 +18,7 @@ If left empty, the description will be set to an empty string.
 .PARAMETER Parameters
 The parameters for the stream profile.
 If left empty, the parameters will be set to the values defined in the AxisPowershell configuration file.
+See Get-AxisPSRecordingParams for more information on the parameters.
 
 .EXAMPLE
 New-AxisStreamProfile -Device "192.168.0.1" -Name "Profile1" -Description "Profile 1" -Parameters "videocodec=h264&resolution=1920x1080"
@@ -41,10 +42,18 @@ function New-AxisStreamProfile {
     )
     
     $streamParameters = $Parameters
+    $Model = (Get-AxisDevice -Device $Device).ProdNbr.Split('-')[0]
     $SupportedCodecs = (Get-AxisRecordingSupport -Device $Device).SupportedCodecs
 
+    # If no parameters are provided, search the configuration for the model-specific parameters
+    # If no model-specific parameters are found, use the default parameters
     if(!$Parameters) {
-        $streamParameters = "$($Config.RecordingParams)"
+        if($Config.RecordingParams.ContainsKey($Model)) {
+            $streamParameters = "$($Config.RecordingParams.$Model)"
+        } 
+        else {
+            $streamParameters = "$($Config.RecordingParams.Default)"
+        }
     }
 
     # runs a regex to check if videocodec is one of the supported codecs

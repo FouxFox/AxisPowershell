@@ -30,7 +30,13 @@ function Update-ModuleConfiguration {
         $Script:Config.Add('ProvisioningSnapshotPath', "C:\Users\$env:USERNAME\Downloads")
     }
     if($Script:Config.SchemaVersion -eq 5) {
-        # $Script:Config.SchemaVersion = 6
+        $Script:Config.SchemaVersion = 6
+        $Script:Config.RecordingParams = @{
+            Default = "videocodec=h265&resolution=3840x2160&fps=15&compression=60&videobitratemode=vbr&videozstrength=20&videozgopmode=dynamic&videozmaxgoplength=1200"
+        }
+    }
+    if($Script:Config.SchemaVersion -eq 6) {
+        # $Script:Config.SchemaVersion = 7
         # reserved for future updates
     }
 
