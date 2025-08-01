@@ -43,7 +43,9 @@ Tested on:
 | ViewStatus                    | ❌<sup>1</sup> | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 <sup>1</sup>: Command works, but disabling views is not supported and "Enabled" returns null
+
 <sup>2</sup>: This version doesn't return the stream profile in my tests...
+
 <sup>3</sup>: In these versions, "As long as possible" MaxAge is listed as 7000 rather than 0
 
 ## Installation
