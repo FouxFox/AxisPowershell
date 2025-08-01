@@ -27,17 +27,19 @@ function Get-AxisDSCP {
         [String]$Device
     )
 
-    $ClassMap = @{
-        'Network.QoS.Class1.DSCP' = 'Video'
-        'Network.QoS.Class2.DSCP' = 'Audio'
-        'Network.QoS.Class3.DSCP' = 'Management'
-        'Network.QoS.Class4.DSCP' = 'Remote'
-        'Network.QoS.Class5.DSCP' = 'Metadata'
+    $ClassMap = @{}
+
+    $result = Get-AxisParameter -Device $Device -Group 'Network.QoS.*'
+    $descriptions = $result.Keys | Where-Object { $_.contains('Desc') }
+    $settings = $result.Keys | Where-Object { $_.contains('DSCP') }
+
+    ForEach ($class in $descriptions) {
+        $ClassMap.Add($class.Replace('Desc','DSCP'),$result.$class.Replace('Axis','').Replace('Live','').Replace('Service','').Replace('MetaData','Metadata').Trim())
     }
 
-    $result = Get-AxisParameter -Device $Device -Group 'Network.QoS.*.DSCP'
+    
 
-    ForEach ($class in $result.Keys) {
+    ForEach ($class in $settings) {
         [pscustomobject]@{
             Class = $ClassMap[$class]
             DSCP  = $result.$class

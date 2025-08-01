@@ -9,6 +9,43 @@ AxisPowershell is a PowerShell module designed to simplify and automate interact
 - Create and use recording profiles with onboard SD cards
 - Workflow for mass provisioning of devices
 
+## Compatability
+Not every feature can be feasibly tested on every camera. If you have a feature that's not working right, open an issue.
+
+Tested on:
+- 6.55.9
+- 7.25.1.1
+- 8.50.1
+- 9.80.78
+- 10.6.0
+- 11.9.63
+- 12.2.62
+
+| Command                       | v6 | v7 | v8 | v9 | v10 | v11 | v12 |
+| ----------------------------- | -- | -- | -- | -- | --- | --- | --- |
+| Action                        | ❓ | ❓ | ❓ | ❓ | ❓ | ✅ | ❓ |
+| ContinuousRecordingProfile    | ❓ | ✅<sup>2</sup> | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Date                          | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| DeviceInfo                    | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| DSCP                          | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| NetworkInfo                   | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| NTPClient                     | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| Parameter                     | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| RecordingProfile              | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| RecordingSupport              | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| SDCardStatus                  | ❓ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Snapshot                      | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| StorageOptions                | ✅<sup>3</sup> | ✅<sup>3</sup> | ✅<sup>3</sup> | ✅<sup>3</sup> | ✅<sup>3</sup> | ✅ | ✅ |
+| StreamProfile                 | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| StreamStatus                  | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| SupportedResolutions          | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| UserAccount                   | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| ViewStatus                    | ❌<sup>1</sup> | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+<sup>1</sup>: Command works, but disabling views is not supported and "Enabled" returns null
+<sup>2</sup>: This version doesn't return the stream profile in my tests...
+<sup>3</sup>: In these versions, "As long as possible" MaxAge is listed as 7000 rather than 0
+
 ## Installation
 
 Install the latest version of the module from PowerShell Gallery

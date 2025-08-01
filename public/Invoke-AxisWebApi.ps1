@@ -109,8 +109,14 @@ function Invoke-AxisWebApi {
 
     #Unsafe header Parsing as older devices can commit porotocol violations
     #Disable Certificate Validation as the user may try to connect to devices with invalid addresses
-    Set-UseUnsafeHeaderParsing -Disable
-    Set-CertificateValidation -Disable
+    if($PSVersionTable.PSVersion.Major -le 5) {
+        Set-UseUnsafeHeaderParsing -Enable
+        Set-CertificateValidation -Disable
+    }
+    elseif ($PSVersionTable.PSVersion.Major -ge 7) {
+        $Param.Add('SkipCertificateCheck',$true)
+        $Param.Add('AllowUnencryptedAuthentication',$true)
+    }
 
     $ConnectionError = $false
     $Connected = $false
@@ -144,10 +150,6 @@ function Invoke-AxisWebApi {
             $ConnectionError = $_
         }
     }
-
-    #Regardless of Success or Failure, re-enable safe header parsing and Cert Validation
-    Set-UseUnsafeHeaderParsing -Enable
-    #Set-CertificateValidation -Enable
 
     if(!$Connected) {
         Throw $ConnectionError
