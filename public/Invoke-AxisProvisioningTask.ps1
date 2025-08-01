@@ -111,7 +111,7 @@ function Invoke-AxisProvisioningTask {
     if(!$PasswordAlreadySet) {
         #Send to device
         Try {
-            Initialize-AxisDevice -Device $Device -NewPassword $PlainPassword
+            Initialize-AxisDevice -Device $Device
             Write-Log -ID $MacAddress -Message "Successfully set password"
         } Catch {
             Write-Log -ID $MacAddress -Message "Failed to set password"

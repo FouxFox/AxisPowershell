@@ -42,7 +42,7 @@ function New-AxisStreamProfile {
     )
     
     $streamParameters = $Parameters
-    $Model = (Get-AxisDevice -Device $Device).ProdNbr.Split('-')[0]
+    $Model = (Get-AxisDeviceInfo -Device $Device).ProdNbr.Split('-')[0]
     $SupportedCodecs = (Get-AxisRecordingSupport -Device $Device).SupportedCodecs
 
     # If no parameters are provided, search the configuration for the model-specific parameters
@@ -64,6 +64,7 @@ function New-AxisStreamProfile {
         Throw "Codec not supported. Please use a supported codec." 
     }
 
+    #Stream Parameters do not need HTML encoding
     $Param = @{
         Device = $Device
         Path = "/axis-cgi/streamprofile.cgi"
@@ -75,7 +76,7 @@ function New-AxisStreamProfile {
                 "streamProfile" = @(@{
                     "name" = $Name
                     "description" = $Description
-                    "parameters" = $streamParameters.Replace('=','%3D')
+                    "parameters" = $streamParameters
                 
                 })
             }

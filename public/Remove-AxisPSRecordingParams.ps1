@@ -1,3 +1,19 @@
+<#
+.SYNOPSIS
+Removes recording parameters for a specified product number.
+
+.DESCRIPTION
+Removes the recording parameters associated with a given product number. 
+
+.PARAMETER ProdNbr
+The product number for which the recording parameters should be removed.
+
+.NOTES
+If no recording parameters are found for the specified model or product number, a warning message is displayed.
+
+.EXAMPLE
+Remove-AxisPSRecordingParams -ProdNbr "M4318-PVE"
+#>
 function Remove-AxisPSRecordingParams {
     [cmdletbinding()]
     Param(

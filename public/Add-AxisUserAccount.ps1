@@ -26,11 +26,14 @@ The password for the new user account.
 Add-AxisUserAccount -Device "192.168.0.100" -User "newuser"
 
 .EXAMPLE
-$pw = ConvertTo-SecureString -AsPlainText -Force "P@ssw0rd"
-Add-AxisUserAccount -Device "192.168.0.100" -User "newuser" -Password $pw -PrivGroup "operator" -Comment "Temporary account"
+$Credentials = Get-Credential
+Add-AxisUserAccount -Device "192.168.0.100" -User $Credentials.UserName -Password $Credentials.Password -PrivGroup "operator" -Comment "Temporary account"
 
 .NOTES
 Requires the Invoke-AxisWebApi function to be available in the session.
+
+If you need to hardcode a password for some reason (this is unsafe) you can use the following:
+$pw = ConvertTo-SecureString -AsPlainText -Force "P@ssw0rd"
 #>
 function Add-AxisUserAccount {
     [cmdletbinding(DefaultParameterSetName='Normal')]
@@ -39,14 +42,11 @@ function Add-AxisUserAccount {
         [Parameter(ParameterSetName='Root', Mandatory)]
         [String]$Device,
 
-        [Parameter(MParameterSetName='Normal', Mandatory)]
-        [Parameter(ParameterSetName='Root')]
-        [String]$User,
-
         [Parameter(ParameterSetName='Normal', Mandatory)]
         [Parameter(ParameterSetName='Root', Mandatory)]
-        [SecureString]$Password,
+        [PSCredential]$Credential,
 
+        #Don't Show when root as root gets a specific set of privileges
         [Parameter(ParameterSetName='Normal')]
         [Parameter(ParameterSetName='Root',DontShow)]
         [String]$PrivGroup="admin:operator:viewer:ptz",
@@ -55,17 +55,23 @@ function Add-AxisUserAccount {
         [String]$Comment,
 
         [Parameter(ParameterSetName='Root', Mandatory)]
-        [Switch]$AsRoot
+        [Switch]$AsRoot,
+
+        #Included for Initialize-AxisDevice to provision user first time
+        [Parameter(ParameterSetName='Root', DontShow)]
+        [Switch]$NoAuth
     )
 
     #Decode Password
-    $ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)
+    $ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Credential.Password)
     $PlainTextPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($ptr)
     [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr)
 
-    #Set User Group
+    #Set User Info
+    $User = $Credential.UserName
     $grp = "users"
     if($AsRoot) {
+        $User = "root"
         $grp = "root"
     }
 
@@ -77,9 +83,14 @@ function Add-AxisUserAccount {
     if($Comment) {
         $Param.Path += "&comment=$Comment"
     }
+
+    if($NoAuth) {
+        $Param.Add("NoAuth",$true)
+    }
+
     $result = Invoke-AxisWebApi @Param
 
-    if($result -ne 'OK') {
+    if($result.contains('Error')) {
         Throw "Unable to add user"
     }
 }

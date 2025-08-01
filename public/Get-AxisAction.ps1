@@ -25,8 +25,12 @@ function Get-AxisAction {
     )
 
     Check-Credential
-
-    $soap_action = New-WebServiceProxy -Uri "http://www.axis.com/vapix/ws/action1/ActionService.wsdl" -Credential $Config.Credential
+    Try {
+        $soap_action = New-WebServiceProxy -Uri "http://www.axis.com/vapix/ws/action1/ActionService.wsdl" -Credential $Config.Credential -ErrorAction Stop
+    } Catch {
+        Write-Error "Failed to create web service proxy for Axis ActionService. Check your network connection and device availability."
+        return @()
+    }
     $soap_action.URL = "https://$($Device)/vapix/services"
     $ActionConfigs = @{}
     $soap_action.GetActionConfigurations() | ForEach-Object {

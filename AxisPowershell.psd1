@@ -75,7 +75,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '1.1.0'
+    ModuleVersion = '1.1.2'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -84,6 +84,8 @@
             )
             IsPrerelease = $false
             ReleaseNotes = @'
+## 1.1.2
+    * Various fixes, security improvements, and code cleanup.
 ## 1.1.0
     * Added Get-AxisPSRecordingParams
     * Added Set-AxisPSRecordingParams

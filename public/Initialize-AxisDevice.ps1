@@ -13,7 +13,8 @@ Specifies the IP address or hostname of the Axis camera.
 Specifies the new password to be set for the root user. If not provided, a random password will be generated.
 
 .EXAMPLE
-Initialize-AxisDevice -Device "192.168.1.100" -NewPassword "MyNewPassword"
+$pw = ConvertTo-SecureString -AsPlainText -Force "P@ssw0rd"
+Initialize-AxisDevice -Device "192.168.1.100" -NewPassword $pw
 
 #>
 function Initialize-AxisDevice {
@@ -33,13 +34,15 @@ function Initialize-AxisDevice {
         return
     }
 
+    
+
     if(-not $NewPassword) {
         Write-Host "Setting Password to Stored Credential..."
-        $TargetPassword = $Config.Credential.Password
+        $TargetCredential = $Config.Credential
     }
     else {
-        $TargetPassword = $NewPassword
+        $TargetCredential = New-Object System.Management.Automation.PSCredential ("root", $NewPassword)   
     }
 
-    Add-AxisUserAccount -Device $Device -Password $TargetPassword -AsRoot
+    Add-AxisUserAccount -Device $Device -Credential $TargetCredential -AsRoot -NoAuth
 }
