@@ -75,7 +75,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '1.1.2'
+    ModuleVersion = '1.1.3'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -84,6 +84,10 @@
             )
             IsPrerelease = $false
             ReleaseNotes = @'
+## 1.1.3
+    * Fixed issue with Get-AxisDate where it would not work with firmware versions less than 9.30.
+    * Fixed issue with Set-AxisDSCP where it would not accept the first value provided.
+    * Added functionality to New-AxisProvisioningJob to allow the interfaceIP to be specified.
 ## 1.1.2
     * Various fixes, security improvements, and code cleanup.
 ## 1.1.0
