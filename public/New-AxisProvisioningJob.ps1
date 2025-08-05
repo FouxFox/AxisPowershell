@@ -10,6 +10,10 @@ It allows you to specify a list of IP addresses or automatically discover device
 Specifies the IP addresses of the target devices. 
 If not provided, the function will automatically discover devices on the local network.
 
+.PARAMETER InterfaceIP
+Specifies the IP of the interface to use for device discovery.
+If not provided, the function will automatically discover devices on the local network.
+
 .EXAMPLE
 New-AxisProvisioningJob -IP 192.168.1.10,192.168.1.20
 Creates a new provisioning job for the specified IP addresses.
@@ -25,6 +29,9 @@ function New-AxisProvisioningJob {
         [String[]]$IP,
 
         [Parameter()]
+        [String]$InterfaceIP,
+
+        [Parameter(DontShow)]
         [Switch]$SingleThreaded
     )
 
@@ -40,15 +47,31 @@ function New-AxisProvisioningJob {
         $ModuleString = $env:TestModulePath
     }
 
+    #List of Axis OUI prefixes to filter devices
     $AxisOUIs = @(
         "e8-27-25"
         "00-40-8c"
         "b8-a4-4f"
         "ac-cc-8e"
     )
+    #If the user does not provide an IP and InterfaceIP, this list will filter commonly unwanted interfaces
+    $InterfaceFilter = {
+        !$_.InterfaceAlias.StartsWith('Loopback') -and
+        !$_.InterfaceAlias.Contains('VMware') -and
+        !$_.InterfaceAlias.Contains('Hyper-V') -and
+        !$_.InterfaceAlias.StartsWith('Virtual') -and
+        !$_.InterfaceAlias.StartsWith('vEthernet') -and
+        !$_.InterfaceAlias.StartsWith('vboxnet')
+    }
 
-    if(!$IP) {
-        $ipInfo = Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.InterfaceIndex -ne 1 }
+    if(!$IP) {  
+        if($InterfaceIP) {
+            $ipInfo = Get-NetIPAddress $InterfaceIP
+        }
+        else {
+            $ipInfo = Get-NetIPAddress -AddressState Preferred -AddressFamily IPv4 | Where-Object $InterfaceFilter | Select-Object -First 1
+        }
+        
         $IPRange = Out-SubnetRange -Subnet $ipInfo.IPAddress -Prefix $ipInfo.PrefixLength
         $TargetDevices = Find-LANHosts -IP $IPRange | Where-Object { $_.MACAddress -match "($($AxisOUIs -join '|'))" }
     }
