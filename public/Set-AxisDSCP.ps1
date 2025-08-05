@@ -45,8 +45,8 @@ Sets the DSCP value to 34 for Live Video and 36 for Live Audio.
 function Set-AxisDSCP {
     [cmdletbinding(DefaultParameterSetName='All')]
     Param(
-        [Parameter(ParameterSetName='All', Mandatory)]
-        [Parameter(ParameterSetName='Specific', Mandatory)]
+        [Parameter(ParameterSetName='All', Mandatory, Position=0)]
+        [Parameter(ParameterSetName='Specific', Mandatory, Position=0)]
         [String]$Device,
 
         [Parameter(ParameterSetName='All')]
