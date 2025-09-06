@@ -99,6 +99,9 @@ if($Env:ModuleTools_TestMode -ne 1) {
         }
     }
 
+    #Load Security variables for hardening
+    . $PSScriptRoot\SecurityVariables.ps1
+
     #Turn off certificate checking
     #Moved this to Invoke-AxisWebApi
     #Set-CertificateValidation -Disable

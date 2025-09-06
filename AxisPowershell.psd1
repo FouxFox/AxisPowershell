@@ -29,6 +29,7 @@
         'Get-AxisRecordingProfile'
         'Get-AxisRecordingSupport'
         'Get-AxisSDCardStatus'
+        'Get-AxisSecurityConfiguration'
         'Get-AxisSnapshot'
         'Get-AxisStorageOptions'
         'Get-AxisStreamProfile'
