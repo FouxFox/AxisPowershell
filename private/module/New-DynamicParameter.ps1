@@ -37,18 +37,21 @@ function New-DynamicParameter {
     Param(
         [Parameter(Mandatory=$true)]
         [String]$Name,
-        [Parameter(Mandatory=$false)]
-        [String]$Mandatory=$true,
-        [Parameter(Mandatory=$false)]
+        [Parameter()]
+        [bool]$Mandatory=$true,
+        [Parameter()]
         [String]$Position=1,
-        [Parameter(Mandatory=$false)]
-        [String[]]$ValidateSet
+        [Parameter()]
+        [String[]]$ValidateSet,
+        [Parameter()]
+        [String]$ParameterSetName="__AllParameterSets"
     )
     $ParameterName = $Name
     $ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
 
-    $ParameterAttribute.Mandatory = $Mandatory
-    $ParameterAttribute.Position = $Position
+    $ParameterAttribute.Mandatory           = $Mandatory
+    $ParameterAttribute.Position            = $Position
+    $ParameterAttribute.ParameterSetName    = $ParameterSetName
 
     $AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
     $AttributeCollection.Add($ParameterAttribute)
