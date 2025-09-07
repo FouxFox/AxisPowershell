@@ -12,7 +12,10 @@ function Get-AxisSecurityConfiguration {
         [String]$Device,
 
         [Parameter()]
-        [switch]$NoColor
+        [switch]$NoColor,
+
+        [Parameter()]
+        [switch]$IncludeDeviceName
     )
     
     $DeviceParameters = Get-AxisParameter -Device $Device -Group $Script:AxisSecurityParamGroups
@@ -21,6 +24,11 @@ function Get-AxisSecurityConfiguration {
     $Results = @()
 
     ForEach ($SecuritySettingName in $Script:AxisSecuritySettings.Keys) {
+        #Skip Ciphers
+        if ($SecuritySettingName -eq "Https Ciphers") {
+            continue
+        }
+
         $SecuritySetting = $Script:AxisSecuritySettings[$SecuritySettingName]
         $AxisHardeningType = $SecuritySetting.AxisHardeningSet
 
@@ -49,15 +57,28 @@ function Get-AxisSecurityConfiguration {
                 $CurrentValueDisplay = $CurrentValue
                 $RecommendedValueDisplay = $RecommendedValue
             }
+            
 
-            $Results += [pscustomobject]@{
-                Device            = $Device
-                AxisHardeningType = $AxisHardeningType
-                SecuritySetting   = $SecuritySettingName
-                Parameter         = $ParameterName
-                CurrentValue      = $CurrentValueDisplay
-                RecommendedValue  = $RecommendedValueDisplay
+            if($IncludeDeviceName.IsPresent) {
+                $Results += [pscustomobject]@{
+                    "Device"                = $Device
+                    "Axis Hardening Type"   = $AxisHardeningType
+                    "Security Setting"      = $SecuritySettingName
+                    "Parameter"             = $ParameterName
+                    "Current Value"         = $CurrentValueDisplay
+                    "Recommended Value"     = $RecommendedValueDisplay
+                }
             }
+            else {
+                $Results += [pscustomobject]@{
+                    "Axis Hardening Type"   = $AxisHardeningType
+                    "Security Setting"      = $SecuritySettingName
+                    "Parameter"             = $ParameterName
+                    "Current Value"         = $CurrentValueDisplay
+                    "Recommended Value"     = $RecommendedValueDisplay
+                }
+            }
+            
         }
     }
 
