@@ -22,6 +22,7 @@
         'Get-AxisDeviceInfo'
         'Get-AxisDeviceStatus'
         'Get-AxisDSCP'
+        'Get-AxisHttpsCiphers'
         'Get-AxisNetworkInfo'
         'Get-AxisNTPClient'
         'Get-AxisParameter'
