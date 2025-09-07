@@ -59,6 +59,7 @@
         'Set-AxisParameter'
         'Set-AxisPSConfig'
         'Set-AxisPSRecordingParams'
+        'Set-AxisSecurityConfiguration'
         'Set-AxisServices'
         'Set-AxisStorageOptions'
         'Set-AxisStreamProfile'

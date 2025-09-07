@@ -16,6 +16,17 @@ $AxisSecurityParamGroups = @(
     #'Storage.S0.Enabled'
 )
 
+enum SecuritySet {
+    Standard  = 1
+    DoNotUse = 99 #Ensures that we don't apply these settings as part of module best practices
+}
+
+enum AxisHardeningTier {
+    Default  = 0
+    Basic    = 1
+    Extended = 2
+}
+
 $AxisSecuritySettings = [ordered]@{
     #Default
     "Brute Force Protection" = @{
@@ -45,8 +56,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = '1'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Default'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Default'
     }
     "ONVIF Replay Protection" = @{
         Parameters = @(
@@ -55,8 +66,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'yes'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Default'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Default'
     }
     "Disable Anonymous Access" = @{
         Parameters = @(
@@ -73,8 +84,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'password'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Default'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Default'
     }
     "CGI Editor" = @{
         Parameters = @(
@@ -83,8 +94,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'no'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
     }
     "Web Access Protocol" = @{
         Parameters = @(
@@ -101,8 +112,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'https'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Default'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Default'
     }
 
     #Basic
@@ -113,8 +124,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'On'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
     }
     "Arp/Ping" = @{
         Parameters = @(
@@ -123,8 +134,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'no'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
     }
     "Bonjour" = @{
         Parameters = @(
@@ -133,18 +144,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'no'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
-    }
-    "Disable Web UI" = @{
-        Parameters = @(
-            @{
-                Name = "System.WebInterfaceDisabled"
-                HardenedValue = 'yes'
-            }
-        )   
-        SecuritySet = 'Aggressive'
-        AxisHardeningSet = 'Basic'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
     }
     "FTP" = @{
         Parameters = @(
@@ -153,8 +154,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'no'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
     }
     "O3C" = @{
         Parameters = @(
@@ -163,8 +164,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'no'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
     }
     "Server Headers" = @{
         Parameters = @(
@@ -173,8 +174,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'no'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
     }
     "SSH" = @{
         Parameters = @(
@@ -183,8 +184,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'no'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
     }
     "TLS Versions" = @{
         Parameters = @(
@@ -201,8 +202,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'no'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
     }
     "UPnP" = @{
         Parameters = @(
@@ -215,8 +216,19 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'no'
             }
         )  
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
+    }
+    #Web UI has it's own set of commands
+    "Web UI Disabled" = @{
+        Parameters = @(
+            @{
+                Name = "System.WebInterfaceDisabled"
+                HardenedValue = 'yes'
+            }
+        )   
+        SecuritySet = [SecuritySet]'DoNotUse'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
     }
     "WS-Discovery" = @{
         Parameters = @(
@@ -225,8 +237,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'no'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
     }
     "ZeroConf" = @{
         Parameters = @(
@@ -235,8 +247,8 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'no'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
     }
 
     #Extended
@@ -251,20 +263,20 @@ $AxisSecuritySettings = [ordered]@{
                 HardenedValue = 'yes'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Extended'
+        SecuritySet = [SecuritySet]'Standard'
+        AxisHardeningSet = [AxisHardeningTier]'Extended'
     }
+
     #Moving HTTPS Ciphers to it's own set of commmands due to amount of information that can be stored.
-    <#
-    HttpsCiphers = @{
+    
+    "Https Ciphers" = @{
         Parameters = @(
             @{
                 Name = "HTTPS.Ciphers"
                 HardenedValue = 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305'
             }
         )   
-        SecuritySet = 'Standard'
-        AxisHardeningSet = 'Basic'
-    }
-    #>
+        SecuritySet = [SecuritySet]'DoNotUse'
+        AxisHardeningSet = [AxisHardeningTier]'Basic'
+    }    
 }
