@@ -1,3 +1,4 @@
+#NeedDoc
 function Set-AxisSecurityConfiguration {
     [cmdletbinding()]
     param(
