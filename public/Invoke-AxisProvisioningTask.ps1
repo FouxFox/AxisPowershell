@@ -100,17 +100,13 @@ function Invoke-AxisProvisioningTask {
 
     #Check Device state
     $PasswordAlreadySet = $false
-    Try {
-        $PasswordAlreadySet = (Get-AxisDeviceStatus -Device $Device).Status -eq "Ready"
-        Write-Log -ID $MacAddress -Message "Device has already had password set"
-    } Catch {
-        Write-Log -ID $MacAddress -Message "Device in Factory default state"
-    }
+    $PasswordAlreadySet = (Get-AxisDeviceStatus -Device $Device).Status -eq "Ready"
 
     #Set password if not already set
     if(!$PasswordAlreadySet) {
         #Send to device
         Try {
+            Write-Log -ID $MacAddress -Message "Device in Factory default state"
             Initialize-AxisDevice -Device $Device
             Write-Log -ID $MacAddress -Message "Successfully set password"
         } Catch {
@@ -118,6 +114,18 @@ function Invoke-AxisProvisioningTask {
             Write-Log -ID $MacAddress -Message $_.Exception.Message
             Throw $_
         }
+    }
+    else {
+        Write-Log -ID $MacAddress -Message "Device has already had password set"
+        Try {
+            $null = Get-AxisDeviceInfo -Device $Device -ErrorAction Stop
+        }
+        catch {
+            Write-Log -ID $MacAddress -Message "Unable to connect to device with provided credentials"
+            Write-Log -ID $MacAddress -Message "This shouldn't happen. What did you do?"
+            Write-Log -ID $MacAddress -Message $_.Exception.Message
+            Throw $_
+        }  
     }
 
     #################################
@@ -153,17 +161,17 @@ function Invoke-AxisProvisioningTask {
     ##################################
     ## Stage 4: Set Security Config ##
     ##################################
-    Write-Verbose "Applying Security Best Practices"
+    Write-Verbose "Applying Security Hardening"
     $ProgParam = @{
         Activity = "Perfroming Factory Preparation on $Device..."
-        Status = "Stage 4/7: Applying Security Best Practices" 
+        Status = "Stage 4/7: Applying Security Hardening" 
         PercentComplete = 50
     }
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Setting Security Settings"
     Try {
-        Set-AxisServices -Device $Device
-        Write-Log -ID $MacAddress -Message "Successfully set security settings"
+        Set-AxisSecurityConfiguration -Device $Device
+        Write-Log -ID $MacAddress -Message "Successfully set Security Hardening"
     } Catch {
         Write-Log -ID $MacAddress -Message "Failed to set security settings"
         Write-Log -ID $MacAddress -Message $_.Exception.Message
@@ -192,7 +200,7 @@ function Invoke-AxisProvisioningTask {
 
     Start-Sleep -Seconds 10
 
-    Write-Log -ID $MacAddress -Message "setting retention"
+    Write-Log -ID $MacAddress -Message "Setting retention to As long as possible"
     Try {
         Set-AxisStorageOptions -Device $Device
         Write-Log -ID $MacAddress -Message "Successfully set retention"
@@ -226,9 +234,9 @@ function Invoke-AxisProvisioningTask {
 
     Try {
         New-AxisRecordingProfile -Device $Device -StreamProfile "EdgeRecording"
-        Write-Log -ID $MacAddress -Message "Successfully created Continuious Recording Profile"
+        Write-Log -ID $MacAddress -Message "Successfully created Continuous Recording Profile"
     } Catch {
-        Write-Log -ID $MacAddress -Message "Failed to create Continuious Recording Profile"
+        Write-Log -ID $MacAddress -Message "Failed to create Continuous Recording Profile"
         Write-Log -ID $MacAddress -Message $_.Exception.Message
         Throw $_
     }
