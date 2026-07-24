@@ -133,7 +133,7 @@ function New-AxisProvisioningJob {
     Write-Verbose "Jobs Sent"
 
     #$jobs.pipe[0].Streams.Progress[0].StatusDescription
-    while ($jobs.Handle.IsCompleted -notcontains $true) {
+    while ($jobs.Handle.IsCompleted -contains $false) {
         Clear-Host
         ForEach ($item in $Jobs) {
             $ProgressIndex = $item.Pipe.Streams.Progress.count - 1
