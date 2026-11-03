@@ -31,6 +31,12 @@ function Get-AxisTlsCertificate {
         [Int]$TimeoutSec=10
     )
 
+    #Device may carry an explicit port (host:port, e.g. behind a port-forward); it overrides -Port
+    if($Device -match '^(?<host>[^:\[\]]+):(?<port>\d+)$') {
+        $Device = $Matches.host
+        if(!$PSBoundParameters.ContainsKey('Port')) { $Port = [int]$Matches.port }
+    }
+
     $Client = $null
     $Ssl = $null
     Try {

@@ -206,11 +206,31 @@ function Install-AxisCertificate {
             "System.BoaGroupPolicy.operator" = 'https'
             "System.BoaGroupPolicy.viewer" = 'https'
         }
-        Try {
-            Update-AxisParameter -Device $Device -ParameterSet $ParamSet
+        #VERIFIED on Q8641-E / AXIS OS 9.80.146 (2026-11-03): switching the admin policy restarts the web server
+        #mid-request, so the first call can fail with only "admin" applied. Retry once, then read back to decide.
+        $Applied = $false
+        ForEach($Attempt in 1..2) {
+            Try {
+                Update-AxisParameter -Device $Device -ParameterSet $ParamSet
+                $Applied = $true
+                break
+            }
+            Catch {
+                Write-Verbose "HTTPS-only update attempt $Attempt on $Device failed: $_"
+                Start-Sleep -Seconds 3
+            }
         }
-        Catch {
-            Throw "Certificate installed, but unable to enable HTTPS-only on $($Device): $_"
+        if(!$Applied) {
+            Try {
+                #Get-AxisParameter returns a hashtable keyed without the "root." prefix
+                $Policy = Get-AxisParameter -Device $Device -Group System.BoaGroupPolicy
+                $Values = @($ParamSet.Keys | ForEach-Object { $Policy[$_] })
+                $Applied = $Values.Count -eq 3 -and @($Values | Where-Object { $_ -ne 'https' }).Count -eq 0
+            }
+            Catch {}
+        }
+        if(!$Applied) {
+            Throw "Certificate installed, but unable to enable HTTPS-only on $($Device)"
         }
         Initialize-AxisCache -Device $Device
         $Cache.$Device.Type = "https"
