@@ -10,6 +10,7 @@ function Get-ModuleSchemaVersion {
         '0.7.0' = 4
         '0.8.0' = 5
         '1.1.0' = 6
+        '1.2.0' = 7
     }
 
     if($SchemaVersionTable.ContainsKey($Version) -or $SchemaVersionTable.Keys.Count -lt 2) {

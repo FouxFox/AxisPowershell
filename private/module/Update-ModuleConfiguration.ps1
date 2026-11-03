@@ -1,5 +1,5 @@
 #Upgrades the configuration file with new schema changes
-## CURRENT SCHEMA VERSION: 4
+## CURRENT SCHEMA VERSION: 7
 #Don't forget to update Schema Version in Get-ModuleSchemaVersion and the Reference Object
 
 function Update-ModuleConfiguration {
@@ -36,7 +36,23 @@ function Update-ModuleConfiguration {
         }
     }
     if($Script:Config.SchemaVersion -eq 6) {
-        # $Script:Config.SchemaVersion = 7
+        $Script:Config.SchemaVersion = 7
+        $Script:Config.Add('CertificateAuthorities', @{})
+        $Script:Config.Add('Certificate', @{
+            DefaultAuthority = $false
+            SubjectTemplate = "CN={FQDN}"
+            SanTemplate = @("DNS:{FQDN}")
+            IncludeIP = $false
+            KeyType = "Auto"
+            Keystore = "Auto"
+            Alias = "AxisPowershell"
+            HttpsOnly = $true
+            RenewWithinDays = 30
+        })
+        $Script:Config.Add('ProvisionCertificate', $false)
+    }
+    if($Script:Config.SchemaVersion -eq 7) {
+        # $Script:Config.SchemaVersion = 8
         # reserved for future updates
     }
 

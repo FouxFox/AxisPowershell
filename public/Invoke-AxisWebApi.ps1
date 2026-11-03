@@ -16,6 +16,11 @@ The HTTP method to be used for the request. The default value is "GET".
 
 .PARAMETER Body
 The body of the request. This parameter is used when making POST requests.
+A hashtable is converted to JSON. A string is sent as-is (for example SOAP XML or a PEM blob); set ContentType accordingly.
+
+.PARAMETER ContentType
+The Content-Type header for the request. Defaults to the module configuration (application/json).
+Use "application/soap+xml" for SOAP requests to /vapix/services.
 
 .PARAMETER Headers
 A hashtable containing custom headers to be included in the request.
@@ -54,6 +59,9 @@ function Invoke-AxisWebApi {
         $Body,
 
         [Parameter()]
+        [String]$ContentType,
+
+        [Parameter()]
         [Switch]$WebRequest,
 
         [Parameter()]
@@ -69,6 +77,9 @@ function Invoke-AxisWebApi {
 
     #Build Headers
     $RequestHeaders = $Config.Headers.Clone()
+    if($ContentType) {
+        $RequestHeaders["Content-Type"] = $ContentType
+    }
 #   if($Headers) {
 #       ForEach ($h in $Headers.Keys) {
 #           $RequestHeaders.Add($h,$Headers[$h])
@@ -93,8 +104,17 @@ function Invoke-AxisWebApi {
     }
 
     if($Body) {
-        $Param.Method = 'Post'
-        $Param.Add('Body',(ConvertTo-JSON -Depth 10 $Body))
+        #Only default to POST when the caller did not ask for another write method (PATCH, PUT, DELETE)
+        if($Method -eq "GET") {
+            $Param.Method = 'Post'
+        }
+        #Strings (SOAP XML, PEM, form data) are sent as-is; everything else is serialized to JSON
+        if($Body -is [String]) {
+            $Param.Add('Body',$Body)
+        }
+        else {
+            $Param.Add('Body',(ConvertTo-JSON -Depth 10 $Body))
+        }
     }
 
     if($OutFile) {
