@@ -71,7 +71,8 @@ function Get-AxisCertificateSubject {
 
     $Hostname = [String]$NetworkInfo.HostName
     $IP = [String]$NetworkInfo.IPAddress
-    $Serial = [String]$DeviceInfo.SerialNumber
+    #Lower-case so that CN=axis-{Serial}.<suffix> matches the device's own default hostname (axis-<serial>)
+    $Serial = ([String]$DeviceInfo.SerialNumber).ToLower()
     $Model = [String]$DeviceInfo.ProdNbr
 
     #DNS suffix: configuration wins, otherwise what the device registers via DNS update
