@@ -11,6 +11,7 @@ It supports:
  - Enabling DHCP
  - Updating DNS settings
  - Configuring security settings
+ - Deploying a CA-issued HTTPS certificate (when enabled with Set-AxisPSConfig -EnableCertificateProvisioning)
  - Formatting the SD card.
 
 .PARAMETER Device
@@ -72,7 +73,7 @@ function Invoke-AxisProvisioningTask {
     Write-Verbose "Update Firmware"
     $ProgParam = @{
         Activity = "Perfroming Factory Preparation on $Device..."
-        Status = "Stage 1/7: Updating Firmware" 
+        Status = "Stage 1/8: Updating Firmware" 
         PercentComplete = 0
     }
     Write-Progress @ProgParam
@@ -92,8 +93,8 @@ function Invoke-AxisProvisioningTask {
     Write-Verbose "New Password"
     $ProgParam = @{
         Activity = "Perfroming Factory Preparation on $Device..."
-        Status = "Stage 2/7: Setting Password" 
-        PercentComplete = 16
+        Status = "Stage 2/8: Setting Password" 
+        PercentComplete = 14
     }
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Checking Device State"
@@ -126,8 +127,8 @@ function Invoke-AxisProvisioningTask {
     Write-Verbose "Set Network Settings"
     $ProgParam = @{
         Activity = "Perfroming Factory Preparation on $Device..."
-        Status = "Stage 3/7: Set Network Configuration" 
-        PercentComplete = 33
+        Status = "Stage 3/8: Set Network Configuration" 
+        PercentComplete = 28
     }
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Setting DNS Hostname"
@@ -156,8 +157,8 @@ function Invoke-AxisProvisioningTask {
     Write-Verbose "Applying Security Best Practices"
     $ProgParam = @{
         Activity = "Perfroming Factory Preparation on $Device..."
-        Status = "Stage 4/7: Applying Security Best Practices" 
-        PercentComplete = 50
+        Status = "Stage 4/8: Applying Security Best Practices" 
+        PercentComplete = 42
     }
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Setting Security Settings"
@@ -170,14 +171,47 @@ function Invoke-AxisProvisioningTask {
         Throw $_
     }
 
+    ####################################
+    ## Stage 5: Deploy SSL Certificate ##
+    ####################################
+    Write-Verbose "Deploying Certificate"
+    $ProgParam = @{
+        Activity = "Perfroming Factory Preparation on $Device..."
+        Status = "Stage 5/8: Deploying Certificate" 
+        PercentComplete = 57
+    }
+    Write-Progress @ProgParam
+    #Runs after Stage 3 so the DNS hostname exists for the subject; opt-in via Set-AxisPSConfig -EnableCertificateProvisioning
+    if($Config.ProvisionCertificate -and $Config.Certificate.DefaultAuthority) {
+        Write-Log -ID $MacAddress -Message "Requesting certificate from $($Config.Certificate.DefaultAuthority)"
+        Try {
+            $CertResult = Request-AxisCertificate -Device $Device
+            Write-Log -ID $MacAddress -Message "Certificate: $($CertResult.Action) - $($CertResult.Message)"
+        } Catch {
+            #Firmware below 11.6 without working SOAP CSR support ends up here; do not fail the whole job
+            if($_.Exception.Message -like "*not supported on this device*") {
+                Write-Log -ID $MacAddress -Message "Certificate stage skipped: not supported on this firmware"
+                Write-Warning "$($Device): certificate stage skipped, not supported on this firmware"
+            }
+            else {
+                Write-Log -ID $MacAddress -Message "Failed to deploy certificate"
+                Write-Log -ID $MacAddress -Message $_.Exception.Message
+                Throw $_
+            }
+        }
+    }
+    else {
+        Write-Log -ID $MacAddress -Message "Certificate stage skipped (disabled or no default authority)"
+    }
+
     #############################
-    ## Stage 5: Format SD Card ##
+    ## Stage 6: Format SD Card ##
     #############################
     Write-Verbose "Formatting SD Card"
     $ProgParam = @{
         Activity = "Perfroming Factory Preparation on $Device..."
-        Status = "Stage 5/7: Formatting SD Card" 
-        PercentComplete = 67
+        Status = "Stage 6/8: Formatting SD Card" 
+        PercentComplete = 71
     }
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Formatting SD Card"
@@ -203,13 +237,13 @@ function Invoke-AxisProvisioningTask {
     }
 
     #################################
-    ## Stage 6: Set Edge Recording ##
+    ## Stage 7: Set Edge Recording ##
     #################################
     Write-Verbose "Creating Edge Recording Profile"
     $ProgParam = @{
         Activity = "Perfroming Factory Preparation on $Device..."
-        Status = "Stage 6/7: Creating Edge Recording Profile" 
-        PercentComplete = 84
+        Status = "Stage 7/8: Creating Edge Recording Profile" 
+        PercentComplete = 85
     }
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Creating Edge Recording Profile"
@@ -234,13 +268,13 @@ function Invoke-AxisProvisioningTask {
     }
 
     ###############################
-    ## Stage 7: Getting Snapshot ##
+    ## Stage 8: Getting Snapshot ##
     ###############################
     Write-Verbose "Getting snapshot from camera"
     $ProgParam = @{
         Activity = "Perfroming Factory Preparation on $Device..."
-        Status = "Stage 7/7: Getting Snapshot from camera" 
-        PercentComplete = 84
+        Status = "Stage 8/8: Getting Snapshot from camera" 
+        PercentComplete = 92
     }
     Write-Progress @ProgParam
     Write-Log -ID $MacAddress -Message "Getting Snapshot from camera"
