@@ -66,11 +66,19 @@ Function InitTestEnvironment {
 	#Pulled from https://stackoverflow.com/questions/7468707/deep-copy-a-dictionary-hashtable-in-powershell
 	function Global:Copy-Object {
 		param($DeepCopyObject)
-		$memStream = new-object IO.MemoryStream
-		$formatter = new-object Runtime.Serialization.Formatters.Binary.BinaryFormatter
-		$formatter.Serialize($memStream,$DeepCopyObject)
-		$memStream.Position=0
-		$formatter.Deserialize($memStream)
+		#BinaryFormatter was removed in .NET 9 (PS 7.5+); use a JSON round trip instead
+		$Json = $DeepCopyObject | ConvertTo-Json -Depth 10
+		$Hash = @{}
+		($Json | ConvertFrom-Json).PSObject.Properties | ForEach-Object {
+			$Value = $_.Value
+			if($Value -is [System.Management.Automation.PSCustomObject]) {
+				$Inner = @{}
+				$Value.PSObject.Properties | ForEach-Object { $Inner[$_.Name] = $_.Value }
+				$Value = $Inner
+			}
+			$Hash[$_.Name] = $Value
+		}
+		$Hash
 	}
 
 	function Global:reload { 

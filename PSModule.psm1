@@ -5,8 +5,8 @@ Import-LocalizedData ModuleData -filename AxisPowershell.psd1
 . "$PSScriptRoot\private\setup\PreFunctionLoad.ps1"
 
 $PublicFunctions = @( Get-ChildItem -Path $PSScriptRoot\public\*.ps1 -Recurse -ErrorAction SilentlyContinue )
-$PrivateFunctions = @( Get-ChildItem -Path $PSScriptRoot\Private\Functions\*.ps1 -ErrorAction SilentlyContinue )
-$ModuleFunctions = @( Get-ChildItem -Path $PSScriptRoot\Private\module\*.ps1 -ErrorAction SilentlyContinue )
+$PrivateFunctions = @( Get-ChildItem -Path $PSScriptRoot\private\functions\*.ps1 -ErrorAction SilentlyContinue )
+$ModuleFunctions = @( Get-ChildItem -Path $PSScriptRoot\private\module\*.ps1 -ErrorAction SilentlyContinue )
 
 # Load the separate function files from the private and public folders.
 $AllFunctions = $PublicFunctions + $PrivateFunctions + $ModuleFunctions
