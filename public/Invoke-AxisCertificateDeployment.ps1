@@ -209,7 +209,8 @@ function Invoke-AxisCertificateDeployment {
             & $Module ([scriptblock]::Create($RuntimeData.Worker)) $RuntimeData.Device $RuntimeData.Mode $RuntimeData.RequestParam
         }
 
-        $jobs = ForEach($Device in $TargetDevices) {
+        #@() keeps a single job an array on Windows PowerShell 5.1 (otherwise .Count is null -> divide by zero)
+        $jobs = @(ForEach($Device in $TargetDevices) {
             $RuntimeData = @{
                 ModulePath = $ModuleString
                 Credential = $Config.Credential
@@ -225,7 +226,7 @@ function Invoke-AxisCertificateDeployment {
                 PowerShell = $PowerShell
                 Handle = $PowerShell.BeginInvoke()
             }
-        }
+        })
 
         $Total = $jobs.Count
         While($jobs | Where-Object { !$_.Handle.IsCompleted }) {

@@ -236,16 +236,18 @@ function Install-AxisCertificate {
         $Cache.$Device.Type = "https"
     }
 
-    #Verify what the device actually serves (web server may need a moment to reload)
+    #Verify what the device actually serves. VERIFIED on AXIS OS 9.80 and 12.11 (2026-11-03): the web server restarts
+    #after a certificate/policy change and can refuse connections for 10-20 seconds, so poll for up to 45 seconds.
     $HttpsVerified = $false
     if($AssignToHttps) {
-        For($Attempt = 1; $Attempt -le 3; $Attempt++) {
+        For($Attempt = 1; $Attempt -le 15; $Attempt++) {
             $Served = Get-AxisTlsCertificate -Device $Device
             if($Served -and $Served.Thumbprint -eq $Leaf.Thumbprint) {
                 $HttpsVerified = $true
                 break
             }
-            Start-Sleep -Seconds 2
+            Write-Verbose "$($Device): served certificate not updated yet ($Attempt/15)"
+            Start-Sleep -Seconds 3
         }
         if(!$HttpsVerified) {
             Write-Warning "$Device does not (yet) serve certificate $($Leaf.Thumbprint) on HTTPS"

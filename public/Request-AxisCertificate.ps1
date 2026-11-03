@@ -168,9 +168,10 @@ function Request-AxisCertificate {
         $Issued = Submit-AxisCertificateRequest -Authority $Authority -Csr $Request.Csr -Device $Device -TimeoutSec $Authority.TimeoutSec
     }
     Catch {
-        #Leave the camera clean: the placeholder key is useless without a certificate
-        if($Action -eq "Issued") {
+        #Leave the camera clean: the placeholder key is useless without a certificate (never the active alias)
+        if(!$Existing -or $NewAlias -ne $Existing.Alias) {
             Try { Remove-AxisCertificate -Device $Device -Alias $NewAlias -Force } Catch {}
+            Try { Remove-AxisCertificate -Device $Device -Alias "$NewAlias-csr" -Force } Catch {}
         }
         Throw "$($Device): Certificate authority rejected the request: $($_.Exception.Message)"
     }
@@ -235,10 +236,11 @@ function Request-AxisCertificate {
             return $Result
         }
 
-        #Every other managed, CA-issued entry is superseded now (includes leftovers from interrupted earlier runs)
+        #Every other managed entry is superseded now: CA-issued predecessors (revoked below) and self-signed
+        #placeholders left by interrupted earlier runs (just removed)
         $NewIssuer = (ConvertFrom-PemString -Pem $Issued.Certificate -AsCertificate | Select-Object -First 1).Issuer
         $Superseded = $Current | Where-Object {
-            ($_.Alias -eq $Alias -or $_.Alias -like "$Alias-*") -and $_.Alias -ne $NewAlias -and $_.Issuer -ne $_.Subject
+            ($_.Alias -eq $Alias -or $_.Alias -like "$Alias-*") -and $_.Alias -ne $NewAlias -and $_.Alias -ne "$NewAlias-csr"
         }
         ForEach($Old in $Superseded) {
             Write-Verbose "$($Device): Removing superseded certificate $($Old.Alias)"
@@ -249,7 +251,7 @@ function Request-AxisCertificate {
                 Write-Warning "$($Device): Could not remove old certificate $($Old.Alias): $($_.Exception.Message)"
             }
 
-            if(!$NoRevoke -and $Old.Issuer -eq $NewIssuer -and $Old.Serial) {
+            if(!$NoRevoke -and $Old.Issuer -eq $NewIssuer -and $Old.Issuer -ne $Old.Subject -and $Old.Serial) {
                 Try {
                     $null = Revoke-AxisIssuedCertificate -Authority $Authority -Serial $Old.Serial -Reason Superseded
                     $Result.RevokedSerial = (@($Result.RevokedSerial, $Old.Serial) | Where-Object { $_ }) -join ","

@@ -139,6 +139,11 @@ function Invoke-AxisWebApi {
     if($PSVersionTable.PSVersion.Major -le 5) {
         Set-UseUnsafeHeaderParsing -Enable
         Set-CertificateValidation -Disable
+        #VERIFIED on Server 2016 / PS 5.1 (2026-11-03): the default is "Ssl3, Tls" and AXIS OS >= 12 refuses TLS 1.0
+        #("Could not create SSL/TLS secure channel"). Enable TLS 1.2 without removing anything already enabled.
+        if(([Net.ServicePointManager]::SecurityProtocol -band [Net.SecurityProtocolType]::Tls12) -eq 0) {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+        }
     }
     elseif ($PSVersionTable.PSVersion.Major -ge 7) {
         $Param.Add('SkipCertificateCheck',$true)
