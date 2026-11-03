@@ -171,14 +171,23 @@ function New-AxisCertificateRequest {
     }
     else {
         #SOAP fallback for firmware < 11.6
-        #UNVERIFIED on hardware: CreateCertificate2 is documented by Axis, tds:GetPkcs10Request is standard ONVIF
-        #(Device Management, Pkcs10Request/tt:Data base64 DER) but not listed on the Axis page.
+        #CreateCertificate2 is documented by Axis; tds:GetPkcs10Request is standard ONVIF (not on the Axis page) and was
+        #VERIFIED working on M3045-V / AXIS OS 9.80.49 (2026-11-03): returns Pkcs10Request/tt:Data base64 DER, RSA-2048.
         Write-Warning "$Device has no certificate REST API (firmware < 11.6); using SOAP. Subject Alternative Names are not supported by this firmware."
 
-        $SoapExisting = @(Get-AxisCertificate -Device $Device -Alias $Alias)
-        if($SoapExisting.Count -gt 0 -and $Force) {
-            Write-Verbose "Alias '$Alias' exists on $Device; removing it (-Force)"
-            $null = Invoke-AxisSoapRequest -Device $Device -Body "<tds:DeleteCertificates xmlns=`"http://www.onvif.org/ver10/device/wsdl`"><CertificateID>$([System.Security.SecurityElement]::Escape($Alias))</CertificateID></tds:DeleteCertificates>"
+        #VERIFIED on M3045-V / AXIS OS 9.80.49 (2026-11-03): ONVIF LoadCertificates refuses an existing CertificateID
+        #("Unknown certificate reference or the certificate ID already exists") and creates a NEW entry matched to the
+        #key by public key. So the key/CSR placeholder lives under "<Alias>-csr" and Install-AxisCertificate loads the
+        #signed certificate as "<Alias>" and then deletes the placeholder.
+        $KeyAlias = "$Alias-csr"
+        $SoapExisting = @(Get-AxisCertificate -Device $Device | Where-Object { $_.Alias -eq $KeyAlias })
+        if($Force) {
+            ForEach($Id in @($Alias, $KeyAlias)) {
+                if(@(Get-AxisCertificate -Device $Device | Where-Object { $_.Alias -eq $Id }).Count -gt 0) {
+                    Write-Verbose "Alias '$Id' exists on $Device; removing it (-Force)"
+                    $null = Invoke-AxisSoapRequest -Device $Device -Body "<tds:DeleteCertificates xmlns=`"http://www.onvif.org/ver10/device/wsdl`"><CertificateID>$([System.Security.SecurityElement]::Escape($Id))</CertificateID></tds:DeleteCertificates>"
+                }
+            }
             $SoapExisting = @()
         }
 
@@ -202,7 +211,7 @@ function New-AxisCertificateRequest {
             $NotAfter = (Get-Date).ToUniversalTime().AddYears(1).ToString("yyyy-MM-ddTHH:mm:ss")
             $Body = @"
 <acertificates:CreateCertificate2 xmlns="http://www.axis.com/vapix/ws/certificates">
-            <acertificates:Id>$([System.Security.SecurityElement]::Escape($Alias))</acertificates:Id>
+            <acertificates:Id>$([System.Security.SecurityElement]::Escape($KeyAlias))</acertificates:Id>
             <acertificates:Subject>
                 <acert:C>$($Parts.C)</acert:C>
                 <acert:ST>$($Parts.ST)</acert:ST>
@@ -215,22 +224,26 @@ function New-AxisCertificateRequest {
             <acertificates:ValidNotAfter>$NotAfter</acertificates:ValidNotAfter>
         </acertificates:CreateCertificate2>
 "@
-            Write-Verbose "Generating key/certificate '$Alias' on $Device via CreateCertificate2"
+            Write-Verbose "Generating key/certificate '$KeyAlias' on $Device via CreateCertificate2"
             Try {
                 $null = Invoke-AxisSoapRequest -Device $Device -Body $Body
             }
             Catch {
-                Throw "Unable to generate key/certificate '$Alias' on $($Device): $_"
+                Throw "Unable to generate key/certificate '$KeyAlias' on $($Device): $_"
             }
         }
         else {
-            Write-Verbose "Alias '$Alias' exists on $Device; reusing its key (use -Force to generate a new one)"
+            Write-Verbose "Alias '$KeyAlias' exists on $Device; reusing its key (use -Force to generate a new one)"
         }
 
+        #VERIFIED on M3045-V / AXIS OS 9.80.49 (2026-11-03): the device uses tds:Subject as the CN only; C/ST/L/O/OU come from
+        #the certificate created by CreateCertificate2. Passing the full DN here yields "CN=CN=host,O=..." in the CSR.
+        $CnValue = (($Subject -split '(?<!\\),') | Where-Object { $_.Trim() -match '^CN=' } | Select-Object -First 1)
+        $CnValue = $CnValue.Trim().Substring(3).Replace('\,',',')
         $Body = @"
 <tds:GetPkcs10Request xmlns="http://www.onvif.org/ver10/device/wsdl">
-            <tds:CertificateID>$([System.Security.SecurityElement]::Escape($Alias))</tds:CertificateID>
-            <tds:Subject>$([System.Security.SecurityElement]::Escape($Subject))</tds:Subject>
+            <tds:CertificateID>$([System.Security.SecurityElement]::Escape($KeyAlias))</tds:CertificateID>
+            <tds:Subject>$([System.Security.SecurityElement]::Escape($CnValue))</tds:Subject>
         </tds:GetPkcs10Request>
 "@
         Try {

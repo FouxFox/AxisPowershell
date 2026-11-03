@@ -59,6 +59,7 @@ function Invoke-AxisSoapRequest {
         Body = $Envelope
         ContentType = "application/soap+xml; charset=utf-8"
         WebRequest = $true
+        SkipHttpErrorCheck = $true
     }
 
     Try {
@@ -90,11 +91,14 @@ function Invoke-AxisSoapRequest {
         Throw "Device returned a non-XML response to the SOAP request."
     }
 
-    $Fault = $Xml.GetElementsByTagName("Fault") | Select-Object -First 1
+    #Elements are namespace-prefixed (SOAP-ENV:Fault), so match on local name + namespace
+    $SoapNs = "http://www.w3.org/2003/05/soap-envelope"
+    $Fault = $Xml.GetElementsByTagName("Fault", $SoapNs) | Select-Object -First 1
     if($Fault) {
-        $Reason = ($Fault.GetElementsByTagName("Text") | Select-Object -First 1).InnerText
-        $Code = ($Fault.GetElementsByTagName("Value") | Select-Object -Last 1).InnerText
-        Throw "SOAP Fault: $Reason ($Code)"
+        $Reason = ($Fault.GetElementsByTagName("Text", $SoapNs) | Select-Object -First 1).InnerText
+        $Detail = ($Fault.GetElementsByTagName("Detail", $SoapNs) | Select-Object -First 1).InnerText
+        $Code = ($Fault.GetElementsByTagName("Value", $SoapNs) | Select-Object -Last 1).InnerText
+        Throw "SOAP Fault: $Reason - $Detail ($Code)"
     }
 
     return $Xml.Envelope.Body

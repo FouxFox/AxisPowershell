@@ -113,16 +113,16 @@ Describe "New-AxisCertificateRequest" {
             $Result.SubjectAltNames.Count | Should -Be 0
             Should @m -Invoke "Invoke-AxisSoapRequest" -ParameterFilter {
                 $Body -like "*acertificates:CreateCertificate2*" -and $Body -like "*<acert:CN>cam01.example.com</acert:CN>*" -and
-                $Body -like "*<acert:O>Example</acert:O>*" -and $Body -like "*<acert:C>US</acert:C>*" -and $Body -like "*<acertificates:Id>AxisPowershell</acertificates:Id>*"
+                $Body -like "*<acert:O>Example</acert:O>*" -and $Body -like "*<acert:C>US</acert:C>*" -and $Body -like "*<acertificates:Id>AxisPowershell-csr</acertificates:Id>*"
             } -Times 1
             Should @m -Invoke "Invoke-AxisSoapRequest" -ParameterFilter {
-                $Body -like "*tds:GetPkcs10Request*" -and $Body -like "*<tds:CertificateID>AxisPowershell</tds:CertificateID>*"
+                $Body -like "*tds:GetPkcs10Request*" -and $Body -like "*<tds:CertificateID>AxisPowershell-csr</tds:CertificateID>*" -and $Body -like "*<tds:Subject>cam01.example.com</tds:Subject>*"
             } -Times 1
         }
 
         It "Does not recreate an existing alias without -Force" {
             Mock @m Invoke-AxisCertApi { Throw "Command not supported on this device" }
-            Mock @m Get-AxisCertificate { return @([pscustomobject]@{ Alias = "AxisPowershell"; Thumbprint = "AA" }) }
+            Mock @m Get-AxisCertificate { return @([pscustomobject]@{ Alias = "AxisPowershell-csr"; Thumbprint = "AA" }) }
             Mock @m Get-AxisCertificateKeyType { return [pscustomobject]@{ KeyType = "RSA-2048"; Keystore = $null; Source = "SOAP" } }
             Mock @m Invoke-AxisSoapRequest {
                 $Xml = [xml]@"

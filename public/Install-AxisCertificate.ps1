@@ -105,7 +105,9 @@ function Install-AxisCertificate {
     }
 
     if($Source -eq "SOAP") {
-        #UNVERIFIED on hardware: standard ONVIF LoadCertificates (replaces the certificate of an existing key)
+        #VERIFIED on M3045-V / AXIS OS 9.80.49 (2026-11-03): ONVIF LoadCertificates creates a NEW entry (the ID must not
+        #exist) and matches the certificate to the key generated for "<Alias>-csr" by public key. The placeholder is
+        #removed afterwards; the signed entry keeps working (listing verified; TLS binding verified separately).
         $Body = @"
 <tds:LoadCertificates xmlns="http://www.onvif.org/ver10/device/wsdl">
             <tds:NVTCertificate>
@@ -121,6 +123,18 @@ function Install-AxisCertificate {
         }
         Catch {
             Throw "Unable to install certificate '$Alias' on $($Device): $_"
+        }
+
+        #Drop the CSR placeholder created by New-AxisCertificateRequest
+        $KeyAlias = "$Alias-csr"
+        if(@(Get-AxisCertificate -Device $Device | Where-Object { $_.Alias -eq $KeyAlias }).Count -gt 0) {
+            Write-Verbose "Removing CSR placeholder '$KeyAlias' from $Device"
+            Try {
+                $null = Invoke-AxisSoapRequest -Device $Device -Body "<tds:DeleteCertificates xmlns=`"http://www.onvif.org/ver10/device/wsdl`"><CertificateID>$([System.Security.SecurityElement]::Escape($KeyAlias))</CertificateID></tds:DeleteCertificates>"
+            }
+            Catch {
+                Write-Warning "$($Device): could not remove CSR placeholder '$KeyAlias': $_"
+            }
         }
     }
 

@@ -29,6 +29,10 @@ A hashtable containing custom headers to be included in the request.
 The path to a file to be included in the request. This parameter is used when uploading files.
 Currentlky not implemented
 
+.PARAMETER SkipHttpErrorCheck
+PowerShell 7 only: return the response for HTTP error status codes instead of throwing, so the body (e.g. a SOAP
+fault) can be read. Ignored on Windows PowerShell 5.1 where the body is available from the exception.
+
 .PARAMETER NoAuth
 A switch parameter indicating whether to skip authentication. By default, authentication is enabled.
 
@@ -71,7 +75,10 @@ function Invoke-AxisWebApi {
         [Switch]$NoAuth=$false,
 
         [Parameter()]
-        [Int]$TimeoutSec
+        [Int]$TimeoutSec,
+
+        [Parameter()]
+        [Switch]$SkipHttpErrorCheck
     )
 
 
@@ -136,6 +143,10 @@ function Invoke-AxisWebApi {
     elseif ($PSVersionTable.PSVersion.Major -ge 7) {
         $Param.Add('SkipCertificateCheck',$true)
         $Param.Add('AllowUnencryptedAuthentication',$true)
+        #PowerShell 7 discards the response body of HTTP errors; SOAP faults (HTTP 400/500) need it
+        if($SkipHttpErrorCheck) {
+            $Param.Add('SkipHttpErrorCheck',$true)
+        }
     }
 
     $ConnectionError = $false

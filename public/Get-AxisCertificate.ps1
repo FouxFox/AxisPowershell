@@ -133,8 +133,9 @@ function Get-AxisCertificate {
             Try {
                 switch($Certificate.PublicKey.Oid.Value) {
                     "1.2.840.113549.1.1.1" {
+                        #PublicKey.Key.KeySize is write-only on some .NET builds; read the modulus length from the encoded key
                         $Key = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPublicKey($Certificate)
-                        $KeyType = "RSA-$($Key.KeySize)"
+                        $KeyType = "RSA-$($Key.ExportParameters($false).Modulus.Length * 8)"
                     }
                     "1.2.840.10045.2.1" {
                         $Key = [System.Security.Cryptography.X509Certificates.ECDsaCertificateExtensions]::GetECDsaPublicKey($Certificate)
