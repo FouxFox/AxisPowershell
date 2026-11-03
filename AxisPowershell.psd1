@@ -97,6 +97,16 @@
             )
             IsPrerelease = $false
             ReleaseNotes = @'
+## 1.2.0
+    * Added Get-AxisCertificate, New-AxisCertificateRequest, Install-AxisCertificate and Remove-AxisCertificate (JSON certificate API on AXIS OS 11.6+, SOAP fallback on older firmware)
+    * Added Get-AxisCertificateSubject for template-based subject/SAN generation
+    * Added New-, Get-, Remove-AxisPSCertificateAuthority (WindowsCA, Dogtag, EST and Command authority types; secrets stored in the Windows Credential Manager)
+    * Added Get-AxisPSCertificateTemplate and Set-AxisPSCertificateTemplate
+    * Added Request-AxisCertificate for the full issue/install/bind/renew/revoke lifecycle of a single device, with the private key kept on the camera
+    * Added Invoke-AxisCertificateDeployment for parallel apply/renew across many devices with a CSV report
+    * Added Set-/Get-/Remove-AxisCertificateEnrollment to hand certificate renewal over to the camera's native EST client (AXIS OS 12.9+)
+    * Provisioning jobs can now deploy a CA-issued HTTPS certificate as stage 5/8 (opt-in with Set-AxisPSConfig -EnableCertificateProvisioning)
+    * Exported Remove-AxisUserAccount
 ## 1.1.3
     * Fixed issue with Get-AxisDate where it would not work with firmware versions less than 9.30.
     * Fixed issue with Set-AxisDSCP where it would not accept the first value provided.

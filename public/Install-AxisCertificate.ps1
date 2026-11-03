@@ -34,8 +34,8 @@ Bind the certificate to the HTTPS web server.
 Force HTTPS for all user roles (System.BoaGroupPolicy.*=https). Implies -AssignToHttps.
 
 .EXAMPLE
-$Issued = Submit-AxisCertificateRequest -Device "192.168.1.100" -Csr $Request.Csr
-Install-AxisCertificate -Device "192.168.1.100" -Alias $Request.Alias -Certificate $Issued.Certificate -CACertificates $Issued.Chain -AssignToHttps -HttpsOnly
+# $Request comes from New-AxisCertificateRequest; the signed certificate and chain come back from your CA
+Install-AxisCertificate -Device "192.168.1.100" -Alias $Request.Alias -Certificate (Get-Content .\cam01.cer -Raw) -CACertificates (Get-Content .\issuing-ca.cer -Raw) -AssignToHttps -HttpsOnly
 
 Device        : 192.168.1.100
 Alias         : AxisPowershell
