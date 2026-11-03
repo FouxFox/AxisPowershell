@@ -215,24 +215,50 @@ function Request-AxisCertificate {
     ## Step 6: Retire the old    ##
     ###############################
     if($Existing) {
-        Write-Verbose "$($Device): Removing superseded certificate $($Existing.Alias)"
-        Try {
-            Remove-AxisCertificate -Device $Device -Alias $Existing.Alias -Force
-        }
-        Catch {
-            Write-Warning "$($Device): Could not remove old certificate $($Existing.Alias): $($_.Exception.Message)"
-        }
-
-        $SameIssuer = $Existing.Issuer -eq (ConvertFrom-PemString -Pem $Issued.Certificate -AsCertificate | Select-Object -First 1).Issuer
-        if(!$NoRevoke -and $SameIssuer -and $Existing.Serial) {
+        #VERIFIED on Q1726 / AXIS OS 12.11 (2026-11-03): binding a new web server certificate restarts the web server,
+        #so API calls are refused for a few seconds. Wait for the device to answer again before cleaning up.
+        $Ready = $false
+        ForEach($Attempt in 1..10) {
             Try {
-                $null = Revoke-AxisIssuedCertificate -Authority $Authority -Serial $Existing.Serial -Reason Superseded
-                $Result.RevokedSerial = $Existing.Serial
-                $Result.Message += "; revoked $($Existing.Serial) (Superseded)"
+                $Current = @(Get-AxisCertificate -Device $Device)
+                $Ready = $true
+                break
             }
             Catch {
-                $Result.Message += "; revocation of $($Existing.Serial) failed: $($_.Exception.Message)"
-                Write-Warning "$($Device): $($Result.Message)"
+                Write-Verbose "$($Device): web server not ready yet ($Attempt/10): $($_.Exception.Message)"
+                Start-Sleep -Seconds 3
+            }
+        }
+        if(!$Ready) {
+            Write-Warning "$($Device): web server did not come back within 30 seconds; old certificate $($Existing.Alias) left in place"
+            $Result.Message += "; old certificate left in place (device busy)"
+            return $Result
+        }
+
+        #Every other managed, CA-issued entry is superseded now (includes leftovers from interrupted earlier runs)
+        $NewIssuer = (ConvertFrom-PemString -Pem $Issued.Certificate -AsCertificate | Select-Object -First 1).Issuer
+        $Superseded = $Current | Where-Object {
+            ($_.Alias -eq $Alias -or $_.Alias -like "$Alias-*") -and $_.Alias -ne $NewAlias -and $_.Issuer -ne $_.Subject
+        }
+        ForEach($Old in $Superseded) {
+            Write-Verbose "$($Device): Removing superseded certificate $($Old.Alias)"
+            Try {
+                Remove-AxisCertificate -Device $Device -Alias $Old.Alias -Force
+            }
+            Catch {
+                Write-Warning "$($Device): Could not remove old certificate $($Old.Alias): $($_.Exception.Message)"
+            }
+
+            if(!$NoRevoke -and $Old.Issuer -eq $NewIssuer -and $Old.Serial) {
+                Try {
+                    $null = Revoke-AxisIssuedCertificate -Authority $Authority -Serial $Old.Serial -Reason Superseded
+                    $Result.RevokedSerial = (@($Result.RevokedSerial, $Old.Serial) | Where-Object { $_ }) -join ","
+                    $Result.Message += "; revoked $($Old.Serial) (Superseded)"
+                }
+                Catch {
+                    $Result.Message += "; revocation of $($Old.Serial) failed: $($_.Exception.Message)"
+                    Write-Warning "$($Device): $($Result.Message)"
+                }
             }
         }
     }
