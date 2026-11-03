@@ -60,6 +60,10 @@ Command: SSH user name.
 .PARAMETER SshKeyFile
 Command: SSH private key file passed to ssh -i.
 
+.PARAMETER KeyTypes
+Key algorithms this CA/template accepts, e.g. RSA-2048,RSA-4096 for an RSA-only AD CS template. The camera's
+strongest key type within this list is used. Default: any.
+
 .PARAMETER TimeoutSec
 How long to wait for issuance (pending approvals, slow commands). Default 300.
 
@@ -133,6 +137,10 @@ function New-AxisCertificateAuthority {
         [String]$SshKeyFile,
 
         [Parameter()]
+        [ValidateSet("NIST-P384","NIST-P256","RSA-4096","RSA-3072","RSA-2048")]
+        [String[]]$KeyTypes,
+
+        [Parameter()]
         [Int]$TimeoutSec=300,
 
         [Parameter()]
@@ -146,6 +154,10 @@ function New-AxisCertificateAuthority {
         Type = $Type
         Template = $Template
         TimeoutSec = $TimeoutSec
+    }
+    if($KeyTypes) {
+        #The CA template may only sign some algorithms (an RSA-only AD CS template, for example)
+        $Authority.Add("KeyTypes",@($KeyTypes))
     }
 
     switch($Type) {
