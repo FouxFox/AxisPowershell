@@ -35,6 +35,8 @@ function Get-AxisSupportedResolutions {
         Device = $Device
         Path = "/axis-cgi/param.cgi?action=listdefinitions&listformat=xmlschema&group=root.Image.*.Appearance.Resolution"
     }
-    $resolutions = (Invoke-AxisWebApi @Param).parameterDefinitions.group.group.group.Where({ $_.name -eq "I0"}).group.parameter.type.enum.entry.value
+    #Where-Object instead of .Where(): a single XmlElement has no .Where() method on Windows PowerShell 5.1
+    $Groups = @((Invoke-AxisWebApi @Param).parameterDefinitions.group.group.group) | Where-Object { $_.name -eq "I0" }
+    $resolutions = $Groups.group.parameter.type.enum.entry.value
     return $resolutions | Sort-Object { [int]($_.split('x')[0]) }
 }

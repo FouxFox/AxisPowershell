@@ -64,15 +64,22 @@ Describe "Install-AxisCertificate" {
             Mock @m Get-AxisTlsCertificate { return $TestLeaf }
             InModuleScope AxisPowerShell { $Script:Cache["192.168.0.100"] = @{ Type = "http" } }
 
+            #Policy reads "both" before the update and "https" afterwards (device restarts its web server in between)
+            $Script:PolicyCalls = 0
+            Mock @m Get-AxisParameter {
+                $Script:PolicyCalls++
+                $v = if($Script:PolicyCalls -gt 1) { 'https' } else { 'both' }
+                return @{ "System.BoaGroupPolicy.admin" = $v; "System.BoaGroupPolicy.operator" = $v; "System.BoaGroupPolicy.viewer" = $v }
+            }
+
             $Result = Install-AxisCertificate -Device "192.168.0.100" -Alias "AxisPowershell" -Certificate $TestLeafPem -HttpsOnly
 
             $Result.HttpsVerified | Should -BeTrue
             Should @m -Invoke "Set-AxisWebServerCertificate" -Times 1
-            Should @m -Invoke "Update-AxisParameter" -ParameterFilter {
-                $ParameterSet."System.BoaGroupPolicy.admin" -eq "https" -and
-                $ParameterSet."System.BoaGroupPolicy.operator" -eq "https" -and
-                $ParameterSet."System.BoaGroupPolicy.viewer" -eq "https"
-            } -Times 1
+            #operator and viewer first, admin last (admin restarts the web server)
+            Should @m -Invoke "Update-AxisParameter" -ParameterFilter { $ParameterSet."System.BoaGroupPolicy.operator" -eq "https" } -Times 1
+            Should @m -Invoke "Update-AxisParameter" -ParameterFilter { $ParameterSet."System.BoaGroupPolicy.viewer" -eq "https" } -Times 1
+            Should @m -Invoke "Update-AxisParameter" -ParameterFilter { $ParameterSet."System.BoaGroupPolicy.admin" -eq "https" } -Times 1
             InModuleScope AxisPowerShell { $Cache["192.168.0.100"].Type } | Should -Be "https"
         }
 

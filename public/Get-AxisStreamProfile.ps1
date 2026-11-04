@@ -64,7 +64,7 @@ function Get-AxisStreamProfile {
             "apiVersion" = '1.0'
             "method" = "list"
             "params" = @{
-                "streamProfileName" = @()
+                "streamProfileName" = $profiles
             }
         }
     }

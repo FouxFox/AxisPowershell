@@ -91,7 +91,7 @@ function Set-AxisNTPClient {
     }
 
     if($NTSecurity.IsPresent -or $KEServers) {
-        $ReqParams.Add("NTSEnabled",$NTSecurity)
+        $ReqParams.Add("NTSEnabled",$NTSecurity.IsPresent)
     }
 
     if($KEServers) {

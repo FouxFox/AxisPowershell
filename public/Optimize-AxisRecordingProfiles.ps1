@@ -9,6 +9,9 @@ It creates continuous recording profiles for lenses that have action profiles or
 .PARAMETER Device
 Specifies the device for which the recording profiles should be optimized.
 
+.PARAMETER StreamProfile
+The stream profile used for the new continuous recording profiles. Defaults to "EdgeRecording" (created by the provisioning task).
+
 .EXAMPLE
 Optimize-AxisRecordingProfiles -Device "AXIS-1234"
 Removes action profiles and creates continuous profiles for the specified device.
@@ -18,7 +21,10 @@ function Optimize-AxisRecordingProfiles {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-        [String]$Device
+        [String]$Device,
+
+        [Parameter()]
+        [String]$StreamProfile="EdgeRecording"
     )
     
     Get-AxisRecordingProfile -Device $Device | Where-Object { $_.Status -ne 'OK' } | ForEach-Object {
@@ -32,7 +38,7 @@ function Optimize-AxisRecordingProfiles {
         }
         
         Write-Verbose "Creating Continuous profile for lens $($_.Lens)"
-        New-AxisRecordingProfile -Device $Device -Lens $_.Lens
+        New-AxisRecordingProfile -Device $Device -StreamProfile $StreamProfile -Lens $_.Lens
     }
 
 }

@@ -13,7 +13,8 @@ function Invoke-MultiPartWebRequest {
 
     # Extract plaintext password from PSCredential
     $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Config.Credential.Password)
-    $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+    #PtrToStringBSTR is correct on PS 5.1 and on PS 7 for every OS (PtrToStringAuto truncates on Linux/macOS)
+    $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($BSTR)
     [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
 
     #Create Boundry string

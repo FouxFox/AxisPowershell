@@ -64,7 +64,7 @@ function Add-AxisUserAccount {
 
     #Decode Password
     $ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Credential.Password)
-    $PlainTextPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($ptr)
+    $PlainTextPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr)
     [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr)
 
     #Set User Info
@@ -77,11 +77,11 @@ function Add-AxisUserAccount {
 
     $Param = @{
         Device = $Device
-        Path = "/axis-cgi/pwdgrp.cgi?action=add&user=$User&pwd=$PlainTextPassword&grp=$grp&sgrp=$PrivGroup"
+        Path = "/axis-cgi/pwdgrp.cgi?action=add&user=$User&pwd=$([System.Uri]::EscapeDataString($PlainTextPassword))&grp=$grp&sgrp=$PrivGroup"
     }
 
     if($Comment) {
-        $Param.Path += "&comment=$Comment"
+        $Param.Path += "&comment=$([System.Uri]::EscapeDataString($Comment))"
     }
 
     if($NoAuth) {
@@ -90,7 +90,7 @@ function Add-AxisUserAccount {
 
     $result = Invoke-AxisWebApi @Param
 
-    if($result.contains('Error')) {
+    if("$result" -match 'Error') {
         Throw "Unable to add user"
     }
 }

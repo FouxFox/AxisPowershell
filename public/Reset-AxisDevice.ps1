@@ -40,12 +40,14 @@ function Reset-AxisDevice {
         Body = @{
             "apiVersion" = "1.0"
             "method" = "factoryDefault"
-            "factoryDefaultMode" = "sot"
+            "params" = @{
+                "factoryDefaultMode" = "soft"
+            }
         }
     }
     
     if($Hard) {
-        $Param.Body.factoryDefaultMode = "hard"
+        $Param.Body.params.factoryDefaultMode = "hard"
     }
 
     $result = Invoke-AxisWebApi @Param

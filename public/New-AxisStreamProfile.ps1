@@ -59,7 +59,7 @@ function New-AxisStreamProfile {
     # runs a regex to check if videocodec is one of the supported codecs
     if(
         $streamParameters.contains('videocodec') -and
-        $streamParameters -notmatch "videocodec=($($SupportedCodecs.Replace(',','|')))&"
+        $streamParameters -notmatch "videocodec=($($SupportedCodecs.Replace(',','|')))(&|$)"
     ) {
         Throw "Codec not supported. Please use a supported codec." 
     }

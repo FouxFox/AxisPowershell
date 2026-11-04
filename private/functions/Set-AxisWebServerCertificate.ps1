@@ -19,7 +19,8 @@ function Set-AxisWebServerCertificate {
     The certificate alias (acert:Id) of a certificate with private key already installed on the device.
 
     .PARAMETER ConnectionPolicy
-    Connection policy sent for the admin (and on OS < 7.10 operator/viewer) role. Default "Https" as documented.
+    Connection policy (Http, Https, HttpAndHttps) for the admin (and on OS < 7.10 operator/viewer) role.
+    Default: the device's current policy, so binding a certificate does not change HTTP/HTTPS access.
     #>
     [cmdletbinding()]
     Param(
@@ -30,7 +31,8 @@ function Set-AxisWebServerCertificate {
         [String]$Alias,
 
         [Parameter()]
-        [String]$ConnectionPolicy="Https"
+        [ValidateSet("Http","Https","HttpAndHttps")]
+        [String]$ConnectionPolicy
     )
 
     #Cipher list must mirror the device's own HTTPS.Ciphers value
@@ -51,6 +53,21 @@ function Set-AxisWebServerCertificate {
     $Legacy = $false
     if($Version -and (Compare-Version -Version $Version -TargetVersion "7.10") -eq 1) {
         $Legacy = $true
+    }
+
+    #VERIFIED on AXIS OS 9.80 (2026-11-04): the Axis example uses "Https", which silently switches the admin role to
+    #HTTPS-only. The enum is Http | Https | HttpAndHttps. Unless the caller chooses, keep the device's current policy
+    #(read from the live configuration; HTTPS-only enforcement is done separately through System.BoaGroupPolicy).
+    if(!$ConnectionPolicy) {
+        $ConnectionPolicy = "HttpAndHttps"
+        Try {
+            $Current = Invoke-AxisSoapRequest -Device $Device -Body "<aweb:GetWebServerTlsConfiguration/>"
+            $AdminNode = $Current.SelectSingleNode("//*[local-name()='ConnectionPolicies']/*[local-name()='Admin']")
+            if($AdminNode -and $AdminNode.InnerText) { $ConnectionPolicy = $AdminNode.InnerText }
+        }
+        Catch {
+            Write-Verbose "Could not read the current web server TLS configuration from $Device; using HttpAndHttps: $_"
+        }
     }
 
     $Policies = "                    <aweb:Admin>$ConnectionPolicy</aweb:Admin>`n"

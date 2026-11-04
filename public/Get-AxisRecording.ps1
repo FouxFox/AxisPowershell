@@ -64,7 +64,9 @@ function Get-AxisRecording {
         Write-Warning "The time difference between the device and the current time is greater than 60 seconds."
     }
 
-    $DateTimeFormat = "yyyy-MM-ddThh:mm:ss"
+    #HH = 24-hour clock; "hh" silently produced 12-hour timestamps for afternoon times
+    #VERIFIED on AXIS OS 12.11 (2026-11-04): list.cgi requires the ISO 8601 "Z" suffix (plain timestamps return 400); 9.x accepts both
+    $DateTimeFormat = "yyyy-MM-ddTHH:mm:ssZ"
 
     $begin = $StartTimeUTC.ToString($DateTimeFormat)
     $end = $StopTimeUTC.ToString($DateTimeFormat)

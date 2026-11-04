@@ -69,22 +69,19 @@ function Set-AxisDSCP {
     )
 
     if($PSCmdlet.ParameterSetName -eq 'All') {
-        $ParamSet = @{
-            "Network.QoS.Class1.DSCP" = 26 #AxisLiveVideo
-            "Network.QoS.Class2.DSCP" = 26 #AxisLiveAudio
-            "Network.QoS.Class3.DSCP" = 26 #AxisManagement
-            "Network.QoS.Class4.DSCP" = 26 #AxisRemoteService
-            "Network.QoS.Class5.DSCP" = 26 #AxisMetaData
-        }
+        $VideoValue = $Value
+        $AudioValue = $Value
+        $ManagementValue = $Value
+        $RemoteValue = $Value
+        $MetadataValue = $Value
     }
-    else {
-        $ParamSet = @{
-            $ParamSet["Network.QoS.Class1.DSCP"] = $VideoValue
-            $ParamSet["Network.QoS.Class2.DSCP"] = $AudioValue
-            $ParamSet["Network.QoS.Class3.DSCP"] = $ManagementValue
-            $ParamSet["Network.QoS.Class4.DSCP"] = $RemoteValue
-            $ParamSet["Network.QoS.Class5.DSCP"] = $MetadataValue
-        }
+
+    $ParamSet = @{
+        "Network.QoS.Class1.DSCP" = $VideoValue #AxisLiveVideo
+        "Network.QoS.Class2.DSCP" = $AudioValue #AxisLiveAudio
+        "Network.QoS.Class3.DSCP" = $ManagementValue #AxisManagement
+        "Network.QoS.Class4.DSCP" = $RemoteValue #AxisRemoteService
+        "Network.QoS.Class5.DSCP" = $MetadataValue #AxisMetaData
     }
 
     Try {

@@ -3,19 +3,20 @@
 Retrieves the action configurations and rules for an Axis device.
 
 .DESCRIPTION
-The Get-AxisAction function retrieves the action configurations and rules for a specified Axis device. 
-It uses the Axis VAPIX ActionService web service to communicate with the device.
+The Get-AxisAction function retrieves the action rules of an Axis device together with the primary action
+configuration each rule uses (template token, stream options, storage). It calls the VAPIX Action1 web service
+(GetActionConfigurations / GetActionRules) through Invoke-AxisSoapRequest, so it works on both Windows PowerShell
+and PowerShell 7 (New-WebServiceProxy does not exist on PowerShell 7).
 
 .PARAMETER Device
 The IP address or hostname of the Axis device.
 
 .EXAMPLE
 Get-AxisAction -Device "192.168.1.100"
-Retrieves the action configurations and rules for the Axis device with the IP address "192.168.1.100".
+Retrieves the action rules for the Axis device with the IP address "192.168.1.100".
 
 .LINK
 https://www.axis.com/vapix/ws/action1/ActionService.wsdl
-The Axis VAPIX ActionService web service documentation.
 #>
 function Get-AxisAction {
     [CmdletBinding()]
@@ -24,35 +25,45 @@ function Get-AxisAction {
         [String]$Device
     )
 
-    Check-Credential
+    $Namespaces = @{ aa = "http://www.axis.com/vapix/ws/action1" }
+
     Try {
-        $soap_action = New-WebServiceProxy -Uri "http://www.axis.com/vapix/ws/action1/ActionService.wsdl" -Credential $Config.Credential -ErrorAction Stop
-    } Catch {
-        Write-Error "Failed to create web service proxy for Axis ActionService. Check your network connection and device availability."
-        return @()
+        $ConfigResponse = Invoke-AxisSoapRequest -Device $Device -Body "<aa:GetActionConfigurations/>" -Namespaces $Namespaces
+        $RuleResponse = Invoke-AxisSoapRequest -Device $Device -Body "<aa:GetActionRules/>" -Namespaces $Namespaces
     }
-    $soap_action.URL = "https://$($Device)/vapix/services"
+    Catch {
+        Throw "Unable to retrieve action rules from $($Device): $_"
+    }
+
+    #Index configurations by ID; elements are namespace-prefixed so match on local names
     $ActionConfigs = @{}
-    $soap_action.GetActionConfigurations() | ForEach-Object {
-        $ActionConfigs.Add($_.ConfigurationID,$_)
+    ForEach ($Node in $ConfigResponse.SelectNodes("//*[local-name()='ActionConfiguration']")) {
+        $Id = $Node.SelectSingleNode("*[local-name()='ConfigurationID']").InnerText
+        $Parameters = @{}
+        ForEach ($P in $Node.SelectNodes("*[local-name()='Parameters']/*[local-name()='Parameter']")) {
+            $Parameters[$P.GetAttribute("Name")] = $P.GetAttribute("Value")
+        }
+        $ActionConfigs[$Id] = [pscustomobject]@{
+            ConfigurationID = $Id
+            Name = $Node.SelectSingleNode("*[local-name()='Name']").InnerText
+            TemplateToken = $Node.SelectSingleNode("*[local-name()='TemplateToken']").InnerText
+            Parameters = $Parameters
+        }
     }
-    $ActionRules = $soap_action.GetActionRules()
 
     #TemplateToken = com.axis.action.unlimited.recording.storage
-
-    ForEach ($action in $ActionRules) {
-        $aConfig = $ActionConfigs[$action.PrimaryAction]
-        $templateToken = $aConfig.TemplateToken
-        $streamOptions = ($aConfig.Parameters.Parameter | ? { $_.Name -eq 'stream_options' }).value
-        $storageId = ($aConfig.Parameters.Parameter | ? { $_.Name -eq 'storage_id' }).value
+    ForEach ($Rule in $RuleResponse.SelectNodes("//*[local-name()='ActionRule']")) {
+        $PrimaryAction = $Rule.SelectSingleNode("*[local-name()='PrimaryAction']").InnerText
+        $aConfig = $null
+        if($PrimaryAction -and $ActionConfigs.ContainsKey($PrimaryAction)) { $aConfig = $ActionConfigs[$PrimaryAction] }
         [pscustomobject]@{
-            ID = $action.RuleID
-            Name = $action.Name
-            Enabled = $action.Enabled
-            TemplateToken = $templateToken
-            StreamOptions = $streamOptions
-            StorageLocation = $storageId
-            PrimaryAction = $action.PrimaryAction
+            ID = $Rule.SelectSingleNode("*[local-name()='RuleID']").InnerText
+            Name = $Rule.SelectSingleNode("*[local-name()='Name']").InnerText
+            Enabled = ($Rule.SelectSingleNode("*[local-name()='Enabled']").InnerText -eq 'true')
+            TemplateToken = $aConfig.TemplateToken
+            StreamOptions = $(if($aConfig) { $aConfig.Parameters['stream_options'] })
+            StorageLocation = $(if($aConfig) { $aConfig.Parameters['storage_id'] })
+            PrimaryAction = $PrimaryAction
         }
     }
 }

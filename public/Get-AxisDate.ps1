@@ -72,7 +72,7 @@ function Get-AxisDate {
     $VersionComparison = Compare-Version -Version $Version -TargetVersion '9.30'
     if($VersionComparison -eq 1) {
         Write-Warning "Cannot calculate time offset for firmware versions less than 9.30."
-        $DeviceTime = [datetime](Invoke-AxisWebApi -Device 10.72.244.60 -Path "/axis-cgi/admin/date.cgi?action=get")
+        $DeviceTime = [datetime](Invoke-AxisWebApi -Device $Device -Path "/axis-cgi/admin/date.cgi?action=get")
         $DeviceTimeSettings = Get-AxisParameter -Device $Device -Group Time
 
         $Output.LocalTime = $DeviceTime

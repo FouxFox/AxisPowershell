@@ -47,5 +47,14 @@ function Get-AxisStreamStatus {
         }
     }
 
-    (Invoke-AxisWebApi @Param).data.streams
+    #The stream status API only exists on AXIS OS 12+; older firmware answers 400/404
+    Try {
+        (Invoke-AxisWebApi @Param).data.streams
+    }
+    Catch {
+        if($_.Exception.Response -and [int]$_.Exception.Response.StatusCode -in 400,404) {
+            Throw "Command not supported on this device"
+        }
+        Throw $_
+    }
 }

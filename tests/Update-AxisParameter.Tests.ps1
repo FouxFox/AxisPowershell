@@ -39,8 +39,13 @@ Describe "Update-AxisParameter" {
             Update-AxisParameter -Device $device -ParameterSet $parameterSet
 
             Should @m -Invoke "Invoke-AxisWebApi" -ParameterFilter {
+                # Hashtable key order is not deterministic, so compare the parsed query string
+                $Query = [System.Web.HttpUtility]::ParseQueryString($Path.Split('?')[1])
                 $Device -eq $device -and
-                $Path -eq "/axis-cgi/param.cgi?action=update&Brightness=50&Contrast=75"
+                $Path.StartsWith("/axis-cgi/param.cgi?action=update&") -and
+                $Query.Count -eq 3 -and
+                $Query['Brightness'] -eq '50' -and
+                $Query['Contrast'] -eq '75'
             }
         }
 

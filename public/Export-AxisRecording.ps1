@@ -8,11 +8,11 @@ The Export-AxisRecording function exports a recording from an Axis device to a s
 .PARAMETER Device
 The Hostname or IP address of the Axis device.
 
-.PARAMETER StartTime
-The start time of the recording to export.
+.PARAMETER StartTimeUTC
+The start time (UTC) of the recording to export.
 
-.PARAMETER StopTime
-The stop time of the recording to export.
+.PARAMETER StopTimeUTC
+The stop time (UTC) of the recording to export.
 
 .PARAMETER FilePath
 The file path where the exported recording will be saved.
@@ -54,15 +54,15 @@ function Export-AxisRecording {
         throw "Invalid Path. Please specify a valid path with a file name and extension."
     }
 
-    $DateTimeFormat = "yyyy-MM-ddThh:mm:ss"
+    $DateTimeFormat = "yyyy-MM-ddTHH:mm:ss"
 
     $begin = $StartTimeUTC.ToString($DateTimeFormat)
     $end = $StopTimeUTC.ToString($DateTimeFormat)
 
     $Param = @{
         Device = $Device
-        StartTime = $begin
-        StopTime = $end
+        StartTimeUTC = $StartTimeUTC
+        StopTimeUTC = $StopTimeUTC
         MaxResults = 1
         ThrowErrorOnTimeDifference = $true
     }
@@ -83,25 +83,31 @@ function Export-AxisRecording {
         $Recording = Get-AxisRecording @Param
     }
 
-    if($Recording) {
-        $Param = @{
-            Device = $Device
-            Path = "/axis-cgi/record/export/exportrecording.cgi?schemaversion=1"
-            OutFile = $FilePath
-        }
-        $Param.Path += "&recordingid=$($Recording.recordingid)"
-        $Param.Path += "&diskid=$($Recording.diskid)"
-        $Param.Path += "&exportformat=$Format"
-        $Param.Path += "&starttime=$begin"
-        $Param.Path += "&stoptime=$end"
+    if(!$Recording) {
+        Throw "No recording found for the specified time range."
     }
+
+    $Recording = $Recording | Select-Object -First 1
+    $Param = @{
+        Device = $Device
+        Path = "/axis-cgi/record/export/exportrecording.cgi?schemaversion=1"
+        OutFile = $FilePath
+    }
+    $Param.Path += "&recordingid=$($Recording.recordingid)"
+    $Param.Path += "&diskid=$($Recording.diskid)"
+    $Param.Path += "&exportformat=$Format"
+    $Param.Path += "&starttime=$begin"
+    $Param.Path += "&stoptime=$end"
+
     $OldProgressPreference = $ProgressPreference
     $ProgressPreference = 'SilentlyContinue'
     Try{
         Invoke-AxisWebApi @Param
     }
     Catch {
-        $ProgressPreference = $OldProgressPreference
         Throw $_
+    }
+    Finally {
+        $ProgressPreference = $OldProgressPreference
     }
 }

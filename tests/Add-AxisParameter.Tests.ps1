@@ -45,8 +45,15 @@ Describe "Add-AxisParameter" {
             Add-AxisParameter -Device $device -Template $template -Group $group -ParameterSet $parameterSet
 
             Should @m -Invoke "Invoke-AxisWebApi" -ParameterFilter {
+                # Hashtable key order is not deterministic, so compare the parsed query string
+                $Query = [System.Web.HttpUtility]::ParseQueryString($Path.Split('?')[1])
                 $Device -eq $device -and
-                $Path -eq "/axis-cgi/param.cgi?action=add&template=Template1&group=Group1&Brightness=50&Contrast=75"
+                $Path.StartsWith("/axis-cgi/param.cgi?action=add&") -and
+                $Query['template'] -eq 'Template1' -and
+                $Query['group'] -eq 'Group1' -and
+                $Query.Count -eq 5 -and
+                $Query['Brightness'] -eq '50' -and
+                $Query['Contrast'] -eq '75'
             }
         }
 

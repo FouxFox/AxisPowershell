@@ -43,8 +43,13 @@ Describe "AxisPowerShell.Public.Enable-AxisDNSUpdate" {
         It 'Sets the configuration with the provided hostname' {
             $cmd = 'Invoke-AxisWebApi'
             $Filter = {
+                # Hashtable key order is not deterministic, so compare the parsed query string
+                $Query = [System.Web.HttpUtility]::ParseQueryString($Path.Split('?')[1])
                 $Device -eq $TestDevice_IP -and
-                $Path -eq "/axis-cgi/param.cgi?action=update&Network.DNSUpdate.DNSName=axis-camera.example.com&Network.DNSUpdate.Enabled=yes"
+                $Path.StartsWith("/axis-cgi/param.cgi?action=update&") -and
+                $Query.Count -eq 3 -and
+                $Query['Network.DNSUpdate.DNSName'] -eq "axis-camera.example.com" -and
+                $Query['Network.DNSUpdate.Enabled'] -eq "yes"
             }
             Should @m -Invoke $cmd -Exactly -Times 1 -ParameterFilter $Filter
         }
@@ -72,8 +77,13 @@ Describe "AxisPowerShell.Public.Enable-AxisDNSUpdate" {
         It 'Sets the configuration with the generated hostname' {
             $cmd = 'Invoke-AxisWebApi'
             $Filter = {
+                # Hashtable key order is not deterministic, so compare the parsed query string
+                $Query = [System.Web.HttpUtility]::ParseQueryString($Path.Split('?')[1])
                 $Device -eq $TestDevice_IP -and
-                $Path -eq "/axis-cgi/param.cgi?action=update&Network.DNSUpdate.DNSName=axis-123456.example.com&Network.DNSUpdate.Enabled=yes"
+                $Path.StartsWith("/axis-cgi/param.cgi?action=update&") -and
+                $Query.Count -eq 3 -and
+                $Query['Network.DNSUpdate.DNSName'] -eq "axis-123456.example.com" -and
+                $Query['Network.DNSUpdate.Enabled'] -eq "yes"
             }
             Should @m -Invoke $cmd -Exactly -Times 1 -ParameterFilter $Filter
         }

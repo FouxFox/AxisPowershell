@@ -75,7 +75,22 @@ function Get-AxisSnapshot {
             WebRequest = $true
         }
         $response = Invoke-AxisWebApi @Param
-        $image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream]$response.Content)
+
+        $NewFileName = $FileName
+        if($FileName.contains('.')) {
+            $NewFileName = $FileName.Remove($FileName.LastIndexOf('.'))
+        }
+        $OutputPath = Join-Path (Resolve-Path $Path).Path "$($NewFileName)_$($CurrentLens).jpg"
+
+        #System.Drawing (GDI+) is Windows only; elsewhere save the raw JPEG without the text overlay
+        Try {
+            $image = [System.Drawing.Image]::FromStream([System.IO.MemoryStream]$response.Content)
+        }
+        Catch {
+            Write-Verbose "System.Drawing is not available on this platform; saving the snapshot without overlay"
+            [System.IO.File]::WriteAllBytes($OutputPath, [byte[]]$response.Content)
+            continue
+        }
         $graphics = [System.Drawing.Graphics]::FromImage($image)
 
         #Determine Text Properties
@@ -103,11 +118,6 @@ function Get-AxisSnapshot {
         }
 
         # Save the image
-        $NewFileName = $FileName
-        if($FileName.contains('.')) {
-            $NewFileName = $FileName.Remove($FileName.LastIndexOf('.'))
-        }
-        $OutputPath = "$((Resolve-Path $Path).Path)\$($NewFileName)_$($CurrentLens).jpg"
         $image.Save($OutputPath)
 
         # Dispose of objects

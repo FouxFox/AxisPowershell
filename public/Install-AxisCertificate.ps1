@@ -201,33 +201,33 @@ function Install-AxisCertificate {
         Set-AxisWebServerCertificate -Device $Device -Alias $Alias
     }
     if($HttpsOnly) {
-        $ParamSet = @{
-            "System.BoaGroupPolicy.admin" = 'https'
-            "System.BoaGroupPolicy.operator" = 'https'
-            "System.BoaGroupPolicy.viewer" = 'https'
-        }
-        #VERIFIED on Q8641-E / AXIS OS 9.80.146 (2026-11-03): switching the admin policy restarts the web server
-        #mid-request, so the first call can fail with only "admin" applied. Retry once, then read back to decide.
-        $Applied = $false
-        ForEach($Attempt in 1..2) {
+        #VERIFIED on AXIS OS 9.80 / 12.11 / 13.0 (2026-11-03/04): changing the admin policy restarts the web server
+        #mid-request, so operator and viewer are set first, admin last, and the device is polled until it answers again.
+        $Policy = @{}
+        Try { $Policy = Get-AxisParameter -Device $Device -Group System.BoaGroupPolicy } Catch {}
+        $Pending = @("operator","viewer","admin") | Where-Object { $Policy["System.BoaGroupPolicy.$_"] -ne 'https' }
+        ForEach($Role in $Pending) {
             Try {
-                Update-AxisParameter -Device $Device -ParameterSet $ParamSet
-                $Applied = $true
-                break
+                Update-AxisParameter -Device $Device -ParameterSet @{ "System.BoaGroupPolicy.$Role" = 'https' }
             }
             Catch {
-                Write-Verbose "HTTPS-only update attempt $Attempt on $Device failed: $_"
-                Start-Sleep -Seconds 3
+                #The connection drops when the web server restarts; the value is checked below
+                Write-Verbose "HTTPS-only update for '$Role' on $Device returned an error (web server restarting?): $_"
             }
         }
-        if(!$Applied) {
+        $Applied = $false
+        if($Pending.Count -eq 0) { $Applied = $true }
+        ForEach($Attempt in 1..10) {
+            if($Applied) { break }
+            Start-Sleep -Seconds 3
             Try {
-                #Get-AxisParameter returns a hashtable keyed without the "root." prefix
                 $Policy = Get-AxisParameter -Device $Device -Group System.BoaGroupPolicy
-                $Values = @($ParamSet.Keys | ForEach-Object { $Policy[$_] })
-                $Applied = $Values.Count -eq 3 -and @($Values | Where-Object { $_ -ne 'https' }).Count -eq 0
+                $Values = @("admin","operator","viewer" | ForEach-Object { $Policy["System.BoaGroupPolicy.$_"] })
+                $Applied = @($Values | Where-Object { $_ -ne 'https' }).Count -eq 0
             }
-            Catch {}
+            Catch {
+                Write-Verbose "$($Device): not answering yet after HTTPS-only change ($Attempt/10)"
+            }
         }
         if(!$Applied) {
             Throw "Certificate installed, but unable to enable HTTPS-only on $($Device)"

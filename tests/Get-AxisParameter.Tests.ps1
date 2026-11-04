@@ -14,13 +14,30 @@ Describe "Get-AxisParameter" {
             }
         }
 
-        It "Throws an error when unable to fetch parameter" {
-            Mock @m Invoke-AxisWebApi { return 'Error' }
+        It "Parses the root.-prefixed key/value lines into a hashtable" {
+            Mock @m Invoke-AxisWebApi { return "root.System.SerialNumber=ACCC8E000001`nroot.System.Language=English`n" }
+
+            $result = Get-AxisParameter -Device "192.168.0.100" -Group "System"
+
+            $result | Should -BeOfType [Hashtable]
+            $result['System.SerialNumber'] | Should -Be 'ACCC8E000001'
+            $result['System.Language'] | Should -Be 'English'
+            $result.Count | Should -Be 2
+        }
+
+        It "Throws an error when the web request fails" {
+            Mock @m Invoke-AxisWebApi { Throw "connection refused" }
 
             $device = "192.168.0.100"
             $group = "System"
 
-            { Get-AxisParameter -Device $device -Group $group } | Should -Throw "Unable to fetch parameter(s)"
+            { Get-AxisParameter -Device $device -Group $group } | Should -Throw "Unable to fetch parameter(s)*"
+        }
+
+        It "Throws an error when the device answers with a param.cgi error line" {
+            Mock @m Invoke-AxisWebApi { return "# Error: Error -1 getting param in group 'System'" }
+
+            { Get-AxisParameter -Device "192.168.0.100" -Group "System" } | Should -Throw "Unable to fetch parameter(s)*"
         }
     }
 
@@ -40,12 +57,12 @@ Describe "Get-AxisParameter" {
         }
 
         It "Throws an error when unable to fetch parameters" {
-            Mock @m Invoke-AxisWebApi { return 'Error' }
+            Mock @m Invoke-AxisWebApi { Throw "connection refused" }
 
             $device = "192.168.0.100"
             $group = @("System", "Image")
 
-            { Get-AxisParameter -Device $device -Group $group } | Should -Throw "Unable to fetch parameter(s)"
+            { Get-AxisParameter -Device $device -Group $group } | Should -Throw "Unable to fetch parameter(s)*"
         }
     }
 

@@ -10,8 +10,8 @@ It supports both DHCP and static IP configurations.
 Specifies the Hostname or IP address of the Axis device.
 
 .PARAMETER LegacyMethod
-Indicates whether to use the legacy method for setting the DNS resolver configuration. 
-This parameter is only applicable when using DHCP.
+Indicates whether to use the legacy method (Axis parameters) for setting the DNS resolver configuration.
+The legacy method supports at most two DNS servers.
 
 .PARAMETER UseDHCP
 Specifies whether to use DHCP for obtaining the DNS resolver information. 
@@ -37,18 +37,16 @@ function Set-AxisDNSResolver {
     Param(
         [Parameter(ParameterSetName='DHCP', Mandatory)]
         [Parameter(ParameterSetName='Static', Mandatory)]
-        [Parameter(ParameterSetName='StaticLegacy', Mandatory)]
         [String]$Device,
 
         [Parameter(ParameterSetName='DHCP')]
-        [Parameter(ParameterSetName='StaticLegacy')]
+        [Parameter(ParameterSetName='Static')]
         [Switch]$LegacyMethod,
 
         [Parameter(ParameterSetName='DHCP', Mandatory)]
         [Switch]$UseDHCP,
 
         [Parameter(ParameterSetName='Static', Mandatory)]
-        [Parameter(ParameterSetName='StaticLegacy', Mandatory)]
         [String[]]$DNSServers,
 
         [Parameter(ParameterSetName='Static')]
@@ -75,35 +73,39 @@ function Set-AxisDNSResolver {
         }
     }
     else {
-        $IPSubnetInfo = Get-SubnetInformation -IPv4Address $IPAddress -Prefix $PrefixLength
-
         if(!$LegacyMethod) {
             $Param = @{
                 Device = $Device
                 Path = "/axis-cgi/network_settings.cgi"
                 Body = @{
                     apiVersion = "1.0"
-                    method = "setIPv4AddressConfiguration"
+                    method = "setResolverConfiguration"
                     params = @{
                         useDhcpResolverInfo = $false
-                        staticNameServers = $DNSServers
+                        staticNameServers = @($DNSServers)
                     }
                 }
             }
 
             if($SearchDomains) {
-                $Param.Body.params.Add("staticSearchDomains",$SearchDomains)
+                $Param.Body.params.Add("staticSearchDomains",@($SearchDomains))
             }
 
             Invoke-AxisWebApi @Param
         }
         else {
+            #Legacy parameters only support two name servers
             $ParamSet = @{
                 "Network.Resolver.ObtainFromDHCP" = "no"
-                "Network.DNSServer1" = $IPAddress
-                "Network.DNSServer2" = $IPSubnetInfo.SubnetMask
+                "Network.DNSServer1" = $DNSServers[0]
             }
-            Update-AxisParameter -Device $Device -ParameterSet $ParamSet 
+            if($DNSServers.Count -gt 1) {
+                $ParamSet["Network.DNSServer2"] = $DNSServers[1]
+            }
+            if($SearchDomains) {
+                $ParamSet["Network.DomainName"] = $SearchDomains -join ' '
+            }
+            Update-AxisParameter -Device $Device -ParameterSet $ParamSet
         }
     }
 }

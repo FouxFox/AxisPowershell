@@ -49,6 +49,16 @@ function Set-AxisStreamProfile {
     }
 
     if($Description -or $Parameters) {
+        $StreamProfile = @{
+            "name" = $Name
+        }
+        if($Description) {
+            $StreamProfile.Add("description",$Description)
+        }
+        if($Parameters) {
+            $StreamProfile.Add("parameters",$Parameters)
+        }
+
         $Param = @{
             Device = $Device
             Path = "/axis-cgi/streamprofile.cgi"
@@ -57,12 +67,7 @@ function Set-AxisStreamProfile {
                 "apiVersion" = '1.0'
                 "method" = "update"
                 "params" = @{
-                    "streamProfile" = @(@{
-                        "name" = $Name
-                        "description" = $Description
-                        "parameters" = $Parameters
-                    
-                    })
+                    "streamProfile" = @($StreamProfile)
                 }
             }
         }
@@ -72,14 +77,15 @@ function Set-AxisStreamProfile {
         if($result.error) {
             Write-Warning $result.error.message
         }
+    }
 
-        if($NewName) {
-            Try {
-                $StreamProfile = Get-AxisRecordingProfile -Device $Device -Name $Name
-                Remove-AxisRecordingProfile -Device $Device -Name $Name
-                New-AxisRecordingProfile -Device $Device -Name $NewName -Description $StreamProfile.Description -Parameters $StreamProfile.Parameters
-            }
-            Catch {}
+    #The stream profile API has no rename method, so recreate the profile under the new name
+    if($NewName) {
+        $Existing = Get-AxisStreamProfile -Device $Device -Name $Name
+        if(!$Existing) {
+            Throw "Stream profile '$Name' not found"
         }
+        Remove-AxisStreamProfile -Device $Device -Name $Name
+        New-AxisStreamProfile -Device $Device -Name $NewName -Description $Existing.description -Parameters $Existing.parameters
     }
 }

@@ -13,8 +13,9 @@ function Resolve-AxisCertificateAuthority {
         [String]$Name
     )
 
-    if(!$Name) {
-        $Name = $Config.Certificate.DefaultAuthority
+    #DefaultAuthority is $false when unset; [String]$false would become "False"
+    if(!$Name -and $Config.Certificate.DefaultAuthority) {
+        $Name = [String]$Config.Certificate.DefaultAuthority
     }
 
     if(!$Name) {

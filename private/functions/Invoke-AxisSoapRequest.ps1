@@ -28,7 +28,10 @@ function Invoke-AxisSoapRequest {
         [String]$Body,
 
         [Parameter()]
-        [Hashtable]$Namespaces=@{}
+        [Hashtable]$Namespaces=@{},
+
+        [Parameter(DontShow)]
+        [Switch]$Retried
     )
 
     $DefaultNamespaces = @{
@@ -88,7 +91,20 @@ function Invoke-AxisSoapRequest {
         [xml]$Xml = $Content
     }
     Catch {
-        Throw "Device returned a non-XML response to the SOAP request."
+        #Seen once on AXIS OS 9.80 right after a web server restart: an empty/HTML body. Retry the request once.
+        if(!$Retried) {
+            Write-Verbose "Non-XML SOAP response from $Device; retrying once in 2 seconds"
+            Start-Sleep -Seconds 2
+            Try {
+                return Invoke-AxisSoapRequest -Device $Device -Body $Body -Namespaces $Namespaces -Retried
+            }
+            Catch {
+                Throw $_
+            }
+        }
+        $Snippet = ""
+        if($Content) { $Snippet = " (" + ($Content.Substring(0, [Math]::Min(120, $Content.Length)) -replace '\s+', ' ') + ")" }
+        Throw "Device returned a non-XML response to the SOAP request$Snippet"
     }
 
     #Elements are namespace-prefixed (SOAP-ENV:Fault), so match on local name + namespace

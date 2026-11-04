@@ -14,6 +14,7 @@
         'Enable-AxisDNSUpdate'
         'Export-AxisRecording'
         'Format-AxisSDCard'
+        'Get-AxisACAP'
         'Get-AxisAction'
         'Get-AxisCertificate'
         'Get-AxisCertificateEnrollment'
@@ -91,7 +92,7 @@
         @{ModuleName='PSLANSCAN'; ModuleVersion='1.2.0'}
     )
     HelpInfoURI = ''
-    ModuleVersion = '1.2.0'
+    ModuleVersion = '1.2.1'
     PrivateData = @{
         PSData = @{
             Tags = @(
@@ -100,6 +101,16 @@
             )
             IsPrerelease = $false
             ReleaseNotes = @'
+## 1.2.1
+    * Test coverage for every public cmdlet (86 test files, 579 tests) on Windows PowerShell 5.1 and PowerShell 7.
+    * Binding a certificate to the web server no longer switches the admin role to HTTPS-only (connection policy is preserved; enum is Http/Https/HttpAndHttps).
+    * HTTPS-only is applied role by role (operator, viewer, then admin) and verified after the web server restart.
+    * Invoke-AxisWebApi retries connection-level failures (web server restarts), reports HTTP 401 clearly, and TLS verification waits up to 45 s.
+    * Fixed: password truncated to one character on PowerShell 7 (PtrToStringAuto -> PtrToStringBSTR) in provisioning and firmware upload.
+    * Fixed: Get-AxisAction now uses the SOAP helper (works on PowerShell 7), Get-AxisRecording timestamps (24-hour clock, UTC suffix), Get-AxisStreamProfile -Name, Get-AxisSupportedResolutions on 5.1, Get-AxisSnapshot without System.Drawing, Get-AxisStreamStatus on firmware without the API.
+    * Fixed: Remove-AxisUserAccount name, Reset-AxisDevice parameters, Update-AxisDevice wait loops, Export-AxisRecording parameters, user account URL encoding, Set-AxisDSCP, Set-AxisDNSResolver, Set-AxisStreamProfile, Set-AxisNTPClient, Optimize-AxisRecordingProfiles.
+    * Fixed: Set-/Remove-AxisPSRecordingParams not persisting, Resolve-AxisCertificateAuthority default handling, Get-AxisCertificateSubject SAN for hostless devices, Get-AxisDate hard-coded address, Get-AxisACAP export.
+    * Removed dead Set-AxisIPAddress.ps1 (alias of Set-AxisIPv4Address remains).
 ## 1.2.0
     * Added Get-AxisCertificate, New-AxisCertificateRequest, Install-AxisCertificate and Remove-AxisCertificate (JSON certificate API on AXIS OS 11.6+, SOAP fallback on older firmware)
     * Added Get-AxisCertificateSubject for template-based subject/SAN generation

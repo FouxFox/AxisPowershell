@@ -32,6 +32,11 @@ function Get-AxisParameter {
     Try{
         $result = Invoke-AxisWebApi @Param
     } Catch {
+        Throw "Unable to fetch parameter(s): $($_.Exception.Message)"
+    }
+
+    # param.cgi answers HTTP 200 with a "# Error: ..." line when the group does not exist
+    if($null -eq $result -or "$result".TrimStart().StartsWith('# Error')) {
         Throw "Unable to fetch parameter(s)"
     }
 

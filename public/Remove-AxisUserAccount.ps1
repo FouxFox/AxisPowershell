@@ -1,5 +1,20 @@
+<#
+.SYNOPSIS
+Removes a user account from an Axis device.
 
-function Set-AxisUserAccount {
+.DESCRIPTION
+The Remove-AxisUserAccount function removes the specified user account from an Axis device.
+
+.PARAMETER Device
+The hostname or IP address of the Axis device.
+
+.PARAMETER User
+The username of the account to remove.
+
+.EXAMPLE
+Remove-AxisUserAccount -Device "192.168.0.100" -User "olduser"
+#>
+function Remove-AxisUserAccount {
     [cmdletbinding()]
     Param(
         [Parameter(Mandatory)]

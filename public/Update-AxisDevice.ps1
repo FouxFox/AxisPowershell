@@ -42,6 +42,9 @@ function Update-AxisDevice {
 
     $DeviceInfo = Get-AxisDeviceInfo -Device $Device
     $FirmwareFile = Get-ChildItem -Path $FirmwareFolder -Filter "$($DeviceInfo.ProdNbr)*.bin" | Select-Object -First 1
+    if(!$FirmwareFile) {
+        Throw "No firmware file found for $($DeviceInfo.ProdNbr) in $FirmwareFolder"
+    }
     $FrimwareFileName = $FirmwareFile.BaseName
 
     #Check Firmware Versions
@@ -107,9 +110,8 @@ function Update-AxisDevice {
         Try {
             $DeviceStatus = (Get-AxisDeviceStatus -Device $Device -TimeoutSec 1).Status
             $DeviceUp = ($DeviceStatus -eq "Ready") -or ($DeviceStatus -eq "Needs Setup")
-        } Catch {
-            $count++
-        }
+        } Catch {}
+        $count++
     }
 
     if(!$DeviceUp) {

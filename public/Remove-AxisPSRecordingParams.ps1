@@ -26,6 +26,7 @@ function Remove-AxisPSRecordingParams {
 
     if($Config.RecordingParams.ContainsKey($Model)) {
         $Config.RecordingParams.Remove($Model)
+        Write-ModuleConfiguration
         return
     }
 

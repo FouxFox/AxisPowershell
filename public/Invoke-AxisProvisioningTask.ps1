@@ -64,7 +64,9 @@ function Invoke-AxisProvisioningTask {
 
     #Get Plaintext password for use in provisioning
     $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Config.Credential.Password)
-    $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+    #PtrToStringAuto reads a BSTR as UTF-8 on PowerShell 7 for Linux/macOS and returns only the first character;
+    #PtrToStringBSTR is correct on every platform and on Windows PowerShell 5.1
+    $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($BSTR)
     [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
 
     ##############################

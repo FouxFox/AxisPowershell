@@ -44,8 +44,7 @@ function Set-AxisPSRecordingParams {
     $Model = $ProdNbr.Split('-')[0]
 
     if($Default) {
-        $Config.RecordingParams.Default = $Parameters
-        return
+        $Model = "Default"
     }
 
     if(!$Config.RecordingParams.ContainsKey($Model)) {

@@ -38,7 +38,10 @@ function New-AxisRecordingProfile {
     $disks = Get-AxisSDCardStatus -Device $Device
     $profiles = Get-AxisRecordingProfile -Device $Device | ? { $_.Status -eq 'OK'}
 
-    if($disks.Status -ne 'OK' -and $disks.Status -ne 'connected') {
+    # Every disk must be usable. A plain "$disks.Status -ne 'OK'" comparison filters an
+    # array instead of testing it, so a mix of 'OK' and 'connected' disks would wrongly throw.
+    $BadDisks = @($disks | Where-Object { $_.Status -ne 'OK' -and $_.Status -ne 'connected' })
+    if($BadDisks.Count -gt 0 -or ($disks | Measure-Object).Count -eq 0) {
         Throw "SD Card is not in a valid state"
     }
     $diskCount = ($disks | Measure-Object).count
@@ -50,14 +53,15 @@ function New-AxisRecordingProfile {
         $LensList = 1..(Get-AxisRecordingSupport -Device $Device).NumberofLenses
     }
 
-    $URIString = '?'
-
     ForEach ($CurrentLens in $LensList) {
         #Check if there is an operational profile
         if($profiles.Lens -contains $CurrentLens) {
             Write-Warning "Lens $($CurrentLens): A recording profile already exists"
             continue
         }
+
+        #Build a fresh query string for every lens
+        $URIString = '?'
 
         #Set proper SD Card
         #It is assumed only 2 SD cards will ever be in an Axis Camera

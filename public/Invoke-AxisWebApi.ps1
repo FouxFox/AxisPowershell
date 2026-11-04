@@ -156,23 +156,12 @@ function Invoke-AxisWebApi {
 
     $ConnectionError = $false
     $Connected = $false
-    Try {
-        if($WebRequest) {
-            $response = Invoke-WebRequest @Param
-        }
-        else {
-            $response = Invoke-RestMethod @Param
-        }
-        $Connected = $true
-    }
-    Catch {
-        Write-Verbose "Failed to connect to $Device using HTTPS, trying HTTP"
-    }
-
-    if(!$Connected) {
+    #Connection-level failures (device rebooting its web server after a certificate or policy change, brief network
+    #blips) are retried a few times; HTTP status errors are not.
+    $MaxAttempts = 4
+    For($Attempt = 1; $Attempt -le $MaxAttempts -and !$Connected; $Attempt++) {
+        $Param.Uri = "$baseUrl$Path"
         Try {
-            #If HTTPS call fails, try HTTP
-            $Param.Uri = "http://$Device$($Path)"
             if($WebRequest) {
                 $response = Invoke-WebRequest @Param
             }
@@ -182,12 +171,43 @@ function Invoke-AxisWebApi {
             $Connected = $true
         }
         Catch {
-            Write-Verbose "Failed to connect to $Device using HTTP"
             $ConnectionError = $_
+            Write-Verbose "Failed to connect to $Device using HTTPS, trying HTTP"
+        }
+
+        if(!$Connected) {
+            Try {
+                #If HTTPS call fails, try HTTP
+                $Param.Uri = "http://$Device$($Path)"
+                if($WebRequest) {
+                    $response = Invoke-WebRequest @Param
+                }
+                else {
+                    $response = Invoke-RestMethod @Param
+                }
+                $Connected = $true
+            }
+            Catch {
+                Write-Verbose "Failed to connect to $Device using HTTP"
+                #Keep the HTTPS error when the HTTP attempt only failed because the port does not speak HTTP
+                if($_.Exception.Response) { $ConnectionError = $_ }
+            }
+        }
+
+        if(!$Connected) {
+            #An HTTP status error carries a response; a connection failure does not
+            if($ConnectionError.Exception.Response) { break }
+            if($Attempt -lt $MaxAttempts) {
+                Write-Verbose "No connection to $Device (attempt $Attempt/$MaxAttempts); retrying in 3 seconds"
+                Start-Sleep -Seconds 3
+            }
         }
     }
 
     if(!$Connected) {
+        if($ConnectionError.Exception.Response -and [int]$ConnectionError.Exception.Response.StatusCode -eq 401) {
+            Throw "Authentication failed on $Device (HTTP 401): check the credential set with Set-AxisCredential"
+        }
         Throw $ConnectionError
     }
 

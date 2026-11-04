@@ -142,6 +142,10 @@ function Get-AxisCertificateSubject {
             Write-Verbose "Skipping SAN template '$Template': resolved to '$Entry'"
             continue
         }
+        if($Entry -match '^DNS:(\d{1,3}(\.\d{1,3}){3})$') {
+            #A DNS name that resolved to a bare IP (device without hostname) is only valid as an IP SAN
+            $Entry = "IP:$($Matches[1])"
+        }
         if($Entry -like "IP:*" -and !$IncludeIP) {
             continue
         }
